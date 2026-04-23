@@ -1,0 +1,23 @@
+{
+  "name": "atravel-a",
+  "version": "1.0.0",
+  "description": "Migracion completa de ATRAVEL Laravel a Astro con backend nativo",
+  "main": "astro.config.mjs",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "dependencies": {
+    "@astrojs/node": "^9.5.1",
+    "astro": "^5.17.3"
+  },
+  "devDependencies": {
+    "sass": "^1.93.2"
+  }
+}

@@ -1,0 +1,402 @@
+/* ═════════════════════════════════════════════════════════════════════════════ */
+/* PÁGINA TOURS AT - RECORRIDOS TURÍSTICOS                                      */
+/* ═════════════════════════════════════════════════════════════════════════════ */
+
+// ─────────────────────────────────────────────────────────────────────────────
+// SECTION TITLE - Títulos de sección reutilizable
+// ─────────────────────────────────────────────────────────────────────────────
+
+.section-title {
+    font-size: $fs-5xl;
+    font-weight: $fw-800;
+    color: $text-dark;
+    text-align: center;
+    margin: 40px 0 30px 0;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// FILTERS SECTION - Sistema de filtrado de tours
+// ─────────────────────────────────────────────────────────────────────────────
+
+.filters-section {
+    margin-bottom: 40px;
+}
+
+.filters-section .filter-select {
+    width: 100%;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// TOURS GRID - Grid de tours con tarjetas
+// ─────────────────────────────────────────────────────────────────────────────
+
+.tours-section {
+    margin: 60px 0 40px 0;
+    padding: 2rem;
+}
+
+.tours-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 24px;
+    margin-top: 40px;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// TOUR CARD - Tarjeta individual de tour
+// ─────────────────────────────────────────────────────────────────────────────
+
+.tour-card {
+    position: relative;
+    background: linear-gradient(145deg, rgba(255, 255, 255, 0.82) 0%, rgba(255, 255, 255, 0.62) 50%, rgba(233, 244, 255, 0.68) 100%);
+    border-radius: $radius-lg;
+    overflow: hidden;
+    box-shadow: 0 18px 36px rgba(7, 14, 33, 0.18), inset 0 1px 1px rgba(255, 255, 255, 0.82);
+    border: 1px solid rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(16px) saturate(140%);
+    -webkit-backdrop-filter: blur(16px) saturate(140%);
+    transition: all 0.3s;
+    display: flex;
+    flex-direction: column;
+
+    &::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -35%;
+        width: 70%;
+        height: 100%;
+        background: linear-gradient(100deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.36) 50%, rgba(255, 255, 255, 0) 100%);
+        pointer-events: none;
+    }
+
+    &:hover {
+        transform: translateY(-8px);
+        background: linear-gradient(145deg, rgba(255, 255, 255, 0.9) 0%, rgba(242, 248, 255, 0.78) 100%);
+        border-color: rgba(255, 255, 255, 1);
+        box-shadow: 0 22px 38px rgba(7, 14, 33, 0.22), inset 0 1px 1px rgba(255, 255, 255, 0.9);
+    }
+}
+
+.tour-image {
+    position: relative;
+    width: 100%;
+    height: 200px;
+    overflow: hidden;
+    background: $gradient-primary;
+
+    img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.3s;
+    }
+
+    .tour-card:hover & img {
+        transform: scale(1.05);
+    }
+}
+
+.tour-badge {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    padding: 6px 12px;
+    border-radius: $radius-sm;
+    font-size: $fs-xs;
+    font-weight: $fw-700;
+    background: $bg-white;
+    color: $text-dark;
+}
+
+.tour-badge-popular {
+    background: $warning;
+    color: $text-white;
+}
+
+.tour-badge-new {
+    background: $success;
+    color: $text-white;
+}
+
+.tour-badge-top {
+    background: $danger;
+    color: $text-white;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// TOUR CONTENT - Contenido interno de tarjeta
+// ─────────────────────────────────────────────────────────────────────────────
+
+.tour-content {
+    padding: $spacing-xl;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.52) 0%, rgba(244, 250, 255, 0.72) 100%);
+}
+
+.tour-title {
+    font-size: $fs-xl;
+    font-weight: $fw-800;
+    color: #0f172a;
+    margin-bottom: $spacing-md;
+}
+
+.tour-meta {
+    display: flex;
+    gap: $spacing-lg;
+    margin-bottom: $spacing-lg;
+    font-size: $fs-sm;
+}
+
+.tour-duration {
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
+    color: #334155;
+}
+
+.tour-difficulty {
+    padding: 4px 8px;
+    border-radius: $radius-sm;
+    font-weight: $fw-700;
+    font-size: $fs-xs;
+}
+
+.difficulty-facil {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.difficulty-moderado {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.difficulty-dificil {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.difficulty-extremo {
+    background: #e0e7ff;
+    color: #312e81;
+}
+
+.tour-description {
+    font-size: $fs-sm;
+    color: #1e293b;
+    margin-bottom: $spacing-lg;
+    line-height: $lh-relaxed;
+}
+
+.tour-features {
+    display: flex;
+    flex-wrap: wrap;
+    gap: $spacing-sm;
+    margin-bottom: $spacing-lg;
+}
+
+.feature-tag {
+    display: inline-block;
+    padding: 4px 10px;
+    background: rgba(255, 255, 255, 0.78);
+    border: 1px solid rgba(203, 213, 225, 0.9);
+    border-radius: $radius-sm;
+    font-size: $fs-xs;
+    color: #0f172a;
+    font-weight: $fw-600;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// TOUR FOOTER - Precio y botón de reserva
+// ─────────────────────────────────────────────────────────────────────────────
+
+.tour-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: $spacing-lg;
+    border-top: 1px solid rgba(148, 163, 184, 0.4);
+    margin-top: auto;
+}
+
+.tour-price {
+    display: flex;
+    flex-direction: column;
+}
+
+.price-label {
+    font-size: $fs-xs;
+    color: #475569;
+    font-weight: $fw-600;
+}
+
+.price-value {
+    font-size: $fs-2xl;
+    font-weight: $fw-800;
+    color: #5b21b6;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// WHY CHOOSE SECTION - Por qué elegir Tours AT
+// ─────────────────────────────────────────────────────────────────────────────
+
+.why-choose-section {
+    margin: 60px 0 40px 0;
+    padding: 2rem;
+}
+
+.why-choose-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 24px;
+    margin-top: 40px;
+}
+
+.why-choose-card {
+    background: $bg-white;
+    border-radius: $radius-lg;
+    padding: $spacing-3xl;
+    text-align: center;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s;
+    border: 2px solid transparent;
+
+    &:hover {
+        border-color: $primary;
+        transform: translateY(-4px);
+    }
+}
+
+.why-choose-icon {
+    font-size: 48px;
+    color: $primary;
+    margin-bottom: $spacing-lg;
+}
+
+.why-choose-title {
+    font-size: $fs-xl;
+    font-weight: $fw-800;
+    color: $text-dark;
+    margin-bottom: $spacing-md;
+}
+
+.why-choose-text {
+    font-size: $fs-sm;
+    color: $text-gray;
+    line-height: $lh-relaxed;
+}
+
+// Responsive
+@media (max-width: 768px) {
+    .section-title {
+        font-size: $fs-3xl;
+        margin: 30px 0 20px 0;
+    }
+
+    .filters-container {
+        grid-template-columns: 1fr;
+        gap: $spacing-lg;
+        align-items: stretch;
+    }
+
+    .filter-select {
+        width: 100%;
+    }
+
+    .tours-grid {
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 20px;
+    }
+
+    .tour-image {
+        height: 180px;
+    }
+
+    .tour-content {
+        padding: $spacing-lg;
+    }
+
+    .tour-title {
+        font-size: $fs-lg;
+    }
+
+    .why-choose-grid {
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    }
+
+    .why-choose-card {
+        padding: $spacing-2xl;
+    }
+
+    .why-choose-icon {
+        font-size: 40px;
+    }
+}
+
+@media (max-width: 480px) {
+    .section-title {
+        font-size: $fs-2xl;
+        margin: 20px 0 15px 0;
+    }
+
+    .filters-container {
+        grid-template-columns: 1fr;
+        gap: $spacing-md;
+    }
+
+    .tours-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+
+    .tour-image {
+        height: 160px;
+    }
+
+    .tour-content {
+        padding: $spacing-md;
+    }
+
+    .tour-title {
+        font-size: $fs-base;
+        margin-bottom: $spacing-sm;
+    }
+
+    .tour-meta {
+        gap: $spacing-md;
+        font-size: $fs-xs;
+        margin-bottom: $spacing-md;
+    }
+
+    .tour-footer {
+        flex-direction: column;
+        gap: $spacing-sm;
+        align-items: flex-start;
+    }
+
+    .why-choose-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .why-choose-card {
+        padding: $spacing-lg;
+    }
+
+    .why-choose-icon {
+        font-size: 36px;
+        margin-bottom: $spacing-md;
+    }
+
+    .why-choose-title {
+        font-size: $fs-base;
+    }
+
+    .why-choose-text {
+        font-size: $fs-xs;
+    }
+}
+
+

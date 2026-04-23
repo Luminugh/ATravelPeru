@@ -1,0 +1,40 @@
+/* ═════════════════════════════════════════════════════════════════════════════ */
+/* ATRAVEL - MAIN SCSS FILE                                                    */
+/* ═════════════════════════════════════════════════════════════════════════════ */
+/* Importa todos los archivos Scss en orden lógico                              */
+/* ═════════════════════════════════════════════════════════════════════════════ */
+
+// 1. Variables
+@import 'variables/colors';
+@import 'variables/typography';
+@import 'variables/spacing';
+
+// 2. Base
+@import 'base/reset';
+
+// 3. Layout
+@import 'layout/header';
+@import 'layout/footer';
+@import 'layout/modals';
+
+// 4. Components
+@import 'components/hero';
+@import 'components/forms';
+@import 'components/buttons';
+@import 'components/features';
+@import 'components/tours';
+@import 'components/notification';
+
+// 5. Pages
+@import 'pages/_shared';
+@import 'pages/pages';
+@import 'pages/tours-at';
+@import 'pages/vuelos';
+@import 'pages/hoteles';
+@import 'pages/paquetes';
+@import 'pages/ofertas';
+@import 'pages/ayuda';
+
+/* ═════════════════════════════════════════════════════════════════════════════ */
+/* END OF IMPORTS                                                               */
+/* ═════════════════════════════════════════════════════════════════════════════ */

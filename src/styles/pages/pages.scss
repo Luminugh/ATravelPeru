@@ -1,0 +1,111 @@
+/* ═════════════════════════════════════════════════════════════════════════════ */
+/* PÁGINA PRINCIPAL - PACKAGES / HOME                                           */
+/* ═════════════════════════════════════════════════════════════════════════════ */
+
+// ─────────────────────────────────────────────────────────────────────────────
+// FEATURES SECTION - Características principales de ATRAVEL
+// ─────────────────────────────────────────────────────────────────────────────
+
+.features-section {
+    background: $bg-white;
+    border-radius: $radius-lg;
+    padding: 50px 40px;
+    margin-top: 60px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.features-title {
+    font-size: $fs-5xl;
+    font-weight: $fw-900;
+    text-align: center;
+    margin-bottom: 40px;
+    color: $primary;
+}
+
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 25px;
+}
+
+.feature-card {
+    text-align: center;
+    transition: all 0.3s;
+
+    &:hover {
+        transform: translateY(-4px);
+    }
+}
+
+.feature-card-icon {
+    font-size: 42px;
+    margin-bottom: 16px;
+    color: $primary;
+    display: inline-block;
+}
+
+.feature-heading {
+    font-size: $fs-lg;
+    font-weight: $fw-800;
+    margin-bottom: 8px;
+    color: $text-dark;
+}
+
+.feature-text {
+    font-size: $fs-sm;
+    color: $text-gray;
+    line-height: $lh-relaxed;
+}
+
+// Responsive
+@media (max-width: 768px) {
+    .features-section {
+        padding: 40px 20px;
+        margin-top: 40px;
+    }
+
+    .features-title {
+        font-size: $fs-3xl;
+        margin-bottom: 30px;
+    }
+
+    .features-grid {
+        gap: 15px;
+    }
+
+    .feature-card-icon {
+        font-size: 32px;
+        margin-bottom: 12px;
+    }
+
+    .feature-heading {
+        font-size: $fs-base;
+    }
+
+    .feature-text {
+        font-size: $fs-xs;
+    }
+}
+
+@media (max-width: 480px) {
+    .features-section {
+        padding: 30px 15px;
+        margin-top: 30px;
+    }
+
+    .features-title {
+        font-size: $fs-2xl;
+        margin-bottom: 20px;
+    }
+
+    .features-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    .feature-card-icon {
+        font-size: 28px;
+    }
+}
+
+

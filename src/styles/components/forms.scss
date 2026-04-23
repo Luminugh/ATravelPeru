@@ -1,0 +1,79 @@
+/* ═════════════════════════════════════════════════════════════════════════════ */
+/* FORMS - FORMULARIOS                                                          */
+/* ═════════════════════════════════════════════════════════════════════════════ */
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: $spacing-lg;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-sm;
+}
+
+.form-group label {
+    font-size: $fs-sm;
+    font-weight: $fw-700;
+    color: $text-white-95;
+    text-transform: capitalize;
+}
+
+.form-group input {
+    padding: $spacing-md 12px;
+    background: rgba(255, 255, 255, 1);
+    border: 1.5px solid $border-primary;
+    border-radius: 10px;
+    font-size: $fs-base;
+    transition: all 0.3s;
+    font-family: inherit;
+    color: #0a0e27;
+
+    &:focus {
+        outline: none;
+        border-color: $primary;
+        background: rgba(255, 255, 255, 1);
+        box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.3), inset 0 0 0 1px rgba(139, 92, 246, 0.2);
+    }
+}
+
+.password-input-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 100%;
+
+    input {
+        width: 100%;
+        padding-right: 50px;
+    }
+}
+
+.password-toggle {
+    position: absolute;
+    right: 10px;
+    background: none;
+    border: none;
+    color: #4b5563;
+    cursor: pointer;
+    padding: 5px;
+    transition: color 0.3s;
+
+    &:hover {
+        color: $primary;
+    }
+}
+
+.forgot-password-link {
+    color: $primary-dark;
+    text-decoration: none;
+    font-size: $fs-base;
+    font-weight: $fw-600;
+    transition: color 0.3s;
+
+    &:hover {
+        text-decoration: underline;
+    }
+}

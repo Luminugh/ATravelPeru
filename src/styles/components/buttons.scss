@@ -1,0 +1,159 @@
+/* ═════════════════════════════════════════════════════════════════════════════ */
+/* BUTTONS - BOTONES                                                            */
+/* ═════════════════════════════════════════════════════════════════════════════ */
+
+.btn-hero-primary {
+    background: $gradient-primary;
+    color: $text-white;
+    border: none;
+    padding: 16px 40px;
+    border-radius: $radius-full;
+    font-size: $fs-lg;
+    font-weight: $fw-700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 8px 25px rgba(139, 92, 246, 0.4);
+    letter-spacing: 0.5px;
+
+    &:hover {
+        background: $gradient-primary-hover;
+        transform: translateY(-2px);
+        box-shadow: 0 12px 35px rgba(139, 92, 246, 0.6);
+    }
+}
+
+.btn-hero-secondary {
+    background: rgba(255, 255, 255, 0.15);
+    color: $text-white;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    padding: 14px 38px;
+    border-radius: $radius-full;
+    font-size: $fs-lg;
+    font-weight: $fw-700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+    letter-spacing: 0.5px;
+
+    &:hover {
+        background: rgba(255, 255, 255, 0.2);
+        border-color: rgba(255, 255, 255, 0.5);
+        transform: translateY(-2px);
+    }
+}
+
+.btn-modal-submit {
+    padding: $spacing-md 20px;
+    background: $gradient-primary;
+    color: $text-white;
+    border: none;
+    border-radius: $radius;
+    font-size: $fs-lg;
+    font-weight: $fw-700;
+    cursor: pointer;
+    transition: all 0.3s;
+    margin-top: 3px;
+
+    &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4);
+    }
+}
+
+.btn-google {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: $spacing-md;
+    background: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: $text-white;
+    padding: 9px 14px;
+    border-radius: $radius-md;
+    font-size: $fs-base;
+    font-weight: $fw-600;
+    cursor: pointer;
+    transition: all 0.3s;
+
+    &:hover {
+        background: rgba(255, 255, 255, 0.3);
+        border-color: rgba(255, 255, 255, 0.5);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    i {
+        font-size: $fs-lg;
+    }
+}
+
+.btn-filter-search {
+    padding: $spacing-md 24px;
+    background: $gradient-primary;
+    color: $text-white;
+    border: none;
+    border-radius: $radius-md;
+    font-weight: $fw-700;
+    cursor: pointer;
+    transition: all 0.3s;
+
+    &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 16px rgba(139, 92, 246, 0.3);
+    }
+}
+
+.btn-tour-reserve {
+    padding: 8px 16px;
+    background: $gradient-primary;
+    color: $text-white;
+    border: none;
+    border-radius: $radius;
+    font-weight: $fw-700;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-size: $fs-sm;
+
+    &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+    }
+}
+
+.btn-cta-primary {
+    padding: 14px 32px;
+    background: $text-white;
+    color: $primary;
+    border: 2px solid $text-white;
+    border-radius: $radius-md;
+    font-weight: $fw-800;
+    font-size: $fs-lg;
+    cursor: pointer;
+    transition: all 0.3s;
+
+    &:hover {
+        background: transparent;
+        color: $text-white;
+        border-color: $text-white;
+        transform: translateY(-2px);
+    }
+}
+
+.modal-footer-text {
+    text-align: center;
+    font-size: $fs-sm;
+    color: $text-white-95;
+    margin-top: 8px;
+
+    a {
+        color: $primary;
+        text-decoration: none;
+        font-weight: $fw-700;
+        transition: color 0.3s;
+
+        &:hover {
+            color: $primary-dark;
+        }
+    }
+}

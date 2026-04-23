@@ -1,0 +1,204 @@
+<script>
+  function openLoginModal() {
+    document.getElementById("loginModal").style.display = "flex";
+    closeRegisterModal();
+  }
+
+  function closeLoginModal() {
+    document.getElementById("loginModal").style.display = "none";
+  }
+
+  function openRegisterModal() {
+    document.getElementById("registerModal").style.display = "flex";
+    closeLoginModal();
+  }
+
+  function closeRegisterModal() {
+    document.getElementById("registerModal").style.display = "none";
+  }
+
+  function closeForgotPasswordModal() {
+    document.getElementById("forgotPasswordModal").style.display = "none";
+  }
+
+  function openForgotPasswordModal(e) {
+    e.preventDefault();
+    closeLoginModal();
+    document.getElementById("forgotPasswordModal").style.display = "flex";
+  }
+
+  function switchToLogin(e) {
+    e.preventDefault();
+    closeRegisterModal();
+    closeForgotPasswordModal();
+    openLoginModal();
+  }
+
+  function switchToRegister(e) {
+    e.preventDefault();
+    closeLoginModal();
+    closeForgotPasswordModal();
+    openRegisterModal();
+  }
+
+  function togglePasswordVisibility(inputId) {
+    const input = document.getElementById(inputId);
+    const icon = document.getElementById(inputId + "-icon");
+
+    if (input.type === "password") {
+      input.type = "text";
+      icon.className = "fas fa-eye-slash";
+    } else {
+      input.type = "password";
+      icon.className = "fas fa-eye";
+    }
+  }
+
+  function showNotification(message, type = "info") {
+    const notification = document.getElementById("notification");
+    const notificationText = document.getElementById("notificationText");
+    notificationText.textContent = message;
+    notification.dataset.type = type;
+    notification.classList.add("show");
+
+    if (notification.timeoutId) {
+      clearTimeout(notification.timeoutId);
+    }
+
+    notification.timeoutId = setTimeout(() => {
+      notification.classList.remove("show");
+    }, 4000);
+  }
+
+  function closeNotification() {
+    const notification = document.getElementById("notification");
+    notification.classList.remove("show");
+    if (notification.timeoutId) {
+      clearTimeout(notification.timeoutId);
+    }
+  }
+
+  function loginWithGoogle() {
+    showNotification("Redirigiendo a Google...");
+  }
+
+  function registerWithGoogle() {
+    showNotification("Redirigiendo a Google...");
+  }
+
+  function checkLoginBeforeCart() {
+    showNotification("Por favor inicia sesion para acceder al carrito", "warning");
+    setTimeout(() => {
+      openLoginModal();
+    }, 1000);
+  }
+
+  function closeModalOnOutsideClick(modalId, closeFn) {
+    const modal = document.getElementById(modalId);
+    if (!modal) {
+      return;
+    }
+    modal.addEventListener("click", function (e) {
+      if (e.target === this) {
+        closeFn();
+      }
+    });
+  }
+
+  closeModalOnOutsideClick("loginModal", closeLoginModal);
+  closeModalOnOutsideClick("registerModal", closeRegisterModal);
+  closeModalOnOutsideClick("forgotPasswordModal", closeForgotPasswordModal);
+
+  function toggleMobileMenu() {
+    const mobileMenu = document.getElementById("mobile-menu");
+    if (!mobileMenu) {
+      return;
+    }
+    mobileMenu.style.display = mobileMenu.style.display === "block" ? "none" : "block";
+  }
+
+  document.addEventListener("click", function (e) {
+    const mobileMenu = document.getElementById("mobile-menu");
+    const hamburger = document.querySelector(".hamburger-menu");
+
+    if (!mobileMenu || !hamburger) {
+      return;
+    }
+
+    if (!mobileMenu.contains(e.target) && !hamburger.contains(e.target)) {
+      mobileMenu.style.display = "none";
+    }
+  });
+
+  async function postJson(url, data) {
+    const response = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(data)
+    });
+
+    const result = await response.json();
+    if (!response.ok) {
+      throw new Error(result.message || "Operacion no completada");
+    }
+
+    return result;
+  }
+
+  document.getElementById("loginForm")?.addEventListener("submit", async function (e) {
+    e.preventDefault();
+    const data = Object.fromEntries(new FormData(this).entries());
+    try {
+      const result = await postJson("/api/auth/login", data);
+      showNotification(result.message, "success");
+      closeLoginModal();
+      this.reset();
+    } catch (error) {
+      showNotification(error.message, "error");
+    }
+  });
+
+  document.getElementById("registerForm")?.addEventListener("submit", async function (e) {
+    e.preventDefault();
+    const data = Object.fromEntries(new FormData(this).entries());
+    try {
+      const result = await postJson("/api/auth/register", data);
+      showNotification(result.message, "success");
+      closeRegisterModal();
+      this.reset();
+    } catch (error) {
+      showNotification(error.message, "error");
+    }
+  });
+
+  document.getElementById("forgotPasswordForm")?.addEventListener("submit", async function (e) {
+    e.preventDefault();
+    const data = Object.fromEntries(new FormData(this).entries());
+    try {
+      const result = await postJson("/api/auth/forgot-password", data);
+      showNotification(result.message, "success");
+      closeForgotPasswordModal();
+      this.reset();
+    } catch (error) {
+      showNotification(error.message, "error");
+    }
+  });
+
+  window.openLoginModal = openLoginModal;
+  window.closeLoginModal = closeLoginModal;
+  window.openRegisterModal = openRegisterModal;
+  window.closeRegisterModal = closeRegisterModal;
+  window.closeForgotPasswordModal = closeForgotPasswordModal;
+  window.openForgotPasswordModal = openForgotPasswordModal;
+  window.switchToLogin = switchToLogin;
+  window.switchToRegister = switchToRegister;
+  window.togglePasswordVisibility = togglePasswordVisibility;
+  window.showNotification = showNotification;
+  window.closeNotification = closeNotification;
+  window.loginWithGoogle = loginWithGoogle;
+  window.registerWithGoogle = registerWithGoogle;
+  window.checkLoginBeforeCart = checkLoginBeforeCart;
+  window.toggleMobileMenu = toggleMobileMenu;
+</script>

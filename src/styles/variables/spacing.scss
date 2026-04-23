@@ -1,0 +1,32 @@
+/* ═════════════════════════════════════════════════════════════════════════════ */
+/* SPACING - VARIABLES DE ESPACIADO                                             */
+/* ═════════════════════════════════════════════════════════════════════════════ */
+
+$spacing-xs: 4px;
+$spacing-sm: 6px;
+$spacing: 8px;
+$spacing-md: 10px;
+$spacing-lg: 12px;
+$spacing-xl: 16px;
+$spacing-2xl: 20px;
+$spacing-3xl: 24px;
+$spacing-4xl: 32px;
+$spacing-5xl: 40px;
+$spacing-6xl: 50px;
+$spacing-7xl: 60px;
+$spacing-8xl: 80px;
+$spacing-9xl: 100px;
+
+// Border Radius
+$radius-sm: 4px;
+$radius: 6px;
+$radius-md: 8px;
+$radius-lg: 12px;
+$radius-full: 50px;
+
+// Z-index
+$z-base: 1;
+$z-dropdown: 10;
+$z-sticky: 20;
+$z-fixed: 30;
+$z-modal: 1000;

@@ -1,0 +1,51 @@
+/* ═════════════════════════════════════════════════════════════════════════════ */
+/* RESET - ESTILOS BASE NORMALIZADOS                                            */
+/* ═════════════════════════════════════════════════════════════════════════════ */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: $font-primary;
+    line-height: $lh-relaxed;
+    background: $bg-light;
+    color: $text-dark;
+    margin: 0;
+    padding: 0;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+ul, ol {
+    list-style: none;
+}
+
+button {
+    font-family: inherit;
+    cursor: pointer;
+    border: none;
+    background: none;
+}
+
+input, textarea {
+    font-family: inherit;
+}
+
+/* Reset para el primer elemento visible (hero section) */
+body > section:first-of-type,
+body > main:first-of-type {
+    margin-top: 0;
+    padding-top: 0;
+}

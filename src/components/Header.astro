@@ -1,0 +1,42 @@
+---
+interface Props {
+  currentPath: string;
+}
+
+const { currentPath } = Astro.props;
+const isActive = (path: string) => currentPath === path;
+---
+
+<header class="header-premium">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="header-content">
+      <a href="/" class="logo-brand">
+        <i class="fas fa-plane logo-icon"></i>
+        <h1 class="logo-text">ATRAVEL</h1>
+      </a>
+
+      <button class="hamburger-menu" onclick="toggleMobileMenu()">
+        <i class="fas fa-bars"></i>
+      </button>
+
+      <nav class="nav-menu">
+        <a href="/" class={`nav-link ${isActive("/") ? "active" : ""}`}>Principal</a>
+        <a href="/tours-at" class={`nav-link ${isActive("/tours-at") ? "active" : ""}`}>Tours AT</a>
+        <a href="/vuelos" class={`nav-link ${isActive("/vuelos") ? "active" : ""}`}>Vuelos</a>
+        <a href="/hoteles" class={`nav-link ${isActive("/hoteles") ? "active" : ""}`}>Hoteles</a>
+        <a href="/paquetes" class={`nav-link ${isActive("/paquetes") ? "active" : ""}`}>Paquetes</a>
+        <a href="/ofertas" class={`nav-link ${isActive("/ofertas") ? "active" : ""}`}>Ofertas</a>
+      </nav>
+
+      <div class="header-actions">
+        <a href="/ayuda" class="help-link">Ayuda</a>
+        <button class="btn-login" onclick="openLoginModal()">Iniciar Sesion</button>
+        <button class="btn-register" onclick="openRegisterModal()">Registrarse</button>
+        <button class="cart-btn" onclick="checkLoginBeforeCart()">
+          <i class="fas fa-shopping-cart"></i>
+          <span>Carrito</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</header>
