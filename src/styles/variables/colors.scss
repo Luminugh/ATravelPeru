@@ -3,11 +3,11 @@
 /* ═════════════════════════════════════════════════════════════════════════════ */
 
 :root {
-    --pri: #8b5cf6;
-    --pri-dark: #7c3aed;
-    --pri-darker: #6d28d9;
-    --sec: #f59e0b;
-    --sec-dark: #d97706;
+    --pri: #22c55e;
+    --pri-dark: #16a34a;
+    --pri-darker: #15803d;
+    --sec: #84cc16;
+    --sec-dark: #65a30d;
     --text-dark: #1f2937;
     --text-gray: #6b7280;
     --text-light: #9ca3af;
@@ -15,11 +15,11 @@
     --bg-light: #f8f9fa;
 }
 
-$primary: #8b5cf6;
-$primary-dark: #7c3aed;
-$primary-darker: #6d28d9;
-$secondary: #f59e0b;
-$secondary-dark: #d97706;
+$primary: #22c55e;
+$primary-dark: #16a34a;
+$primary-darker: #15803d;
+$secondary: #84cc16;
+$secondary-dark: #65a30d;
 
 $text-dark: #1f2937;
 $text-gray: #6b7280;
@@ -29,14 +29,14 @@ $text-white-85: rgba(255, 255, 255, 0.85);
 $text-white-95: rgba(255, 255, 255, 0.95);
 
 $border-light: #e5e7eb;
-$border-primary: rgba(139, 92, 246, 0.4);
+$border-primary: rgba(34, 197, 94, 0.4);
 $border-white: rgba(255, 255, 255, 0.3);
 
 $bg-light: #f8f9fa;
 $bg-white: #ffffff;
 
-$gradient-primary: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
-$gradient-primary-hover: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+$gradient-primary: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+$gradient-primary-hover: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
 
 $success: #10b981;
 $warning: #fbbf24;

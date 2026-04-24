@@ -3,14 +3,14 @@
 /* ═════════════════════════════════════════════════════════════════════════════ */
 
 .header-premium {
-    background: rgba(139, 92, 246, 0.85);
-    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+    background: rgba(34, 197, 94, 0.85);
+    box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
     z-index: $z-fixed;
-    border-bottom: 1px solid rgba(139, 92, 246, 0.5);
+    border-bottom: 1px solid rgba(34, 197, 94, 0.5);
     padding: 0 40px;
     width: 100%;
 }
@@ -139,8 +139,8 @@
     top: 75px;
     left: 0;
     right: 0;
-    background: rgba(139, 92, 246, 0.95);
-    border-bottom: 1px solid rgba(139, 92, 246, 0.5);
+    background: rgba(34, 197, 94, 0.95);
+    border-bottom: 1px solid rgba(34, 197, 94, 0.5);
     z-index: $z-fixed - 1;
     animation: menuSlideDown 0.3s ease;
 }
