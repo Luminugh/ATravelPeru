@@ -6,6 +6,10 @@
     background: $gradient-primary;
     color: $text-white;
     border: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
     padding: 16px 40px;
     border-radius: $radius-full;
     font-size: $fs-lg;
@@ -26,6 +30,10 @@
     background: rgba(255, 255, 255, 0.15);
     color: $text-white;
     border: 2px solid rgba(255, 255, 255, 0.3);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
     padding: 14px 38px;
     border-radius: $radius-full;
     font-size: $fs-lg;
@@ -47,6 +55,10 @@
     background: $gradient-primary;
     color: $text-white;
     border: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
     border-radius: $radius;
     font-size: $fs-lg;
     font-weight: $fw-700;
@@ -93,6 +105,10 @@
     background: $gradient-primary;
     color: $text-white;
     border: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
     border-radius: $radius-md;
     font-weight: $fw-700;
     cursor: pointer;
@@ -109,6 +125,10 @@
     background: $gradient-primary;
     color: $text-white;
     border: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
     border-radius: $radius;
     font-weight: $fw-700;
     cursor: pointer;
@@ -126,6 +146,10 @@
     background: $text-white;
     color: $primary;
     border: 2px solid $text-white;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
     border-radius: $radius-md;
     font-weight: $fw-800;
     font-size: $fs-lg;

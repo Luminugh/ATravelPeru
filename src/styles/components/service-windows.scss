@@ -1,0 +1,229 @@
+/* ═════════════════════════════════════════════════════════════════════════════ */
+/* SERVICE WINDOWS - VENTANAS POR TIPO DE SERVICIO                              */
+/* ═════════════════════════════════════════════════════════════════════════════ */
+
+body.service-window-open {
+  overflow: hidden;
+}
+
+.service-windows-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: $z-modal;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(2, 6, 23, 0.72);
+  backdrop-filter: blur(12px);
+}
+
+.service-windows-overlay.is-open {
+  display: flex;
+}
+
+.service-window {
+  position: relative;
+  width: min(980px, 100%);
+  max-height: min(88vh, 920px);
+  overflow: auto;
+  padding: 32px;
+  border-radius: 28px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(248, 250, 252, 0.98) 100%);
+  box-shadow: 0 30px 80px rgba(15, 23, 42, 0.35);
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  color: #0f172a;
+}
+
+.service-window[hidden] {
+  display: none;
+}
+
+.service-window__close {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  width: 42px;
+  height: 42px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(15, 23, 42, 0.06);
+  color: #0f172a;
+  cursor: pointer;
+  transition: transform 0.2s ease, background 0.2s ease;
+
+  &:hover {
+    transform: scale(1.05);
+    background: rgba(15, 23, 42, 0.12);
+  }
+}
+
+.service-window__eyebrow {
+  display: inline-flex;
+  align-items: center;
+  margin-bottom: 14px;
+  padding: 7px 14px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--service-accent) 18%, white);
+  color: var(--service-accent);
+  font-size: $fs-xs;
+  font-weight: $fw-800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.service-window__title {
+  font-size: clamp(2rem, 3vw, 3rem);
+  font-weight: $fw-900;
+  margin-bottom: 10px;
+  line-height: 1.02;
+}
+
+.service-window__subtitle {
+  max-width: 760px;
+  margin-bottom: 24px;
+  color: #334155;
+  font-size: $fs-lg;
+  line-height: 1.55;
+}
+
+.service-window__grid {
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  gap: 18px;
+  margin-bottom: 18px;
+}
+
+.service-window__panel {
+  padding: 22px;
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(148, 163, 184, 0.18);
+}
+
+.service-window__panel-title {
+  margin-bottom: 16px;
+  font-size: $fs-lg;
+  font-weight: $fw-800;
+  color: #0f172a;
+}
+
+.service-window__list,
+.service-window__steps {
+  margin: 0;
+  padding-left: 18px;
+  color: #1e293b;
+}
+
+.service-window__list li,
+.service-window__steps li {
+  margin-bottom: 10px;
+  line-height: 1.5;
+}
+
+.service-window__highlights {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+
+.service-window__highlight {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+  padding: 14px 16px;
+  border-radius: 16px;
+  background: color-mix(in srgb, var(--service-accent) 7%, white);
+}
+
+.service-window__highlight-label {
+  color: #475569;
+  font-size: $fs-sm;
+  font-weight: $fw-600;
+}
+
+.service-window__highlight-value {
+  color: var(--service-accent);
+  font-size: $fs-base;
+  font-weight: $fw-900;
+}
+
+.service-window__footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  margin-top: 22px;
+  padding-top: 18px;
+  border-top: 1px solid rgba(148, 163, 184, 0.18);
+}
+
+.service-window__cta-text {
+  color: #334155;
+  font-weight: $fw-600;
+}
+
+.service-window__button {
+  border: none;
+  border-radius: 999px;
+  padding: 14px 24px;
+  background: var(--service-accent);
+  color: white;
+  font-weight: $fw-800;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 24px color-mix(in srgb, var(--service-accent) 28%, transparent);
+  }
+}
+
+.service-window--tours { --service-accent: #7c3aed; }
+.service-window--vuelos { --service-accent: #2563eb; }
+.service-window--hoteles { --service-accent: #0f766e; }
+.service-window--paquetes { --service-accent: #ea580c; }
+.service-window--ofertas { --service-accent: #db2777; }
+
+@media (max-width: 768px) {
+  .service-windows-overlay {
+    padding: 16px;
+  }
+
+  .service-window {
+    padding: 24px 18px 18px;
+    border-radius: 24px;
+  }
+
+  .service-window__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .service-window__footer {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+@media (max-width: 480px) {
+  .service-window {
+    max-height: 92vh;
+  }
+
+  .service-window__title {
+    font-size: clamp(1.7rem, 9vw, 2.2rem);
+  }
+
+  .service-window__subtitle {
+    font-size: $fs-base;
+  }
+
+  .service-window__panel {
+    padding: 18px 16px;
+  }
+
+  .service-window__button {
+    width: 100%;
+  }
+}

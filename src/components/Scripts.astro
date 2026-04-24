@@ -2,9 +2,87 @@
   // @ts-nocheck
   /** @type {ReturnType<typeof setTimeout> | null} */
   let notificationTimeoutId;
+  let activeServiceWindow = null;
+
+  const serviceRoutes = {
+    "/tours-at": "tours",
+    "/vuelos": "vuelos",
+    "/hoteles": "hoteles",
+    "/paquetes": "paquetes",
+    "/ofertas": "ofertas"
+  };
+
+  const serviceMessages = new Set([
+    "Solicitud de reserva enviada",
+    "Solicitud enviada",
+    "Te contactaremos pronto"
+  ]);
+
+  function getCurrentPath() {
+    return window.location.pathname.replace(/\/$/, "");
+  }
+
+  function getServiceFromContext(message) {
+    if (!serviceMessages.has(message)) {
+      return null;
+    }
+
+    return serviceRoutes[getCurrentPath()] ?? null;
+  }
+
+  function syncServiceWindows() {
+    const overlay = document.getElementById("service-windows-overlay");
+    if (!overlay) {
+      return null;
+    }
+
+    const windows = overlay.querySelectorAll("[data-service]");
+    windows.forEach((serviceWindow) => {
+      serviceWindow.classList.remove("is-active");
+      serviceWindow.hidden = true;
+    });
+
+    return overlay;
+  }
+
+  function openServiceWindow(serviceKey) {
+    const overlay = syncServiceWindows();
+    if (!overlay) {
+      return;
+    }
+
+    const serviceWindow = overlay.querySelector(`[data-service="${serviceKey}"]`);
+    if (!serviceWindow) {
+      return;
+    }
+
+    overlay.classList.add("is-open");
+    serviceWindow.hidden = false;
+    serviceWindow.classList.add("is-active");
+    activeServiceWindow = serviceKey;
+    document.body.classList.add("service-window-open");
+  }
+
+  function closeServiceWindow() {
+    const overlay = document.getElementById("service-windows-overlay");
+    if (!overlay) {
+      return;
+    }
+
+    overlay.classList.remove("is-open");
+    syncServiceWindows();
+    activeServiceWindow = null;
+    document.body.classList.remove("service-window-open");
+  }
 
   /** @param {string} message @param {string} [type] */
   function showNotification(message, type = "info") {
+    const serviceKey = getServiceFromContext(message);
+    if (serviceKey) {
+      openServiceWindow(serviceKey);
+      return;
+    }
+
     const notification = document.getElementById("notification");
     const notificationText = document.getElementById("notificationText");
     if (!notification || !notificationText) {
@@ -45,20 +123,35 @@
   document.addEventListener("click", function (e) {
     const mobileMenu = document.getElementById("mobile-menu");
     const hamburger = document.querySelector(".hamburger-menu");
+    const serviceOverlay = document.getElementById("service-windows-overlay");
 
     if (!mobileMenu || !hamburger) {
-      return;
+      if (!serviceOverlay) {
+        return;
+      }
     }
 
     const target = e.target instanceof Node ? e.target : null;
     if (target && !mobileMenu.contains(target) && !hamburger.contains(target)) {
       mobileMenu.style.display = "none";
     }
+
+    if (serviceOverlay && serviceOverlay.classList.contains("is-open") && target && target === serviceOverlay) {
+      closeServiceWindow();
+    }
+  });
+
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape" && activeServiceWindow) {
+      closeServiceWindow();
+    }
   });
 
   Object.assign(window, {
     showNotification,
     closeNotification,
-    toggleMobileMenu
+    toggleMobileMenu,
+    openServiceWindow,
+    closeServiceWindow
   });
 </script>

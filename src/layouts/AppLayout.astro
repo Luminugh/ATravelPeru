@@ -3,6 +3,7 @@ import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
 import MobileMenu from "../components/MobileMenu.astro";
 import Notification from "../components/Notification.astro";
+import ServiceWindows from "../components/ServiceWindows.astro";
 import Scripts from "../components/Scripts.astro";
 import "../styles/app.scss";
 
@@ -31,6 +32,7 @@ const currentPath = Astro.url.pathname;
     <Header currentPath={currentPath} />
     <Notification />
     <MobileMenu currentPath={currentPath} />
+    <ServiceWindows />
 
     <slot />
 

@@ -6,7 +6,7 @@ const title = "Tours AT - Recorridos Turísticos";
 
 <AppLayout title={title}>
 <!-- Hero Section Tours AT -->
-    <section class="hero-section">
+    <section class="hero-section hero-secondary">
         <div class="hero-background">
             <video autoplay muted loop class="hero-video">
                 <source src="/assets/videos/Video1.mp4" type="video/mp4">
@@ -35,7 +35,7 @@ const title = "Tours AT - Recorridos Turísticos";
             </div>
 
             <div class="hero-actions">
-                <button class="btn-hero-primary">Ver Todos</button>
+                <a class="btn-hero-primary" href="#tours-content">Ver Todos</a>
                 <button class="btn-hero-secondary">Consultar Disponibilidad</button>
             </div>
         </div>
@@ -84,7 +84,7 @@ const title = "Tours AT - Recorridos Turísticos";
         </section>
 
         <!-- Tours Grid Section -->
-        <section class="tours-section">
+        <section id="tours-content" class="tours-section">
             <h2 class="section-title mb-12">Nuestros Recorridos Destacados</h2>
             <div class="tours-grid">
                 
