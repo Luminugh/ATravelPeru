@@ -3,7 +3,6 @@ import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
 import MobileMenu from "../components/MobileMenu.astro";
 import Notification from "../components/Notification.astro";
-import Modals from "../components/Modals.astro";
 import Scripts from "../components/Scripts.astro";
 import "../styles/app.scss";
 
@@ -36,7 +35,6 @@ const currentPath = Astro.url.pathname;
     <slot />
 
     <Footer />
-    <Modals />
     <Scripts />
   </body>
 </html>

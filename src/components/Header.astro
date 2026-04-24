@@ -30,9 +30,7 @@ const isActive = (path: string) => currentPath === path;
 
       <div class="header-actions">
         <a href="/ayuda" class="help-link">Ayuda</a>
-        <button class="btn-login" onclick="openLoginModal()">Iniciar Sesion</button>
-        <button class="btn-register" onclick="openRegisterModal()">Registrarse</button>
-        <button class="cart-btn" onclick="checkLoginBeforeCart()">
+        <button class="cart-btn" onclick="showNotification('Carrito en desarrollo')">
           <i class="fas fa-shopping-cart"></i>
           <span>Carrito</span>
         </button>

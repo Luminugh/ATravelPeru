@@ -17,7 +17,5 @@ const isActive = (path: string) => currentPath === path;
     <a href="/ofertas" class={`mobile-nav-link ${isActive("/ofertas") ? "active" : ""}`} onclick="toggleMobileMenu()">Ofertas</a>
     <div class="mobile-menu-divider"></div>
     <a href="/ayuda" class="mobile-nav-link" onclick="toggleMobileMenu()">Ayuda</a>
-    <button class="mobile-btn mobile-btn-login" onclick="openLoginModal(); toggleMobileMenu();">Iniciar Sesion</button>
-    <button class="mobile-btn mobile-btn-register" onclick="openRegisterModal(); toggleMobileMenu();">Registrarse</button>
   </nav>
 </div>

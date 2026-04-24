@@ -1,113 +1,38 @@
 <script>
-  function openLoginModal() {
-    document.getElementById("loginModal").style.display = "flex";
-    closeRegisterModal();
-  }
+  // @ts-nocheck
+  /** @type {ReturnType<typeof setTimeout> | null} */
+  let notificationTimeoutId;
 
-  function closeLoginModal() {
-    document.getElementById("loginModal").style.display = "none";
-  }
-
-  function openRegisterModal() {
-    document.getElementById("registerModal").style.display = "flex";
-    closeLoginModal();
-  }
-
-  function closeRegisterModal() {
-    document.getElementById("registerModal").style.display = "none";
-  }
-
-  function closeForgotPasswordModal() {
-    document.getElementById("forgotPasswordModal").style.display = "none";
-  }
-
-  function openForgotPasswordModal(e) {
-    e.preventDefault();
-    closeLoginModal();
-    document.getElementById("forgotPasswordModal").style.display = "flex";
-  }
-
-  function switchToLogin(e) {
-    e.preventDefault();
-    closeRegisterModal();
-    closeForgotPasswordModal();
-    openLoginModal();
-  }
-
-  function switchToRegister(e) {
-    e.preventDefault();
-    closeLoginModal();
-    closeForgotPasswordModal();
-    openRegisterModal();
-  }
-
-  function togglePasswordVisibility(inputId) {
-    const input = document.getElementById(inputId);
-    const icon = document.getElementById(inputId + "-icon");
-
-    if (input.type === "password") {
-      input.type = "text";
-      icon.className = "fas fa-eye-slash";
-    } else {
-      input.type = "password";
-      icon.className = "fas fa-eye";
-    }
-  }
-
+  /** @param {string} message @param {string} [type] */
   function showNotification(message, type = "info") {
     const notification = document.getElementById("notification");
     const notificationText = document.getElementById("notificationText");
+    if (!notification || !notificationText) {
+      return;
+    }
     notificationText.textContent = message;
     notification.dataset.type = type;
     notification.classList.add("show");
 
-    if (notification.timeoutId) {
-      clearTimeout(notification.timeoutId);
+    if (notificationTimeoutId) {
+      clearTimeout(notificationTimeoutId);
     }
 
-    notification.timeoutId = setTimeout(() => {
+    notificationTimeoutId = setTimeout(() => {
       notification.classList.remove("show");
     }, 4000);
   }
 
   function closeNotification() {
     const notification = document.getElementById("notification");
-    notification.classList.remove("show");
-    if (notification.timeoutId) {
-      clearTimeout(notification.timeoutId);
-    }
-  }
-
-  function loginWithGoogle() {
-    showNotification("Redirigiendo a Google...");
-  }
-
-  function registerWithGoogle() {
-    showNotification("Redirigiendo a Google...");
-  }
-
-  function checkLoginBeforeCart() {
-    showNotification("Por favor inicia sesion para acceder al carrito", "warning");
-    setTimeout(() => {
-      openLoginModal();
-    }, 1000);
-  }
-
-  function closeModalOnOutsideClick(modalId, closeFn) {
-    const modal = document.getElementById(modalId);
-    if (!modal) {
+    if (!notification) {
       return;
     }
-    modal.addEventListener("click", function (e) {
-      if (e.target === this) {
-        closeFn();
-      }
-    });
+    notification.classList.remove("show");
+    if (notificationTimeoutId) {
+      clearTimeout(notificationTimeoutId);
+    }
   }
-
-  closeModalOnOutsideClick("loginModal", closeLoginModal);
-  closeModalOnOutsideClick("registerModal", closeRegisterModal);
-  closeModalOnOutsideClick("forgotPasswordModal", closeForgotPasswordModal);
 
   function toggleMobileMenu() {
     const mobileMenu = document.getElementById("mobile-menu");
@@ -125,80 +50,15 @@
       return;
     }
 
-    if (!mobileMenu.contains(e.target) && !hamburger.contains(e.target)) {
+    const target = e.target instanceof Node ? e.target : null;
+    if (target && !mobileMenu.contains(target) && !hamburger.contains(target)) {
       mobileMenu.style.display = "none";
     }
   });
 
-  async function postJson(url, data) {
-    const response = await fetch(url, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(data)
-    });
-
-    const result = await response.json();
-    if (!response.ok) {
-      throw new Error(result.message || "Operacion no completada");
-    }
-
-    return result;
-  }
-
-  document.getElementById("loginForm")?.addEventListener("submit", async function (e) {
-    e.preventDefault();
-    const data = Object.fromEntries(new FormData(this).entries());
-    try {
-      const result = await postJson("/api/auth/login", data);
-      showNotification(result.message, "success");
-      closeLoginModal();
-      this.reset();
-    } catch (error) {
-      showNotification(error.message, "error");
-    }
+  Object.assign(window, {
+    showNotification,
+    closeNotification,
+    toggleMobileMenu
   });
-
-  document.getElementById("registerForm")?.addEventListener("submit", async function (e) {
-    e.preventDefault();
-    const data = Object.fromEntries(new FormData(this).entries());
-    try {
-      const result = await postJson("/api/auth/register", data);
-      showNotification(result.message, "success");
-      closeRegisterModal();
-      this.reset();
-    } catch (error) {
-      showNotification(error.message, "error");
-    }
-  });
-
-  document.getElementById("forgotPasswordForm")?.addEventListener("submit", async function (e) {
-    e.preventDefault();
-    const data = Object.fromEntries(new FormData(this).entries());
-    try {
-      const result = await postJson("/api/auth/forgot-password", data);
-      showNotification(result.message, "success");
-      closeForgotPasswordModal();
-      this.reset();
-    } catch (error) {
-      showNotification(error.message, "error");
-    }
-  });
-
-  window.openLoginModal = openLoginModal;
-  window.closeLoginModal = closeLoginModal;
-  window.openRegisterModal = openRegisterModal;
-  window.closeRegisterModal = closeRegisterModal;
-  window.closeForgotPasswordModal = closeForgotPasswordModal;
-  window.openForgotPasswordModal = openForgotPasswordModal;
-  window.switchToLogin = switchToLogin;
-  window.switchToRegister = switchToRegister;
-  window.togglePasswordVisibility = togglePasswordVisibility;
-  window.showNotification = showNotification;
-  window.closeNotification = closeNotification;
-  window.loginWithGoogle = loginWithGoogle;
-  window.registerWithGoogle = registerWithGoogle;
-  window.checkLoginBeforeCart = checkLoginBeforeCart;
-  window.toggleMobileMenu = toggleMobileMenu;
 </script>

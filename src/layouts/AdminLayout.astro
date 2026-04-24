@@ -68,18 +68,6 @@ const navClass = (...paths: string[]) => (paths.includes(currentPath) ? "nav-ite
           </div>
 
           <div class="nav-section">
-            <span class="nav-section-title">Administración</span>
-            <a href="/admin/usuarios" class={navClass("/admin/usuarios")}>
-              <i class="fas fa-users"></i>
-              <span>Usuarios</span>
-            </a>
-            <a href="/admin/roles" class={navClass("/admin/roles")}>
-              <i class="fas fa-lock"></i>
-              <span>Roles y Permisos</span>
-            </a>
-          </div>
-
-          <div class="nav-section">
             <a href="/" class="nav-item logout">
               <i class="fas fa-sign-out-alt"></i>
               <span>Volver al Sitio</span>
@@ -103,7 +91,7 @@ const navClass = (...paths: string[]) => (paths.includes(currentPath) ? "nav-ite
               <img src="https://ui-avatars.com/api/?name=Admin+User&background=0D8ABC&color=fff" alt="Admin" class="profile-avatar" />
               <div class="profile-info">
                 <p class="profile-name">Admin User</p>
-                <p class="profile-role">Administrador</p>
+                <p class="profile-meta">Panel principal</p>
               </div>
             </div>
           </div>
