@@ -1,0 +1,64 @@
+---
+import AdminLayout from "../../layouts/AdminLayout.astro";
+
+const title = "Panel Administrativo - ATRAVEL";
+---
+
+<AdminLayout title={title}>
+  <!-- Dashboard Section -->
+  <section id="dashboard-section" class="dashboard-section">
+    <!-- Stats Cards -->
+    <div class="dashboard-grid">
+      <div class="stat-card">
+        <div class="stat-icon tours">
+          <i class="fas fa-map"></i>
+        </div>
+        <p class="stat-label">Tours Activos</p>
+        <p class="stat-value">48</p>
+        <p class="stat-change">? 12% desde el mes pasado</p>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon flights">
+          <i class="fas fa-plane"></i>
+        </div>
+        <p class="stat-label">Vuelos Disponibles</p>
+        <p class="stat-value">256</p>
+        <p class="stat-change">? 8% desde el mes pasado</p>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon hotels">
+          <i class="fas fa-hotel"></i>
+        </div>
+        <p class="stat-label">Hoteles Registrados</p>
+        <p class="stat-value">132</p>
+        <p class="stat-change">? 5% desde el mes pasado</p>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon users">
+          <i class="fas fa-users"></i>
+        </div>
+        <p class="stat-label">Usuarios Activos</p>
+        <p class="stat-value">1,249</p>
+        <p class="stat-change">? 15% desde el mes pasado</p>
+      </div>
+    </div>
+
+    <!-- Quick Navigation Info Card -->
+    <div class="quick-nav-info" style="margin-top: 40px; padding: 20px; background: #f0f7ff; border-left: 4px solid #3b82f6; border-radius: 8px;">
+      <h3 style="margin-top: 0; color: #1e40af;">
+        <i class="fas fa-lightbulb"></i>
+        Navegación Rápida
+      </h3>
+      <p style="color: #555; margin-bottom: 15px;">
+        Utiliza el menú lateral para acceder a las diferentes secciones de gestión:
+      </p>
+      <ul style="color: #666; margin: 0; padding-left: 20px;">
+        <li><strong>Gestión de Contenido:</strong> Tours AT, Vuelos, Hoteles, Paquetes, Ofertas</li>
+        <li><strong>Administración:</strong> Usuarios y Roles &amp; Permisos</li>
+      </ul>
+    </div>
+  </section>
+</AdminLayout>

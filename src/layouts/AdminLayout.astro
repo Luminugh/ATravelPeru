@@ -1,0 +1,150 @@
+---
+import "../styles/pages/admin/index.scss";
+
+interface Props {
+  title?: string;
+}
+
+const { title = "Panel Administrativo - ATRAVEL" } = Astro.props;
+const currentPath = Astro.url.pathname;
+
+const navClass = (...paths: string[]) => (paths.includes(currentPath) ? "nav-item active" : "nav-item");
+---
+
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title}</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.0/css/all.min.css" />
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body class="admin-body">
+    <div class="admin-container">
+      <!-- Sidebar -->
+      <aside class="admin-sidebar">
+        <div class="sidebar-header">
+          <h1 class="sidebar-logo">
+            <i class="fas fa-compass"></i> ATRAVEL Admin
+          </h1>
+        </div>
+
+        <nav class="sidebar-nav">
+          <div class="nav-section">
+            <span class="nav-section-title">Panel</span>
+            <a href="/admin" class={navClass("/admin", "/admin/")}>
+              <i class="fas fa-chart-line"></i>
+              <span>Dashboard</span>
+            </a>
+          </div>
+
+          <div class="nav-section">
+            <span class="nav-section-title">Gestión de Contenido</span>
+            <a href="/admin/tours" class={navClass("/admin/tours")}>
+              <i class="fas fa-map"></i>
+              <span>Tours AT</span>
+            </a>
+            <a href="/admin/vuelos" class={navClass("/admin/vuelos")}>
+              <i class="fas fa-plane"></i>
+              <span>Vuelos</span>
+            </a>
+            <a href="/admin/hoteles" class={navClass("/admin/hoteles")}>
+              <i class="fas fa-hotel"></i>
+              <span>Hoteles</span>
+            </a>
+            <a href="/admin/paquetes" class={navClass("/admin/paquetes")}>
+              <i class="fas fa-box"></i>
+              <span>Paquetes</span>
+            </a>
+            <a href="/admin/ofertas" class={navClass("/admin/ofertas")}>
+              <i class="fas fa-tag"></i>
+              <span>Ofertas</span>
+            </a>
+          </div>
+
+          <div class="nav-section">
+            <span class="nav-section-title">Administración</span>
+            <a href="/admin/usuarios" class={navClass("/admin/usuarios")}>
+              <i class="fas fa-users"></i>
+              <span>Usuarios</span>
+            </a>
+            <a href="/admin/roles" class={navClass("/admin/roles")}>
+              <i class="fas fa-lock"></i>
+              <span>Roles y Permisos</span>
+            </a>
+          </div>
+
+          <div class="nav-section">
+            <a href="/" class="nav-item logout">
+              <i class="fas fa-sign-out-alt"></i>
+              <span>Volver al Sitio</span>
+            </a>
+          </div>
+        </nav>
+      </aside>
+
+      <!-- Main Content -->
+      <main class="admin-main">
+        <!-- Top Bar -->
+        <div class="admin-topbar">
+          <div class="topbar-left">
+            <button class="sidebar-toggle" id="sidebarToggle">
+              <i class="fas fa-bars"></i>
+            </button>
+            <h2 class="page-title" id="pageTitle">Dashboard</h2>
+          </div>
+          <div class="topbar-right">
+            <div class="admin-profile">
+              <img src="https://ui-avatars.com/api/?name=Admin+User&background=0D8ABC&color=fff" alt="Admin" class="profile-avatar" />
+              <div class="profile-info">
+                <p class="profile-name">Admin User</p>
+                <p class="profile-role">Administrador</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Content Area -->
+        <div class="admin-content">
+          <slot />
+        </div>
+      </main>
+    </div>
+
+    <script>
+      // Sidebar toggle functionality
+      const sidebarToggle = document.getElementById('sidebarToggle');
+      const adminSidebar = document.querySelector('.admin-sidebar');
+      const adminContainer = document.querySelector('.admin-container');
+
+      if (sidebarToggle && adminContainer) {
+        sidebarToggle.addEventListener('click', () => {
+          adminContainer.classList.toggle('sidebar-collapsed');
+        });
+      }
+
+      // Navigation items click handlers
+      const navItems = document.querySelectorAll('.nav-item');
+      navItems.forEach(item => {
+        item.addEventListener('click', (e) => {
+          // Remove active class from all items
+          navItems.forEach(i => i.classList.remove('active'));
+          // Add active class to clicked item
+          item.classList.add('active');
+          
+          // Update page title
+          const title = item.textContent.trim();
+          const pageTitle = document.getElementById('pageTitle');
+          if (pageTitle) {
+            pageTitle.textContent = title;
+          }
+        });
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,176 @@
+---
+import AdminLayout from "../../layouts/AdminLayout.astro";
+
+const title = "Gestión de Roles y Permisos - Panel Admin";
+---
+
+<AdminLayout title={title}>
+  <!-- Roles y Permisos Section -->
+  <section class="content-section">
+    <div class="section-header">
+      <h3>
+        <i class="fas fa-lock"></i>
+        Gestión de Roles y Permisos
+      </h3>
+      <div class="section-actions">
+        <button class="btn btn-primary">
+          <i class="fas fa-plus"></i>
+          Nuevo Rol
+        </button>
+        <button class="btn btn-secondary">
+          <i class="fas fa-download"></i>
+          Exportar
+        </button>
+      </div>
+    </div>
+
+    <div class="tabs-container">
+      <div class="tabs-header">
+        <button class="tab-button active">Roles</button>
+        <button class="tab-button">Permisos</button>
+      </div>
+
+      <div class="tabs-content">
+        <!-- Roles Tab -->
+        <div id="rolesTab" class="tab-panel active">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Nombre del Rol</th>
+                <th>Descripción</th>
+                <th>Permisos Asignados</th>
+                <th>Usuarios</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="item-name">Administrador</span></td>
+                <td>Acceso total al sistema</td>
+                <td>12/12</td>
+                <td>2</td>
+                <td>
+                  <div class="item-actions">
+                    <button class="action-btn edit" title="Editar">
+                      <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="action-btn view" title="Ver">
+                      <i class="fas fa-eye"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td><span class="item-name">Vendedor</span></td>
+                <td>Puede gestionar ventas y clientes</td>
+                <td>8/12</td>
+                <td>5</td>
+                <td>
+                  <div class="item-actions">
+                    <button class="action-btn edit" title="Editar">
+                      <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="action-btn view" title="Ver">
+                      <i class="fas fa-eye"></i>
+                    </button>
+                    <button class="action-btn delete" title="Eliminar">
+                      <i class="fas fa-trash"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td><span class="item-name">Cliente</span></td>
+                <td>Acceso limitado - Solo ver reservas</td>
+                <td>3/12</td>
+                <td>1,240</td>
+                <td>
+                  <div class="item-actions">
+                    <button class="action-btn edit" title="Editar">
+                      <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="action-btn view" title="Ver">
+                      <i class="fas fa-eye"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Permisos Tab -->
+        <div id="permissionsTab" class="tab-panel">
+          <div style="padding: 20px; background: #f9fafb; border-radius: 8px; margin-bottom: 20px;">
+            <h4 style="margin-top: 0; color: #1a1a1a;">Permisos Disponibles</h4>
+            <p style="color: #666; margin-bottom: 20px;">Aquí se pueden gestionar todos los permisos del sistema y asignarlos a los roles.</p>
+            
+            <div class="form-row">
+              <div class="form-group">
+                <label>
+                  <input type="checkbox" checked /> Crear Tours
+                </label>
+              </div>
+              <div class="form-group">
+                <label>
+                  <input type="checkbox" checked /> Editar Tours
+                </label>
+              </div>
+              <div class="form-group">
+                <label>
+                  <input type="checkbox" checked /> Eliminar Tours
+                </label>
+              </div>
+              <div class="form-group">
+                <label>
+                  <input type="checkbox" checked /> Ver Tours
+                </label>
+              </div>
+              <div class="form-group">
+                <label>
+                  <input type="checkbox" checked /> Crear Usuarios
+                </label>
+              </div>
+              <div class="form-group">
+                <label>
+                  <input type="checkbox" checked /> Editar Usuarios
+                </label>
+              </div>
+              <div class="form-group">
+                <label>
+                  <input type="checkbox" checked /> Eliminar Usuarios
+                </label>
+              </div>
+              <div class="form-group">
+                <label>
+                  <input type="checkbox" /> Generar Reportes
+                </label>
+              </div>
+            </div>
+
+            <button class="btn btn-primary" style="margin-top: 20px;">
+              <i class="fas fa-save"></i>
+              Guardar Cambios
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const tabButtons = document.querySelectorAll('.tab-button');
+      const tabPanels = document.querySelectorAll('.tab-panel');
+
+      tabButtons.forEach((button, index) => {
+        button.addEventListener('click', () => {
+          tabButtons.forEach(btn => btn.classList.remove('active'));
+          tabPanels.forEach(panel => panel.classList.remove('active'));
+          button.classList.add('active');
+          tabPanels[index].classList.add('active');
+        });
+      });
+    });
+  </script>
+</AdminLayout>
