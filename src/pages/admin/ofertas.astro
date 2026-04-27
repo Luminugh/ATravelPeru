@@ -1,100 +1,14 @@
 ---
 import AdminLayout from "../../layouts/AdminLayout.astro";
 
-const title = "Gestión de Ofertas - Panel Admin";
+const title = "Módulo deshabilitado - Ofertas";
 ---
 
 <AdminLayout title={title}>
-  <!-- Ofertas Section -->
   <section class="content-section">
     <div class="section-header">
-      <h3>
-        <i class="fas fa-tag"></i>
-        Gestión de Ofertas
-      </h3>
-      <div class="section-actions">
-        <button class="btn btn-primary">
-          <i class="fas fa-plus"></i>
-          Nueva Oferta
-        </button>
-        <button class="btn btn-secondary">
-          <i class="fas fa-download"></i>
-          Exportar
-        </button>
-      </div>
+      <h3><i class="fas fa-lock"></i> Módulo deshabilitado</h3>
     </div>
-
-    <div class="search-bar">
-      <div class="search-input">
-        <i class="fas fa-search search-icon"></i>
-        <input type="text" placeholder="Buscar ofertas..." />
-      </div>
-      <div class="filter-select">
-        <select>
-          <option>Todas las ofertas</option>
-          <option>Activas</option>
-          <option>Próximas</option>
-          <option>Finalizadas</option>
-        </select>
-      </div>
-    </div>
-
-    <table class="data-table">
-      <thead>
-        <tr>
-          <th>Oferta</th>
-          <th>Descuento</th>
-          <th>Producto</th>
-          <th>Fecha Inicio</th>
-          <th>Fecha Fin</th>
-          <th>Estado</th>
-          <th>Acciones</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td><span class="item-name">Descuento Machu Picchu</span></td>
-          <td>15%</td>
-          <td>Tour Machu Picchu</td>
-          <td>01/04/2026</td>
-          <td>30/04/2026</td>
-          <td><span class="item-status active">Activa</span></td>
-          <td>
-            <div class="item-actions">
-              <button class="action-btn edit" title="Editar">
-                <i class="fas fa-edit"></i>
-              </button>
-              <button class="action-btn view" title="Ver">
-                <i class="fas fa-eye"></i>
-              </button>
-              <button class="action-btn delete" title="Eliminar">
-                <i class="fas fa-trash"></i>
-              </button>
-            </div>
-          </td>
-        </tr>
-        <tr>
-          <td><span class="item-name">Verano Amazónico</span></td>
-          <td>20%</td>
-          <td>Tour Selva Amazónica</td>
-          <td>15/05/2026</td>
-          <td>31/07/2026</td>
-          <td><span class="item-status pending">Próxima</span></td>
-          <td>
-            <div class="item-actions">
-              <button class="action-btn edit" title="Editar">
-                <i class="fas fa-edit"></i>
-              </button>
-              <button class="action-btn view" title="Ver">
-                <i class="fas fa-eye"></i>
-              </button>
-              <button class="action-btn delete" title="Eliminar">
-                <i class="fas fa-trash"></i>
-              </button>
-            </div>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+    <p>El módulo de Ofertas está deshabilitado temporalmente en el panel administrativo.</p>
   </section>
 </AdminLayout>

@@ -9,46 +9,172 @@ const title = "Panel Administrativo - ATRAVEL";
   <section id="dashboard-section" class="dashboard-section">
     <!-- Stats Cards -->
     <div class="dashboard-grid">
-      <div class="stat-card">
-        <div class="stat-icon tours">
+      <div class="stat-card stat-card-tours">
+        <div class="stat-icon">
           <i class="fas fa-map"></i>
         </div>
         <p class="stat-label">Tours Activos</p>
         <p class="stat-value">48</p>
-        <p class="stat-change">? 12% desde el mes pasado</p>
+        <p class="stat-change">📈 12% desde el mes pasado</p>
       </div>
 
-      <div class="stat-card">
-        <div class="stat-icon flights">
+      <div class="stat-card stat-card-flights">
+        <div class="stat-icon">
           <i class="fas fa-plane"></i>
         </div>
         <p class="stat-label">Vuelos Disponibles</p>
         <p class="stat-value">256</p>
-        <p class="stat-change">? 8% desde el mes pasado</p>
+        <p class="stat-change">📈 8% desde el mes pasado</p>
       </div>
 
-      <div class="stat-card">
-        <div class="stat-icon hotels">
+      <div class="stat-card stat-card-hotels">
+        <div class="stat-icon">
           <i class="fas fa-hotel"></i>
         </div>
         <p class="stat-label">Hoteles Registrados</p>
         <p class="stat-value">132</p>
-        <p class="stat-change">? 5% desde el mes pasado</p>
+        <p class="stat-change">📈 5% desde el mes pasado</p>
       </div>
     </div>
 
     <!-- Quick Navigation Info Card -->
-    <div class="quick-nav-info" style="margin-top: 40px; padding: 20px; background: #f0f7ff; border-left: 4px solid #3b82f6; border-radius: 8px;">
-      <h3 style="margin-top: 0; color: #1e40af;">
-        <i class="fas fa-lightbulb"></i>
-        Navegaci�n R�pida
-      </h3>
-      <p style="color: #555; margin-bottom: 15px;">
-        Utiliza el men� lateral para acceder a las diferentes secciones de gesti�n:
-      </p>
-      <ul style="color: #666; margin: 0; padding-left: 20px;">
-        <li><strong>Gesti�n de Contenido:</strong> Tours AT, Vuelos, Hoteles, Paquetes, Ofertas</li>
-      </ul>
+    <div class="info-card" style="margin-top: 40px;">
+      <div class="info-card-header">
+        <h3 style="margin: 0; display: flex; align-items: center; gap: 10px; color: white; font-size: 20px;">
+          <i class="fas fa-lightbulb"></i>
+          Navegación Rápida
+        </h3>
+      </div>
+      <div class="info-card-content">
+        <p style="color: #555; margin-bottom: 15px; line-height: 1.6;">
+          Utiliza el menú lateral para administrar el catálogo visual y el canal de reservas por WhatsApp.
+        </p>
+        <ul style="color: #666; margin: 0 0 20px 0; padding-left: 20px; line-height: 1.8;">
+          <li><strong style="color: #667eea;">Gestión de Contenido:</strong> Tours AT, Vuelos, Hoteles, Paquetes y Ofertas</li>
+          <li><strong style="color: #667eea;">Catálogo y WhatsApp:</strong> Teléfono de negocio, plantilla automática y visibilidad de servicios</li>
+        </ul>
+        <a href="/admin/tours" class="btn-primary-inline" style="display: inline-flex; align-items: center; gap: 8px; padding: 0.75rem 1.5rem; text-decoration: none; border-radius: 8px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; font-weight: 600; transition: all 0.3s ease;">
+          <i class="fas fa-arrow-right"></i> Ir al Gestor de Tours AT
+        </a>
+      </div>
     </div>
   </section>
+
+  <style>
+    .dashboard-section {
+      padding: 30px;
+    }
+
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 24px;
+      margin-bottom: 40px;
+    }
+
+    .stat-card {
+      background: white;
+      border-radius: 12px;
+      padding: 24px;
+      border: 1px solid #e0e0e0;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .stat-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, #667eea, #764ba2);
+    }
+
+    .stat-card:hover {
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+      transform: translateY(-4px);
+    }
+
+    .stat-card-tours::before {
+      background: linear-gradient(90deg, #667eea, #764ba2);
+    }
+
+    .stat-card-flights::before {
+      background: linear-gradient(90deg, #f093fb, #f5576c);
+    }
+
+    .stat-card-hotels::before {
+      background: linear-gradient(90deg, #4facfe, #00f2fe);
+    }
+
+    .stat-icon {
+      width: 50px;
+      height: 50px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      margin-bottom: 16px;
+      color: white;
+    }
+
+    .stat-card-tours .stat-icon {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+    }
+
+    .stat-card-flights .stat-icon {
+      background: linear-gradient(135deg, #f093fb, #f5576c);
+    }
+
+    .stat-card-hotels .stat-icon {
+      background: linear-gradient(135deg, #4facfe, #00f2fe);
+    }
+
+    .stat-label {
+      margin: 0 0 8px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #718096;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .stat-value {
+      margin: 0 0 8px;
+      font-size: 32px;
+      font-weight: 700;
+      color: #1a202c;
+    }
+
+    .stat-change {
+      margin: 0;
+      font-size: 13px;
+      color: #a0aec0;
+    }
+
+    .info-card {
+      background: white;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid #e0e0e0;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+    }
+
+    .info-card-header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      padding: 24px;
+    }
+
+    .info-card-content {
+      padding: 24px;
+    }
+
+    .btn-primary-inline:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 16px rgba(102, 126, 234, 0.3);
+    }
+  </style>
 </AdminLayout>

@@ -78,6 +78,18 @@
     }
 }
 
+.nav-link-disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+    pointer-events: none;
+    text-decoration: line-through;
+
+    &:hover {
+        color: $text-white-85;
+        font-weight: $fw-600;
+    }
+}
+
 // Header Actions
 .header-actions {
     display: flex;
@@ -188,6 +200,13 @@
         border-left: 4px solid $text-white;
         padding-left: 16px;
     }
+}
+
+.mobile-nav-link-disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+    pointer-events: none;
+    text-decoration: line-through;
 }
 
 .mobile-menu-divider {

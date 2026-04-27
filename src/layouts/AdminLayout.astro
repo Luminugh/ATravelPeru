@@ -49,21 +49,29 @@ const navClass = (...paths: string[]) => (paths.includes(currentPath) ? "nav-ite
               <i class="fas fa-map"></i>
               <span>Tours AT</span>
             </a>
-            <a href="/admin/vuelos" class={navClass("/admin/vuelos")}>
+            <span class="nav-item nav-item-disabled" aria-disabled="true" title="Módulo deshabilitado">
               <i class="fas fa-plane"></i>
-              <span>Vuelos</span>
-            </a>
-            <a href="/admin/hoteles" class={navClass("/admin/hoteles")}>
+              <span>Vuelos (deshabilitado)</span>
+            </span>
+            <span class="nav-item nav-item-disabled" aria-disabled="true" title="Módulo deshabilitado">
               <i class="fas fa-hotel"></i>
-              <span>Hoteles</span>
-            </a>
-            <a href="/admin/paquetes" class={navClass("/admin/paquetes")}>
+              <span>Hoteles (deshabilitado)</span>
+            </span>
+            <span class="nav-item nav-item-disabled" aria-disabled="true" title="Módulo deshabilitado">
               <i class="fas fa-box"></i>
-              <span>Paquetes</span>
-            </a>
-            <a href="/admin/ofertas" class={navClass("/admin/ofertas")}>
+              <span>Paquetes (deshabilitado)</span>
+            </span>
+            <span class="nav-item nav-item-disabled" aria-disabled="true" title="Módulo deshabilitado">
               <i class="fas fa-tag"></i>
-              <span>Ofertas</span>
+              <span>Ofertas (deshabilitado)</span>
+            </span>
+          </div>
+
+          <div class="nav-section">
+            <span class="nav-section-title">Canales y Ventas</span>
+            <a href="/admin/catalogo" class={navClass("/admin/catalogo")}>
+              <i class="fab fa-whatsapp"></i>
+              <span>Catalogo y WhatsApp</span>
             </a>
           </div>
 
@@ -87,13 +95,13 @@ const navClass = (...paths: string[]) => (paths.includes(currentPath) ? "nav-ite
             <h2 class="page-title" id="pageTitle">Dashboard</h2>
           </div>
           <div class="topbar-right">
-            <div class="admin-profile">
-              <img src="https://ui-avatars.com/api/?name=Admin+User&background=0D8ABC&color=fff" alt="Admin" class="profile-avatar" />
+            <button class="admin-profile" id="adminSessionButton" type="button" title="Cerrar sesión">
+              <img src="https://ui-avatars.com/api/?name=Admin+User&background=0D8ABC&color=fff" alt="Admin" class="profile-avatar" id="adminAvatar" />
               <div class="profile-info">
-                <p class="profile-name">Admin User</p>
-                <p class="profile-meta">Panel principal</p>
+                <p class="profile-name" id="adminProfileName">Admin User</p>
+                <p class="profile-meta" id="adminProfileMeta">Panel principal · Cerrar sesión</p>
               </div>
-            </div>
+            </button>
           </div>
         </div>
 
@@ -105,6 +113,7 @@ const navClass = (...paths: string[]) => (paths.includes(currentPath) ? "nav-ite
     </div>
 
     <script>
+      // @ts-nocheck
       // Sidebar toggle functionality
       const sidebarToggle = document.getElementById('sidebarToggle');
       const adminSidebar = document.querySelector('.admin-sidebar');
@@ -117,7 +126,7 @@ const navClass = (...paths: string[]) => (paths.includes(currentPath) ? "nav-ite
       }
 
       // Navigation items click handlers
-      const navItems = document.querySelectorAll('.nav-item');
+      const navItems = document.querySelectorAll('a.nav-item');
       navItems.forEach(item => {
         item.addEventListener('click', (e) => {
           // Remove active class from all items
@@ -133,6 +142,82 @@ const navClass = (...paths: string[]) => (paths.includes(currentPath) ? "nav-ite
           }
         });
       });
+
+      async function logoutAndRedirect() {
+        try {
+          await fetch('/api/admin/auth/logout', {
+            method: 'POST',
+          });
+        } finally {
+          window.location.href = '/admin/login';
+        }
+      }
+
+      // Session info for top-right profile button
+      const adminProfileName = document.getElementById('adminProfileName');
+      const adminAvatar = document.getElementById('adminAvatar');
+      fetch('/api/admin/auth/me')
+        .then((res) => res.json())
+        .then((payload) => {
+          if (!payload?.ok || !payload?.user) {
+            window.location.href = '/admin/login';
+            return;
+          }
+
+          const displayName = payload.user.nombre || payload.user.email || 'Admin User';
+          if (adminProfileName) {
+            adminProfileName.textContent = displayName;
+          }
+          if (adminAvatar instanceof HTMLImageElement) {
+            adminAvatar.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=0D8ABC&color=fff`;
+          }
+        })
+        .catch(() => {
+          window.location.href = '/admin/login';
+        });
+
+      const adminSessionButton = document.getElementById('adminSessionButton');
+      if (adminSessionButton) {
+        adminSessionButton.addEventListener('click', logoutAndRedirect);
+      }
+
+      // Inactivity control: if user stops interacting, session closes automatically.
+      const ADMIN_IDLE_TIMEOUT_MS = 15 * 60 * 1000;
+      const ADMIN_PING_THROTTLE_MS = 60 * 1000;
+      let idleTimer = null;
+      let lastPingAt = 0;
+
+      function scheduleIdleLogout() {
+        if (idleTimer) {
+          clearTimeout(idleTimer);
+        }
+        idleTimer = setTimeout(() => {
+          logoutAndRedirect();
+        }, ADMIN_IDLE_TIMEOUT_MS);
+      }
+
+      function pingSession() {
+        const now = Date.now();
+        if (now - lastPingAt < ADMIN_PING_THROTTLE_MS) {
+          return;
+        }
+        lastPingAt = now;
+        fetch('/api/admin/auth/ping', { method: 'POST' }).catch(() => {
+          window.location.href = '/admin/login';
+        });
+      }
+
+      function onUserActivity() {
+        scheduleIdleLogout();
+        pingSession();
+      }
+
+      ['click', 'mousemove', 'keydown', 'scroll', 'touchstart'].forEach((eventName) => {
+        window.addEventListener(eventName, onUserActivity, { passive: true });
+      });
+
+      scheduleIdleLogout();
+      pingSession();
     </script>
   </body>
 </html>

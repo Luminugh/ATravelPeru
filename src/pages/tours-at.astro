@@ -1,7 +1,11 @@
 ---
 import AppLayout from "../layouts/AppLayout.astro";
+import { getCatalogByService } from "../lib/catalog";
 
 const title = "Tours AT - Recorridos Turísticos";
+
+const { items: toursAtData, error: toursLoadError, source: toursSource } = await getCatalogByService("tours");
+const tourLocations = [...new Set(toursAtData.map((tour) => tour.ubicacion).filter(Boolean))];
 ---
 
 <AppLayout title={title}>
@@ -52,11 +56,7 @@ const title = "Tours AT - Recorridos Turísticos";
                     <label class="filter-label">Destino</label>
                     <select class="filter-select">
                         <option>Todos los destinos</option>
-                        <option>Machu Picchu</option>
-                        <option>Cusco</option>
-                        <option>Sagrado</option>
-                        <option>Selva Peruana</option>
-                        <option>Lima</option>
+                        {tourLocations.map((ubicacion) => <option>{ubicacion}</option>)}
                     </select>
                 </div>
                 <div class="filter-group">
@@ -85,174 +85,38 @@ const title = "Tours AT - Recorridos Turísticos";
 
         <!-- Tours Grid Section -->
         <section id="tours-content" class="tours-section">
-            <h2 class="section-title mb-12">Nuestros Recorridos Destacados</h2>
-            <div class="tours-grid">
-                
-                <!-- Tour 1 -->
-                <div class="tour-card">
-                    <div class="tour-image">
-                        <img src="https://via.placeholder.com/400x250/FF6B6B/FFFFFF?text=Machu+Picchu" alt="Machu Picchu Express">
-                        <div class="tour-badge tour-badge-popular">Popular</div>
-                    </div>
-                    <div class="tour-content">
-                        <h3 class="tour-title">Machu Picchu Express</h3>
-                        <div class="tour-meta">
-                            <span class="tour-duration"><i class="fas fa-calendar-days"></i> 2 días</span>
-                            <span class="tour-difficulty difficulty-moderado">Moderado</span>
-                        </div>
-                        <p class="tour-description">Explora la maravilla del mundo en una experiencia inolvidable. Incluye tren de lujo, guía experto y alojamiento en Aguas Calientes.</p>
-                        <div class="tour-features">
-                            <span class="feature-tag">Transporte incluido</span>
-                            <span class="feature-tag">Guía bilingüe</span>
-                            <span class="feature-tag">Cena incluida</span>
-                        </div>
-                        <div class="tour-footer">
-                            <div class="tour-price">
-                                <span class="price-label">Desde</span>
-                                <span class="price-value">S/ 1,200</span>
-                            </div>
-                            <button class="btn-tour-reserve" onclick="showNotification('Solicitud de reserva enviada', 'success')">Reservar</button>
-                        </div>
-                    </div>
+            <h2 class="section-title mb-12">Recorridos disponibles</h2>
+            {toursAtData.length === 0 && (
+                <div class="tour-empty-state">
+                    <h3>No se encontraron tours para mostrar</h3>
+                    <p>Fuente consultada: {toursSource}</p>
+                    {toursLoadError && <p>Error detectado: {toursLoadError}</p>}
+                    <p>Revisa el diagnóstico en /api/health/supabase y confirma que existan filas activas en la base de datos.</p>
                 </div>
-
-                <!-- Tour 2 -->
-                <div class="tour-card">
-                    <div class="tour-image">
-                        <img src="https://via.placeholder.com/400x250/4ECDC4/FFFFFF?text=Valle+Sagrado" alt="Valle Sagrado">
-                        <div class="tour-badge tour-badge-new">Nuevo</div>
-                    </div>
-                    <div class="tour-content">
-                        <h3 class="tour-title">Valle Sagrado de los Incas</h3>
-                        <div class="tour-meta">
-                            <span class="tour-duration"><i class="fas fa-calendar-days"></i> 1 día</span>
-                            <span class="tour-difficulty difficulty-facil">Fácil</span>
-                        </div>
-                        <p class="tour-description">Conoce los pueblos mágicos, mercados tradicionales y ruinas incaicas en el corazón del Valle Sagrado.</p>
-                        <div class="tour-features">
-                            <span class="feature-tag">Mercado local</span>
-                            <span class="feature-tag">Almuerzo típico</span>
-                            <span class="feature-tag">Fotos épicas</span>
-                        </div>
-                        <div class="tour-footer">
-                            <div class="tour-price">
-                                <span class="price-label">Desde</span>
-                                <span class="price-value">S/ 450</span>
+            )}
+            <div class="tours-summary-grid">
+                {toursAtData.map((tour) => (
+                    <article class="tour-summary-card" data-tour-id={tour.id}>
+                        <div class="summary-image-wrap">
+                            <img src={tour.imagen_principal} alt={tour.titulo} class="summary-image" loading="lazy" />
+                            <div class="summary-badges">
+                                {tour.destacado && <span class="summary-badge destacado">Destacado</span>}
+                                <span class={`summary-badge estado ${tour.estado}`}>{tour.estado}</span>
                             </div>
-                            <button class="btn-tour-reserve" onclick="showNotification('Solicitud de reserva enviada', 'success')">Reservar</button>
                         </div>
-                    </div>
-                </div>
-
-                <!-- Tour 3 -->
-                <div class="tour-card">
-                    <div class="tour-image">
-                        <img src="https://via.placeholder.com/400x250/95E1D3/FFFFFF?text=Selva+Peruana" alt="Selva Peruana">
-                    </div>
-                    <div class="tour-content">
-                        <h3 class="tour-title">Aventura en la Selva Amazónica</h3>
-                        <div class="tour-meta">
-                            <span class="tour-duration"><i class="fas fa-calendar-days"></i> 4 días</span>
-                            <span class="tour-difficulty difficulty-dificil">Difícil</span>
-                        </div>
-                        <p class="tour-description">Inmersión total en la selva peruana: avistamiento de fauna, comunidades nativas y navegación en el río Amazonas.</p>
-                        <div class="tour-features">
-                            <span class="feature-tag">All-inclusive</span>
-                            <span class="feature-tag">Lodge eco-amigable</span>
-                            <span class="feature-tag">Guía naturalista</span>
-                        </div>
-                        <div class="tour-footer">
-                            <div class="tour-price">
-                                <span class="price-label">Desde</span>
-                                <span class="price-value">S/ 2,100</span>
+                        <div class="summary-content">
+                            <h3 class="summary-title">{tour.titulo}</h3>
+                            <p class="summary-meta"><i class="fas fa-location-dot"></i> {tour.ubicacion} · <i class="fas fa-clock"></i> {tour.duracion}</p>
+                            <p class="summary-description">{tour.descripcion}</p>
+                            <div class="summary-footer">
+                                <span class="summary-price">{tour.precio}</span>
+                                <button class="btn-summary-open" type="button" data-open-tour={tour.id} disabled={tour.estado !== "activo"}>
+                                    {tour.estado === "activo" ? "Ver detalles" : "No disponible"}
+                                </button>
                             </div>
-                            <button class="btn-tour-reserve" onclick="showNotification('Solicitud de reserva enviada', 'success')">Reservar</button>
                         </div>
-                    </div>
-                </div>
-
-                <!-- Tour 4 -->
-                <div class="tour-card">
-                    <div class="tour-image">
-                        <img src="https://via.placeholder.com/400x250/F38181/FFFFFF?text=Cusco+Colonial" alt="Cusco Colonial">
-                        <div class="tour-badge tour-badge-top">Top Rating</div>
-                    </div>
-                    <div class="tour-content">
-                        <h3 class="tour-title">Cusco Colonial y Arqueología</h3>
-                        <div class="tour-meta">
-                            <span class="tour-duration"><i class="fas fa-calendar-days"></i> 3 días</span>
-                            <span class="tour-difficulty difficulty-facil">Fácil</span>
-                        </div>
-                        <p class="tour-description">Recorre la capital inca: Qoricancha, Sacsayhuamán, Plaza de Armas y barrios coloniales con historia milenaria.</p>
-                        <div class="tour-features">
-                            <span class="feature-tag">Museo incluido</span>
-                            <span class="feature-tag">Desayunos</span>
-                            <span class="feature-tag">Entradas pagadas</span>
-                        </div>
-                        <div class="tour-footer">
-                            <div class="tour-price">
-                                <span class="price-label">Desde</span>
-                                <span class="price-value">S/ 850</span>
-                            </div>
-                            <button class="btn-tour-reserve" onclick="showNotification('Solicitud de reserva enviada', 'success')">Reservar</button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Tour 5 -->
-                <div class="tour-card">
-                    <div class="tour-image">
-                        <img src="https://via.placeholder.com/400x250/AA96DA/FFFFFF?text=Lima+Gastronómica" alt="Lima Gastronómica">
-                    </div>
-                    <div class="tour-content">
-                        <h3 class="tour-title">Lima Gastronómica y Cultural</h3>
-                        <div class="tour-meta">
-                            <span class="tour-duration"><i class="fas fa-calendar-days"></i> 2 días</span>
-                            <span class="tour-difficulty difficulty-facil">Fácil</span>
-                        </div>
-                        <p class="tour-description">Explora la capital peruana: gastronomía de clase mundial, museos nacionales y miradores con vistas espectaculares.</p>
-                        <div class="tour-features">
-                            <span class="feature-tag">4 restaurantes</span>
-                            <span class="feature-tag">Tour gastronómico</span>
-                            <span class="feature-tag">Transporte 5 estrellas</span>
-                        </div>
-                        <div class="tour-footer">
-                            <div class="tour-price">
-                                <span class="price-label">Desde</span>
-                                <span class="price-value">S/ 950</span>
-                            </div>
-                            <button class="btn-tour-reserve" onclick="showNotification('Solicitud de reserva enviada', 'success')">Reservar</button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Tour 6 -->
-                <div class="tour-card">
-                    <div class="tour-image">
-                        <img src="https://via.placeholder.com/400x250/FCBAD3/FFFFFF?text=Lago+Titicaca" alt="Lago Titicaca">
-                    </div>
-                    <div class="tour-content">
-                        <h3 class="tour-title">Isla de Taquile - Lago Titicaca</h3>
-                        <div class="tour-meta">
-                            <span class="tour-duration"><i class="fas fa-calendar-days"></i> 2 días</span>
-                            <span class="tour-difficulty difficulty-moderado">Moderado</span>
-                        </div>
-                        <p class="tour-description">Vive la experiencia única de las Islas flotantes, tejidos ancestrales y la magia del lago más alto del mundo.</p>
-                        <div class="tour-features">
-                            <span class="feature-tag">Bote turístico</span>
-                            <span class="feature-tag">Casa local</span>
-                            <span class="feature-tag">Artesanías</span>
-                        </div>
-                        <div class="tour-footer">
-                            <div class="tour-price">
-                                <span class="price-label">Desde</span>
-                                <span class="price-value">S/ 680</span>
-                            </div>
-                            <button class="btn-tour-reserve" onclick="showNotification('Solicitud de reserva enviada', 'success')">Reservar</button>
-                        </div>
-                    </div>
-                </div>
-
+                    </article>
+                ))}
             </div>
         </section>
 
@@ -261,14 +125,14 @@ const title = "Tours AT - Recorridos Turísticos";
             <h2 class="section-title mb-12">¿Por qué elegir Tours AT?</h2>
             <div class="why-choose-grid">
                 <div class="why-choose-card">
-                    <i class="fas fa-shield-alt why-choose-icon"></i>
+                    <i class="fas fa-shield-check why-choose-icon"></i>
                     <h3 class="why-choose-title">100% Asegurado</h3>
-                    <p class="why-choose-text">Todos nuestros tours están completamente asegurados. Viajar con seguridad es nuestra prioridad.</p>
+                    <p class="why-choose-text">Todos nuestros tours están completamente asegurados. Tu seguridad es nuestra prioridad.</p>
                 </div>
                 <div class="why-choose-card">
-                    <i class="fas fa-users-class why-choose-icon"></i>
+                    <i class="fas fa-user-tie why-choose-icon"></i>
                     <h3 class="why-choose-title">Guías Expertos</h3>
-                    <p class="why-choose-text">Nuestros guías son locales certificados con años de experiencia en cada ruta.</p>
+                    <p class="why-choose-text">Guías locales certificados con años de experiencia en cada ruta que ofrecemos.</p>
                 </div>
                 <div class="why-choose-card">
                     <i class="fas fa-utensils why-choose-icon"></i>
@@ -276,7 +140,7 @@ const title = "Tours AT - Recorridos Turísticos";
                     <p class="why-choose-text">Disfruta de la auténtica gastronomía peruana en cada recorrido que realizamos.</p>
                 </div>
                 <div class="why-choose-card">
-                    <i class="fas fa-redo why-choose-icon"></i>
+                    <i class="fas fa-check-circle why-choose-icon"></i>
                     <h3 class="why-choose-title">Cancelación Gratuita</h3>
                     <p class="why-choose-text">Cancela tu reserva hasta 48 horas antes sin cargos adicionales.</p>
                 </div>
@@ -294,15 +158,163 @@ const title = "Tours AT - Recorridos Turísticos";
         </section>
 
         <!-- CTA Section -->
-        <section class="cta-section mt-20 bg-gradient-to-r from-purple-600 to-purple-500 rounded-2xl px-8 py-12 text-white">
+        <section class="cta-section mt-20 bg-gradient-to-r from-green-600 to-green-500 rounded-2xl px-8 py-12 text-white">
             <div class="max-w-2xl mx-auto text-center">
                 <h2 class="text-3xl font-bold mb-4">¿Listo para vivir una aventura?</h2>
-                <p class="text-lg mb-8 text-purple-100">Con Tours AT, cada recorrido es una historia que deseará contar una y otra vez</p>
-                <button class="btn-cta-primary" onclick="showNotification('Te contactaremos pronto', 'success')">Reservar Ahora</button>
+                <p class="text-lg mb-8 text-green-100">Con Tours AT, cada recorrido es una historia que deseará contar una y otra vez</p>
+                <a href="#tours-content" class="btn-hero-primary">Explorar Tours Disponibles</a>
             </div>
         </section>
 
     </main>
+
+    <div id="tourDetailModal" class="tour-detail-modal" hidden>
+        <div class="tour-detail-backdrop" data-close-modal></div>
+        <div class="tour-detail-window" role="dialog" aria-modal="true" aria-labelledby="tourDetailTitle">
+            <button type="button" class="tour-detail-close" data-close-modal aria-label="Cerrar ventana">
+                <i class="fas fa-xmark"></i>
+            </button>
+
+            <div class="tour-detail-header">
+                <img id="tourDetailInternalImage" src="" alt="Imagen detalle" class="tour-detail-internal-image" />
+                <div class="tour-detail-title-wrap">
+                    <h3 id="tourDetailTitle" class="tour-detail-title"></h3>
+                    <p id="tourDetailMeta" class="tour-detail-meta"></p>
+                    <div class="tour-detail-badges">
+                        <span id="tourDetailEstado" class="summary-badge estado"></span>
+                        <span id="tourDetailDestacado" class="summary-badge destacado" hidden>Destacado</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tour-detail-body">
+                <p id="tourDetailDescripcion" class="tour-detail-text"></p>
+
+                <div class="tour-detail-block">
+                    <h4>Incluye</h4>
+                    <p id="tourDetailIncluye"></p>
+                </div>
+
+                <div class="tour-detail-block" id="tourDetailNoIncluyeWrap">
+                    <h4>No incluye</h4>
+                    <p id="tourDetailNoIncluye"></p>
+                </div>
+
+                <div class="tour-detail-block" id="tourDetailItinerarioWrap">
+                    <h4>Itinerario</h4>
+                    <p id="tourDetailItinerario"></p>
+                </div>
+
+                <div class="tour-detail-block">
+                    <h4>Galería</h4>
+                    <div id="tourDetailGallery" class="tour-detail-gallery"></div>
+                </div>
+            </div>
+
+            <div class="tour-detail-footer">
+                <strong id="tourDetailPrice" class="tour-detail-price"></strong>
+                <button type="button" id="tourDetailReserve" class="btn-tour-reserve-modal">
+                    <i class="fas fa-whatsapp"></i>
+                    Reservar este tour
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script define:vars={{ toursAtData }}>
+        const modal = document.getElementById('tourDetailModal');
+        const titleEl = document.getElementById('tourDetailTitle');
+        const metaEl = document.getElementById('tourDetailMeta');
+        const estadoEl = document.getElementById('tourDetailEstado');
+        const destacadoEl = document.getElementById('tourDetailDestacado');
+        const descripcionEl = document.getElementById('tourDetailDescripcion');
+        const incluyeEl = document.getElementById('tourDetailIncluye');
+        const noIncluyeWrapEl = document.getElementById('tourDetailNoIncluyeWrap');
+        const noIncluyeEl = document.getElementById('tourDetailNoIncluye');
+        const itinerarioWrapEl = document.getElementById('tourDetailItinerarioWrap');
+        const itinerarioEl = document.getElementById('tourDetailItinerario');
+        const galleryEl = document.getElementById('tourDetailGallery');
+        const priceEl = document.getElementById('tourDetailPrice');
+        const reserveBtn = document.getElementById('tourDetailReserve');
+        const internalImageEl = document.getElementById('tourDetailInternalImage');
+
+        let selectedTour = null;
+
+        function openTourDetail(tourId) {
+            const found = toursAtData.find((tour) => String(tour.id) === String(tourId));
+            if (!found || found.estado !== 'activo') {
+                return;
+            }
+
+            selectedTour = found;
+            titleEl.textContent = found.titulo;
+            metaEl.textContent = `${found.ubicacion} · ${found.duracion} · Vendedor #${found.vendedor_id}`;
+            estadoEl.textContent = found.estado;
+            estadoEl.classList.remove('activo', 'inactivo');
+            estadoEl.classList.add(found.estado);
+            destacadoEl.hidden = !found.destacado;
+
+            descripcionEl.textContent = found.descripcion;
+            incluyeEl.textContent = found.incluye;
+
+            noIncluyeWrapEl.hidden = !found.no_incluye;
+            noIncluyeEl.textContent = found.no_incluye || '';
+
+            itinerarioWrapEl.hidden = !found.itinerario;
+            itinerarioEl.textContent = found.itinerario || '';
+
+            const internalImage = Array.isArray(found.galeria) && found.galeria.length > 0
+                ? found.galeria[0]
+                : found.imagen_principal;
+            internalImageEl.src = internalImage;
+            internalImageEl.alt = `${found.titulo} imagen interna`;
+
+            galleryEl.innerHTML = '';
+            (found.galeria || []).forEach((src, index) => {
+                const img = document.createElement('img');
+                img.src = src;
+                img.alt = `${found.titulo} galería ${index + 1}`;
+                img.loading = 'lazy';
+                galleryEl.appendChild(img);
+            });
+
+            priceEl.textContent = found.precio;
+
+            modal.hidden = false;
+            document.body.classList.add('tour-modal-open');
+        }
+
+        function closeTourDetail() {
+            modal.hidden = true;
+            document.body.classList.remove('tour-modal-open');
+            selectedTour = null;
+        }
+
+        document.querySelectorAll('[data-open-tour]').forEach((button) => {
+            button.addEventListener('click', () => {
+                openTourDetail(button.getAttribute('data-open-tour'));
+            });
+        });
+
+        document.querySelectorAll('[data-close-modal]').forEach((button) => {
+            button.addEventListener('click', closeTourDetail);
+        });
+
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape' && !modal.hidden) {
+                closeTourDetail();
+            }
+        });
+
+        reserveBtn.addEventListener('click', () => {
+            if (!selectedTour) {
+                return;
+            }
+
+            const message = `Hola, quiero reservar ${selectedTour.titulo} (${selectedTour.duracion}) por ${selectedTour.precio}.`;
+            const whatsappUrl = `https://wa.me/51987654321?text=${encodeURIComponent(message)}`;
+            window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
+        });
+    </script>
+
 </AppLayout>
-
-

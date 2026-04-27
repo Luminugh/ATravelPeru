@@ -7,111 +7,329 @@ const title = "Gestión de Tours AT - Panel Admin";
 <AdminLayout title={title}>
   <!-- Tours Section -->
   <section class="content-section">
-    <div class="section-header">
-      <h3>
-        <i class="fas fa-map"></i>
-        Gestión de Tours AT
-      </h3>
-      <div class="section-actions">
-        <button class="btn btn-primary">
-          <i class="fas fa-plus"></i>
-          Nuevo Tour
-        </button>
-        <button class="btn btn-secondary">
-          <i class="fas fa-download"></i>
-          Exportar
-        </button>
+    <div class="section-header" style="margin-bottom: 2rem;">
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+        <div>
+          <h3 style="margin: 0; display: flex; align-items: center; gap: 0.5rem;"><i class="fas fa-map"></i> Gestión de Tours AT</h3>
+          <p style="margin: 0.5rem 0 0 0; color: #666; font-size: 0.9rem;" id="tourCount">Cargando...</p>
+        </div>
+        <button id="newBtn" class="btn btn-primary" style="padding: 0.75rem 1.5rem; font-size: 1rem;"><i class="fas fa-plus"></i> Nuevo Tour</button>
       </div>
     </div>
 
-    <div class="search-bar">
-      <div class="search-input">
-        <i class="fas fa-search search-icon"></i>
-        <input type="text" placeholder="Buscar tours..." />
-      </div>
-      <div class="filter-select">
-        <select>
-          <option>Todos los estados</option>
-          <option>Activo</option>
-          <option>Inactivo</option>
-          <option>Pendiente</option>
+    <!-- Controles de búsqueda y filtro mejorado -->
+    <div style="margin-bottom: 2rem;">
+      <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+        <!-- Buscador mejorado -->
+        <div style="position: relative; display: flex; align-items: center;">
+          <i class="fas fa-search" style="position: absolute; left: 12px; color: #a0aec0; font-size: 0.95rem; pointer-events: none;"></i>
+          <input id="searchInput" type="text" placeholder="Buscar por título o destino..." style="width: 100%; padding: 0.75rem 1rem 0.75rem 2.5rem; border: 1px solid #ddd; border-radius: 8px; font-size: 1rem; background: white; transition: all 0.3s ease; box-shadow: 0 2px 4px rgba(0,0,0,0.02);" onfocus="this.style.borderColor='#667eea'; this.style.boxShadow='0 0 0 3px rgba(102,126,234,0.1)'" onblur="this.style.borderColor='#ddd'; this.style.boxShadow='0 2px 4px rgba(0,0,0,0.02)'" />
+        </div>
+        <!-- Filtro de estado -->
+        <select id="filterStatus" style="padding: 0.75rem 1rem; border: 1px solid #ddd; border-radius: 8px; font-size: 1rem; background: white; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 2px 4px rgba(0,0,0,0.02);" onfocus="this.style.borderColor='#667eea'; this.style.boxShadow='0 0 0 3px rgba(102,126,234,0.1)'" onblur="this.style.borderColor='#ddd'; this.style.boxShadow='0 2px 4px rgba(0,0,0,0.02)'">
+          <option value="">Todos los estados</option>
+          <option value="activo">Activo</option>
+          <option value="inactivo">Inactivo</option>
+        </select>
+        <!-- Filtro de destino -->
+        <select id="filterDestino" style="padding: 0.75rem 1rem; border: 1px solid #ddd; border-radius: 8px; font-size: 1rem; background: white; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 2px 4px rgba(0,0,0,0.02);" onfocus="this.style.borderColor='#667eea'; this.style.boxShadow='0 0 0 3px rgba(102,126,234,0.1)'" onblur="this.style.borderColor='#ddd'; this.style.boxShadow='0 2px 4px rgba(0,0,0,0.02)'">
+          <option value="">Todos los destinos</option>
         </select>
       </div>
     </div>
 
-    <table class="data-table">
-      <thead>
-        <tr>
-          <th>Nombre del Tour</th>
-          <th>Destino</th>
-          <th>Precio</th>
-          <th>Duración</th>
-          <th>Estado</th>
-          <th>Acciones</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td><span class="item-name">Machu Picchu Clásico</span></td>
-          <td>Cusco - Machupicchu</td>
-          <td>$299</td>
-          <td>4 días</td>
-          <td><span class="item-status active">Activo</span></td>
-          <td>
-            <div class="item-actions">
-              <button class="action-btn edit" title="Editar">
-                <i class="fas fa-edit"></i>
-              </button>
-              <button class="action-btn view" title="Ver">
-                <i class="fas fa-eye"></i>
-              </button>
-              <button class="action-btn delete" title="Eliminar">
-                <i class="fas fa-trash"></i>
-              </button>
-            </div>
-          </td>
-        </tr>
-        <tr>
-          <td><span class="item-name">Valle Sagrado</span></td>
-          <td>Cusco - Valle Sagrado</td>
-          <td>$199</td>
-          <td>3 días</td>
-          <td><span class="item-status active">Activo</span></td>
-          <td>
-            <div class="item-actions">
-              <button class="action-btn edit" title="Editar">
-                <i class="fas fa-edit"></i>
-              </button>
-              <button class="action-btn view" title="Ver">
-                <i class="fas fa-eye"></i>
-              </button>
-              <button class="action-btn delete" title="Eliminar">
-                <i class="fas fa-trash"></i>
-              </button>
-            </div>
-          </td>
-        </tr>
-        <tr>
-          <td><span class="item-name">Selva Amazónica</span></td>
-          <td>Iquitos</td>
-          <td>$399</td>
-          <td>5 días</td>
-          <td><span class="item-status inactive">Inactivo</span></td>
-          <td>
-            <div class="item-actions">
-              <button class="action-btn edit" title="Editar">
-                <i class="fas fa-edit"></i>
-              </button>
-              <button class="action-btn view" title="Ver">
-                <i class="fas fa-eye"></i>
-              </button>
-              <button class="action-btn delete" title="Eliminar">
-                <i class="fas fa-trash"></i>
-              </button>
-            </div>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+    <!-- Grid de tarjetas -->
+    <div id="toursList" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.5rem;"></div>
+
+    <!-- Empty state -->
+    <div id="emptyState" style="text-align: center; padding: 3rem 1rem; color: #999; display: none;">
+      <i class="fas fa-inbox" style="font-size: 4rem; margin-bottom: 1rem; display: block; color: #cbd5e0;"></i>
+      <p style="font-size: 1.1rem; font-weight: 500;">No se encontraron tours</p>
+      <p style="font-size: 0.9rem; color: #a0aec0;">Crea uno nuevo para empezar</p>
+    </div>
+
+    <!-- Modal overlay -->
+    <div id="modalOverlay" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); z-index: 999;"></div>
+
+    <!-- Edit modal mejorado -->
+    <div id="editor" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; border-radius: 12px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); z-index: 1000; max-height: 90vh; overflow-y: auto; width: 95%; max-width: 700px;">
+      <div style="padding: 1.5rem 2rem; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; sticky; top: 0; background: linear-gradient(to right, #f8f9fa, #ffffff);">
+        <h2 style="margin: 0; font-size: 1.5rem;" id="modalTitle">Nuevo Tour</h2>
+        <button type="button" id="closeBtn" style="background: none; border: none; font-size: 1.8rem; cursor: pointer; color: #999; transition: color 0.2s;">&times;</button>
+      </div>
+      <form id="editorForm" style="padding: 2rem;">
+        <input type="hidden" name="id" />
+        
+        <!-- Fila 1: Título -->
+        <div style="margin-bottom: 1.5rem;">
+          <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #333; display: flex; align-items: center; gap: 0.5rem;"><i class="fas fa-heading" style="color: #667eea;"></i> Título del Tour *</label>
+          <input name="titulo" required placeholder="Ej: Machu Picchu Express" style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 6px; font-size: 1rem;" />
+        </div>
+
+        <!-- Fila 2: Descripción -->
+        <div style="margin-bottom: 1.5rem;">
+          <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #333; display: flex; align-items: center; gap: 0.5rem;"><i class="fas fa-file-alt" style="color: #667eea;"></i> Descripción *</label>
+          <textarea name="descripcion" rows="3" required placeholder="Describe brevemente el tour..." style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 6px; font-size: 1rem; resize: vertical;"></textarea>
+        </div>
+
+        <!-- Fila 3: Precio, Duración, Ubicación -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem;">
+          <div>
+            <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #333; display: flex; align-items: center; gap: 0.5rem;"><i class="fas fa-dollar-sign" style="color: #667eea;"></i> Precio *</label>
+            <input type="number" step="0.01" name="precio" required placeholder="1200" style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 6px; font-size: 1rem;" />
+          </div>
+          <div>
+            <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #333; display: flex; align-items: center; gap: 0.5rem;"><i class="fas fa-hourglass-end" style="color: #667eea;"></i> Duración *</label>
+            <input name="duracion" required placeholder="Ej: 3 días" style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 6px; font-size: 1rem;" />
+          </div>
+          <div>
+            <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #333; display: flex; align-items: center; gap: 0.5rem;"><i class="fas fa-location-dot" style="color: #667eea;"></i> Ubicación *</label>
+            <select name="ubicacion_id" required style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 6px; font-size: 1rem;"></select>
+          </div>
+        </div>
+
+        <!-- Fila 4: Incluye / No incluye -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem;">
+          <div>
+            <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #333; display: flex; align-items: center; gap: 0.5rem;"><i class="fas fa-check-circle" style="color: #51cf66;"></i> Incluye *</label>
+            <textarea name="incluye" rows="2" placeholder="Transporte, entradas, guía..." style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 6px; font-size: 1rem; resize: vertical;"></textarea>
+          </div>
+          <div>
+            <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #333; display: flex; align-items: center; gap: 0.5rem;"><i class="fas fa-times-circle" style="color: #ff6b6b;"></i> No Incluye</label>
+            <textarea name="no_incluye" rows="2" placeholder="Vuelos, propinas..." style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 6px; font-size: 1rem; resize: vertical;"></textarea>
+          </div>
+        </div>
+
+        <!-- Fila 5: Itinerario e Imagen Principal -->
+        <div style="margin-bottom: 1.5rem;">
+          <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #333; display: flex; align-items: center; gap: 0.5rem;"><i class="fas fa-map" style="color: #667eea;"></i> Itinerario Detallado</label>
+          <textarea name="itinerario" rows="3" placeholder="Día 1: ..., Día 2: ..., Día 3: ..." style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 6px; font-size: 1rem; resize: vertical;"></textarea>
+        </div>
+
+        <div style="margin-bottom: 1.5rem;">
+          <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #333; display: flex; align-items: center; gap: 0.5rem;"><i class="fas fa-image" style="color: #667eea;"></i> Imagen Principal (URL)</label>
+          <input name="imagen_principal" placeholder="https://images.unsplash.com/..." style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 6px; font-size: 1rem;" />
+        </div>
+
+        <!-- Fila 6: Galería -->
+        <div style="margin-bottom: 1.5rem; background: #f9f9f9; padding: 1rem; border-radius: 6px;">
+          <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #333; display: flex; align-items: center; gap: 0.5rem;"><i class="fas fa-gallery" style="color: #667eea;"></i> Galería (JSON Array)</label>
+          <small style="color: #666; display: block; margin-bottom: 0.5rem;">Copiar/pegar un array JSON con imágenes.</small>
+          <textarea name="galeria" rows="3" placeholder='[{"imagen":"https://...","orden":1,"alt_text":"Foto"}]' style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 6px; font-family: 'Courier New', monospace; font-size: 0.9rem; resize: vertical;"></textarea>
+        </div>
+
+        <!-- Fila 7: Destacado y Estado -->
+        <div style="display: grid; grid-template-columns: auto 1fr; gap: 2rem; margin-bottom: 1.5rem;">
+          <label style="display: flex; align-items: center; gap: 0.75rem; cursor: pointer;">
+            <input type="checkbox" name="destacado" style="width: 1.2rem; height: 1.2rem; cursor: pointer;" />
+            <span style="font-weight: 600; color: #333; display: flex; align-items: center; gap: 0.5rem;"><i class="fas fa-star" style="color: #ffc107;"></i> Destacado</span>
+          </label>
+          <div>
+            <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #333; display: flex; align-items: center; gap: 0.5rem;"><i class="fas fa-toggle-on" style="color: #667eea;"></i> Estado</label>
+            <select name="estado" style="padding: 0.5rem 0.75rem; border: 1px solid #ddd; border-radius: 6px; font-size: 1rem;">
+              <option value="activo">Activo</option>
+              <option value="inactivo">Inactivo</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Botones de acción -->
+        <div style="display: flex; gap: 1rem; border-top: 1px solid #eee; padding-top: 1.5rem;">
+          <button type="submit" class="btn btn-primary" style="flex: 1; padding: 0.75rem; font-size: 1rem; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 0.5rem;"><i class="fas fa-save"></i> Guardar Tour</button>
+          <button type="button" id="cancelBtn" class="btn btn-secondary" style="flex: 1; padding: 0.75rem; font-size: 1rem; font-weight: 600;">Cancelar</button>
+        </div>
+      </form>
+    </div>
   </section>
+
+    <script type="module">
+      const api = {
+        list: () => fetch('/api/admin/tours').then(r=>r.json()),
+        create: (payload) => fetch('/api/admin/tours', { method: 'POST', headers:{'content-type':'application/json'}, body: JSON.stringify(payload)}).then(r=>r.json()),
+        update: (payload) => fetch('/api/admin/tours', { method: 'PUT', headers:{'content-type':'application/json'}, body: JSON.stringify(payload)}).then(r=>r.json()),
+        del: (id) => fetch('/api/admin/tours', { method: 'DELETE', headers:{'content-type':'application/json'}, body: JSON.stringify({id})}).then(r=>r.json()),
+        ubicaciones: () => fetch('/api/admin/ubicaciones').then(r=>r.json()),
+      };
+
+      const listEl = document.getElementById('toursList');
+      const emptyEl = document.getElementById('emptyState');
+      const editor = document.getElementById('editor');
+      const modalOverlay = document.getElementById('modalOverlay');
+      const form = document.getElementById('editorForm');
+      const newBtn = document.getElementById('newBtn');
+      const cancelBtn = document.getElementById('cancelBtn');
+      const closeBtn = document.getElementById('closeBtn');
+      const searchInput = document.getElementById('searchInput');
+      const filterStatus = document.getElementById('filterStatus');
+      const filterDestino = document.getElementById('filterDestino');
+      const tourCount = document.getElementById('tourCount');
+
+      let tours = [];
+      let ubicaciones = [];
+
+      async function load() {
+        const [tRes, uRes] = await Promise.all([api.list(), api.ubicaciones()]);
+        if (uRes.ok) ubicaciones = uRes.data;
+        if (tRes.ok) tours = tRes.data;
+        populateUbicaciones();
+        populateFilterDestino();
+        applyFilters();
+      }
+
+      function applyFilters() {
+        const searchTerm = searchInput.value.toLowerCase();
+        const statusTerm = filterStatus.value;
+        const destinoTerm = filterDestino.value;
+
+        const filtered = tours.filter(t => {
+          const matchSearch = !searchTerm || t.titulo.toLowerCase().includes(searchTerm) || t.ubicacion?.toLowerCase().includes(searchTerm);
+          const matchStatus = !statusTerm || t.estado === statusTerm;
+          const matchDestino = !destinoTerm || t.ubicacion_id == destinoTerm;
+          return matchSearch && matchStatus && matchDestino;
+        });
+
+        tourCount.textContent = `${filtered.length} tour${filtered.length !== 1 ? 's' : ''} encontrado${filtered.length !== 1 ? 's' : ''}`;
+        renderList(filtered);
+      }
+
+      function renderList(items) {
+        if (items.length === 0) {
+          listEl.style.display = 'none';
+          emptyEl.style.display = 'block';
+          return;
+        }
+        listEl.style.display = 'grid';
+        emptyEl.style.display = 'none';
+
+        listEl.innerHTML = items.map(t => {
+          const statusBg = t.estado === 'activo' ? '#e8f5e9' : '#ffebee';
+          const statusIcon = t.estado === 'activo' ? 'fa-check-circle' : 'fa-times-circle';
+          const statusText = t.estado === 'activo' ? 'Activo' : 'Inactivo';
+          const statusColor = t.estado === 'activo' ? '#2e7d32' : '#c62828';
+          
+          return `
+            <div style="border: 1px solid #e0e0e0; border-radius: 10px; overflow: hidden; background: white; box-shadow: 0 2px 8px rgba(0,0,0,0.08); transition: box-shadow 0.3s;" onmouseover="this.style.boxShadow='0 4px 16px rgba(0,0,0,0.12)'" onmouseout="this.style.boxShadow='0 2px 8px rgba(0,0,0,0.08)'">
+              <div style="height: 180px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); position: relative; overflow: hidden;">
+                ${t.imagen_principal ? `<img src="${t.imagen_principal}" alt="${t.titulo}" style="width: 100%; height: 100%; object-fit: cover;" />` : ''}
+                <div style="position: absolute; top: 0; right: 0; background: ${statusBg}; color: ${statusColor}; padding: 0.5rem 1rem; font-size: 0.85rem; font-weight: 600; border-bottom-left-radius: 6px; display: flex; align-items: center; gap: 0.4rem;"><i class="fas ${statusIcon}" style="font-size: 0.9rem;"></i> ${statusText}</div>
+                ${t.destacado ? `<div style="position: absolute; top: 0; left: 0; background: #ffc107; color: #333; padding: 0.5rem 1rem; font-size: 0.85rem; font-weight: 600; border-bottom-right-radius: 6px; display: flex; align-items: center; gap: 0.4rem;"><i class="fas fa-star"></i></div>` : ''}
+              </div>
+              <div style="padding: 1.25rem;">
+                <h4 style="margin: 0 0 0.5rem 0; font-size: 1.1rem; color: #222;">${t.titulo}</h4>
+                <div style="font-size: 0.9rem; color: #667eea; margin-bottom: 0.75rem; font-weight: 600; display: flex; align-items: center; gap: 0.5rem;"><i class="fas fa-map-marker-alt"></i> ${t.ubicacion} <span style="color: #a0aec0;">•</span> <i class="fas fa-clock"></i> ${t.duracion}</div>
+                <div style="font-size: 1.3rem; color: #222; margin-bottom: 0.75rem; font-weight: 700;">$${t.precio?.toFixed(2)}</div>
+                <p style="margin: 0.75rem 0; color: #666; font-size: 0.9rem; line-height: 1.4;">${t.descripcion?.slice(0,100) ?? ''}...</p>
+                <div style="display: flex; gap: 0.5rem; margin-top: 1rem;">
+                  <button data-id="${t.id}" class="editBtn" style="flex: 1; padding: 0.6rem; background: #0066cc; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.9rem; transition: background 0.2s; display: flex; align-items: center; justify-content: center; gap: 0.4rem;" onmouseover="this.style.background='#0052a3'" onmouseout="this.style.background='#0066cc'"><i class="fas fa-edit"></i> Editar</button>
+                  <button data-id="${t.id}" class="delBtn" style="flex: 1; padding: 0.6rem; background: #dc3545; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.9rem; transition: background 0.2s; display: flex; align-items: center; justify-content: center; gap: 0.4rem;" onmouseover="this.style.background='#c82333'" onmouseout="this.style.background='#dc3545'"><i class="fas fa-trash"></i> Eliminar</button>
+                </div>
+              </div>
+            </div>
+          `;
+        }).join('');
+
+        listEl.querySelectorAll('.editBtn').forEach(b=>b.addEventListener('click', ()=>openEditor(b.dataset.id)));
+        listEl.querySelectorAll('.delBtn').forEach(b=>b.addEventListener('click', ()=>delItem(b.dataset.id)));
+      }
+
+      function populateUbicaciones() {
+        const sel = form.querySelector('select[name="ubicacion_id"]');
+        sel.innerHTML = ubicaciones.map(u=>`<option value="${u.id}">${u.nombre}</option>`).join('');
+      }
+
+      function populateFilterDestino() {
+        const sel = filterDestino;
+        sel.innerHTML = '<option value="">Todos los destinos</option>' + ubicaciones.map(u=>`<option value="${u.id}">${u.nombre}</option>`).join('');
+      }
+
+      function openEditor(id) {
+        const data = tours.find(t=>String(t.id)===String(id)) || {};
+        const modalTitle = document.getElementById('modalTitle');
+        modalTitle.textContent = data.id ? `Editar: ${data.titulo}` : 'Nuevo Tour';
+
+        form.querySelector('input[name="id"]').value = data.id || '';
+        form.querySelector('input[name="titulo"]').value = data.titulo || '';
+        form.querySelector('textarea[name="descripcion"]').value = data.descripcion || '';
+        form.querySelector('input[name="precio"]').value = data.precio ?? '';
+        form.querySelector('input[name="duracion"]').value = data.duracion || '';
+        form.querySelector('select[name="ubicacion_id"]').value = data.ubicacion_id || (ubicaciones[0]?.id ?? '');
+        form.querySelector('textarea[name="incluye"]').value = data.incluye || '';
+        form.querySelector('textarea[name="no_incluye"]').value = data.no_incluye || '';
+        form.querySelector('textarea[name="itinerario"]').value = data.itinerario || '';
+        form.querySelector('input[name="imagen_principal"]').value = data.imagen_principal || '';
+        form.querySelector('textarea[name="galeria"]').value = JSON.stringify(data.galeria ?? [], null, 2);
+        form.querySelector('input[name="destacado"]').checked = !!data.destacado;
+        form.querySelector('select[name="estado"]').value = data.estado || 'activo';
+        openModal();
+      }
+
+      function openModal() {
+        editor.style.display = 'block';
+        modalOverlay.style.display = 'block';
+      }
+
+      function closeModal() {
+        editor.style.display = 'none';
+        modalOverlay.style.display = 'none';
+      }
+
+      async function delItem(id) {
+        if (!confirm('¿Estás seguro de que deseas eliminar este tour?')) return;
+        const res = await api.del(Number(id));
+        if (res.ok) await load(); else alert(res.error || 'Error al eliminar');
+      }
+
+      form.addEventListener('submit', async (ev) => {
+        ev.preventDefault();
+        const idVal = form.querySelector('input[name="id"]').value;
+        const payload = {
+          id: idVal ? Number(idVal) : undefined,
+          titulo: form.querySelector('input[name="titulo"]').value,
+          descripcion: form.querySelector('textarea[name="descripcion"]').value,
+          precio: Number(form.querySelector('input[name="precio"]').value || 0),
+          duracion: form.querySelector('input[name="duracion"]').value,
+          ubicacion_id: Number(form.querySelector('select[name="ubicacion_id"]').value),
+          incluye: form.querySelector('textarea[name="incluye"]').value,
+          no_incluye: form.querySelector('textarea[name="no_incluye"]').value || null,
+          itinerario: form.querySelector('textarea[name="itinerario"]').value || null,
+          imagen_principal: form.querySelector('input[name="imagen_principal"]').value || null,
+          destacado: form.querySelector('input[name="destacado"]').checked,
+          estado: form.querySelector('select[name="estado"]').value,
+        };
+        try {
+          payload.galeria = JSON.parse(form.querySelector('textarea[name="galeria"]').value || '[]');
+        } catch (e) {
+          alert('Error: Galería JSON inválido - ' + e.message);
+          return;
+        }
+
+        let res;
+        if (payload.id) {
+          res = await api.update(payload);
+        } else {
+          res = await api.create(payload);
+        }
+        if (res.ok) { await load(); closeModal(); } else {
+          alert('Error al guardar: ' + (res.error || 'Error desconocido'));
+        }
+      });
+
+      newBtn.addEventListener('click', () => { 
+        form.reset();
+        form.querySelector('input[name="id"]').value = '';
+        form.querySelector('textarea[name="galeria"]').value = '[]';
+        openModal();
+      });
+
+      cancelBtn.addEventListener('click', closeModal);
+      closeBtn.addEventListener('click', closeModal);
+      modalOverlay.addEventListener('click', closeModal);
+      editor.addEventListener('click', (e) => e.stopPropagation());
+
+      searchInput.addEventListener('input', applyFilters);
+      filterStatus.addEventListener('change', applyFilters);
+      filterDestino.addEventListener('change', applyFilters);
+
+      load();
+    </script>
 </AdminLayout>

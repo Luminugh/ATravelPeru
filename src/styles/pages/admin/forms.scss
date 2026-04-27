@@ -1,2 +1,142 @@
-/* Maquetado admin - formularios.
-   Aquí irán estilos específicos de formularios por módulo. */
+/* ═════════════════════════════════════════════════════════════════════════════ */
+/* ADMIN FORMS - CATALOGO / WHATSAPP                                           */
+/* ═════════════════════════════════════════════════════════════════════════════ */
+
+.catalog-grid {
+   display: grid;
+   grid-template-columns: 1.15fr 0.85fr;
+   gap: 18px;
+}
+
+.catalog-card {
+   border: 1px solid #e5e7eb;
+   border-radius: 16px;
+   padding: 20px;
+   background: #ffffff;
+}
+
+.catalog-card-title-row {
+   display: flex;
+   align-items: center;
+   justify-content: space-between;
+   gap: 12px;
+   margin-bottom: 10px;
+
+   h4 {
+      margin: 0;
+      font-size: $fs-lg;
+      font-weight: $fw-800;
+      color: #111827;
+   }
+}
+
+.catalog-chip {
+   display: inline-flex;
+   align-items: center;
+   padding: 4px 10px;
+   border-radius: 999px;
+   font-size: $fs-xs;
+   font-weight: $fw-700;
+   background: rgba($primary, 0.15);
+   color: $primary-darker;
+
+   &.soft {
+      background: rgba($secondary, 0.2);
+      color: #4d7c0f;
+   }
+}
+
+.catalog-help {
+   margin: 0 0 16px;
+   color: #4b5563;
+   line-height: 1.55;
+}
+
+.catalog-help-inline {
+   display: block;
+   margin-top: 8px;
+   color: #6b7280;
+}
+
+.wa-preview {
+   border: 1px dashed #d1d5db;
+   border-radius: 14px;
+   padding: 14px;
+   background: #f9fafb;
+}
+
+.wa-preview-label {
+   margin: 0 0 10px;
+   font-size: $fs-xs;
+   text-transform: uppercase;
+   letter-spacing: 0.04em;
+   color: #6b7280;
+   font-weight: $fw-700;
+}
+
+.wa-bubble {
+   background: #dcfce7;
+   color: #065f46;
+   border-radius: 14px;
+   padding: 12px 14px;
+   font-size: $fs-sm;
+   line-height: 1.45;
+   margin-bottom: 10px;
+}
+
+.wa-preview-meta {
+   display: flex;
+   flex-direction: column;
+   gap: 4px;
+   color: #4b5563;
+   font-size: $fs-xs;
+   font-weight: $fw-600;
+}
+
+.service-table .switch {
+   position: relative;
+   display: inline-block;
+   width: 46px;
+   height: 24px;
+}
+
+.service-table .switch input {
+   opacity: 0;
+   width: 0;
+   height: 0;
+}
+
+.service-table .slider {
+   position: absolute;
+   cursor: pointer;
+   inset: 0;
+   background-color: #d1d5db;
+   transition: 0.3s;
+   border-radius: 999px;
+}
+
+.service-table .slider::before {
+   content: "";
+   position: absolute;
+   height: 18px;
+   width: 18px;
+   left: 3px;
+   top: 3px;
+   background-color: white;
+   transition: 0.3s;
+   border-radius: 50%;
+}
+
+.service-table .switch input:checked + .slider {
+   background-color: $primary;
+}
+
+.service-table .switch input:checked + .slider::before {
+   transform: translateX(22px);
+}
+
+@media (max-width: 1024px) {
+   .catalog-grid {
+      grid-template-columns: 1fr;
+   }
+}

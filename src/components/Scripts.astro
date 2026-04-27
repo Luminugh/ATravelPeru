@@ -18,6 +18,27 @@
     "Te contactaremos pronto"
   ]);
 
+  const catalogConfigKey = "atravelCatalogConfig";
+  const defaultCatalogConfig = {
+    whatsappPhone: "51999999999",
+    template: "Hola, quiero reservar {item} del servicio {servicio}. Precio referencial: {precio}. Lo vi en el catalogo: {link}",
+    visibility: {
+      tours: true,
+      vuelos: true,
+      hoteles: true,
+      paquetes: true,
+      ofertas: true
+    }
+  };
+
+  const serviceNames = {
+    tours: "Tours AT",
+    vuelos: "Vuelos",
+    hoteles: "Hoteles",
+    paquetes: "Paquetes",
+    ofertas: "Ofertas"
+  };
+
   function getCurrentPath() {
     return window.location.pathname.replace(/\/$/, "");
   }
@@ -28,6 +49,80 @@
     }
 
     return serviceRoutes[getCurrentPath()] ?? null;
+  }
+
+  function sanitizePhone(phone) {
+    return String(phone || "").replace(/\D/g, "");
+  }
+
+  function readCatalogConfig() {
+    try {
+      const raw = localStorage.getItem(catalogConfigKey);
+      if (!raw) {
+        return defaultCatalogConfig;
+      }
+      const parsed = JSON.parse(raw);
+      return {
+        whatsappPhone: sanitizePhone(parsed.whatsappPhone) || defaultCatalogConfig.whatsappPhone,
+        template: parsed.template || defaultCatalogConfig.template,
+        visibility: {
+          ...defaultCatalogConfig.visibility,
+          ...(parsed.visibility || {})
+        }
+      };
+    } catch {
+      return defaultCatalogConfig;
+    }
+  }
+
+  function buildWhatsappMessage(template, data) {
+    return template
+      .replaceAll("{servicio}", data.serviceName)
+      .replaceAll("{item}", data.item)
+      .replaceAll("{precio}", data.price)
+      .replaceAll("{link}", data.link);
+  }
+
+  function getCatalogCardData(targetButton) {
+    const card = targetButton.closest(".tour-card");
+    const titleEl = card ? card.querySelector(".tour-title") : null;
+    const priceEl = card ? card.querySelector(".price-value") : null;
+    const title = titleEl ? titleEl.textContent.trim() : "Servicio del catalogo";
+    const price = priceEl ? priceEl.textContent.trim() : "Por confirmar";
+    return { title, price };
+  }
+
+  function openCatalogWhatsApp(button) {
+    const path = getCurrentPath();
+    const serviceKey = serviceRoutes[path];
+    if (!serviceKey) {
+      return false;
+    }
+
+    const config = readCatalogConfig();
+    if (!config.visibility[serviceKey]) {
+      showNotification("Este servicio no esta disponible por el momento", "info");
+      return true;
+    }
+
+    const phone = sanitizePhone(config.whatsappPhone);
+    if (!phone) {
+      showNotification("No hay telefono de WhatsApp configurado", "error");
+      return true;
+    }
+
+    const cardData = getCatalogCardData(button);
+    const payload = {
+      serviceName: serviceNames[serviceKey] || "Servicio",
+      item: cardData.title,
+      price: cardData.price,
+      link: window.location.href
+    };
+
+    const message = buildWhatsappMessage(config.template, payload);
+    const waUrl = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
+    window.open(waUrl, "_blank", "noopener,noreferrer");
+    return true;
   }
 
   function syncServiceWindows() {
@@ -125,14 +220,8 @@
     const hamburger = document.querySelector(".hamburger-menu");
     const serviceOverlay = document.getElementById("service-windows-overlay");
 
-    if (!mobileMenu || !hamburger) {
-      if (!serviceOverlay) {
-        return;
-      }
-    }
-
     const target = e.target instanceof Node ? e.target : null;
-    if (target && !mobileMenu.contains(target) && !hamburger.contains(target)) {
+    if (target && mobileMenu && hamburger && !mobileMenu.contains(target) && !hamburger.contains(target)) {
       mobileMenu.style.display = "none";
     }
 
@@ -141,17 +230,188 @@
     }
   });
 
+  // Capture clicks early so inline onclick on catalog buttons does not run first.
+  document.addEventListener("click", function (e) {
+    const target = e.target instanceof Element ? e.target : null;
+    if (!target) {
+      return;
+    }
+
+    const reserveButton = target.closest(".btn-tour-reserve, .btn-cta-primary");
+    if (!reserveButton) {
+      return;
+    }
+
+    const handled = openCatalogWhatsApp(reserveButton);
+    if (handled) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+  }, true);
+
   document.addEventListener("keydown", function (e) {
     if (e.key === "Escape" && activeServiceWindow) {
       closeServiceWindow();
     }
   });
 
+  // Accordion functionality for Tours AT
+  function setupAccordions() {
+    const accordionHeaders = document.querySelectorAll('.accordion-header');
+    
+    accordionHeaders.forEach(header => {
+      header.addEventListener('click', function() {
+        const targetId = this.getAttribute('data-target');
+        const content = document.getElementById(targetId);
+        const icon = this.querySelector('.accordion-icon');
+        
+        if (!content) return;
+        
+        // Close all other accordions in the same card
+        const card = this.closest('.tour-card');
+        if (card) {
+          card.querySelectorAll('.accordion-content').forEach(el => {
+            if (el.id !== targetId) {
+              el.classList.remove('active');
+            }
+          });
+          card.querySelectorAll('.accordion-header').forEach(el => {
+            if (el !== this) {
+              const elIcon = el.querySelector('.accordion-icon');
+              if (elIcon) elIcon.classList.remove('active');
+            }
+          });
+        }
+        
+        // Toggle current accordion
+        content.classList.toggle('active');
+        if (icon) icon.classList.toggle('active');
+      });
+    });
+  }
+
+  function setupCollapsibleFilters() {
+    const filterSectionSelectors = [
+      ".vuelos-search-form",
+      ".hoteles-search-form",
+      ".paquetes-filters",
+      ".ofertas-filters",
+      ".filters-section"
+    ];
+
+    const filterSections = document.querySelectorAll(filterSectionSelectors.join(","));
+    filterSections.forEach((section, index) => {
+      if (!(section instanceof HTMLElement) || section.dataset.collapsibleReady === "true") {
+        return;
+      }
+
+      section.dataset.collapsibleReady = "true";
+      section.classList.remove("is-open");
+
+      const panelId = section.id ? `${section.id}-panel` : `filters-panel-${index + 1}`;
+      const toggleButton = document.createElement("button");
+      toggleButton.type = "button";
+      toggleButton.className = "search-toggle-btn";
+      toggleButton.setAttribute("aria-expanded", "false");
+      toggleButton.setAttribute("aria-controls", panelId);
+      toggleButton.innerHTML = `
+        <span class="search-toggle-main">
+          <i class="fas fa-sliders-h" aria-hidden="true"></i>
+          <span>Filtros</span>
+        </span>
+        <i class="fas fa-chevron-down search-toggle-chevron" aria-hidden="true"></i>
+      `;
+
+      const panel = document.createElement("div");
+      panel.className = "search-filter-panel";
+      panel.id = panelId;
+
+      while (section.firstChild) {
+        panel.appendChild(section.firstChild);
+      }
+
+      section.appendChild(toggleButton);
+      section.appendChild(panel);
+
+      toggleButton.addEventListener("click", () => {
+        const isOpen = section.classList.toggle("is-open");
+        toggleButton.setAttribute("aria-expanded", isOpen ? "true" : "false");
+      });
+    });
+
+    document.addEventListener("click", (event) => {
+      const target = event.target instanceof Node ? event.target : null;
+      if (!target) {
+        return;
+      }
+
+      filterSections.forEach((section) => {
+        if (!(section instanceof HTMLElement) || !section.classList.contains("is-open")) {
+          return;
+        }
+
+        if (!section.contains(target)) {
+          section.classList.remove("is-open");
+          const button = section.querySelector(".search-toggle-btn");
+          if (button instanceof HTMLButtonElement) {
+            button.setAttribute("aria-expanded", "false");
+          }
+        }
+      });
+    });
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key !== "Escape") {
+        return;
+      }
+
+      filterSections.forEach((section) => {
+        if (!(section instanceof HTMLElement) || !section.classList.contains("is-open")) {
+          return;
+        }
+
+        section.classList.remove("is-open");
+        const button = section.querySelector(".search-toggle-btn");
+        if (button instanceof HTMLButtonElement) {
+          button.setAttribute("aria-expanded", "false");
+        }
+      });
+    });
+  }
+
+  // Handle WhatsApp reserva for Tours AT
+  function handleReserva(event, tourName, price) {
+    event.preventDefault();
+    const phone = localStorage.getItem('whatsapp_phone') || '+51';
+    const template = localStorage.getItem('whatsapp_template') || 'Hola, me interesa reservar {item} por {precio}';
+    
+    const message = template
+      .replace('{item}', tourName)
+      .replace('{precio}', price)
+      .replace('{servicio}', 'Tours AT');
+    
+    const encodedMessage = encodeURIComponent(message);
+    window.open(`https://wa.me/${phone.replace(/\D/g, '')}?text=${encodedMessage}`, '_blank');
+  }
+
+  // Initialize accordions when DOM is ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+      setupAccordions();
+      setupCollapsibleFilters();
+    });
+  } else {
+    setupAccordions();
+    setupCollapsibleFilters();
+  }
+
   Object.assign(window, {
     showNotification,
     closeNotification,
     toggleMobileMenu,
     openServiceWindow,
-    closeServiceWindow
+    closeServiceWindow,
+    openCatalogWhatsApp,
+    handleReserva
   });
 </script>

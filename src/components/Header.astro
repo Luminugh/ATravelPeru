@@ -22,10 +22,10 @@ const isActive = (path: string) => currentPath === path;
       <nav class="nav-menu">
         <a href="/" class={`nav-link ${isActive("/") ? "active" : ""}`}>Principal</a>
         <a href="/tours-at" class={`nav-link ${isActive("/tours-at") ? "active" : ""}`}>Tours AT</a>
-        <a href="/vuelos" class={`nav-link ${isActive("/vuelos") ? "active" : ""}`}>Vuelos</a>
-        <a href="/hoteles" class={`nav-link ${isActive("/hoteles") ? "active" : ""}`}>Hoteles</a>
-        <a href="/paquetes" class={`nav-link ${isActive("/paquetes") ? "active" : ""}`}>Paquetes</a>
-        <a href="/ofertas" class={`nav-link ${isActive("/ofertas") ? "active" : ""}`}>Ofertas</a>
+        <span class="nav-link nav-link-disabled" aria-disabled="true" title="Disponible pronto">Vuelos</span>
+        <span class="nav-link nav-link-disabled" aria-disabled="true" title="Disponible pronto">Hoteles</span>
+        <span class="nav-link nav-link-disabled" aria-disabled="true" title="Disponible pronto">Paquetes</span>
+        <span class="nav-link nav-link-disabled" aria-disabled="true" title="Disponible pronto">Ofertas</span>
       </nav>
 
       <div class="header-actions">

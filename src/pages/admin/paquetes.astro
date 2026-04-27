@@ -1,100 +1,14 @@
 ---
 import AdminLayout from "../../layouts/AdminLayout.astro";
 
-const title = "Gestión de Paquetes - Panel Admin";
+const title = "Módulo deshabilitado - Paquetes";
 ---
 
 <AdminLayout title={title}>
-  <!-- Paquetes Section -->
   <section class="content-section">
     <div class="section-header">
-      <h3>
-        <i class="fas fa-box"></i>
-        Gestión de Paquetes
-      </h3>
-      <div class="section-actions">
-        <button class="btn btn-primary">
-          <i class="fas fa-plus"></i>
-          Nuevo Paquete
-        </button>
-        <button class="btn btn-secondary">
-          <i class="fas fa-download"></i>
-          Exportar
-        </button>
-      </div>
+      <h3><i class="fas fa-lock"></i> Módulo deshabilitado</h3>
     </div>
-
-    <div class="search-bar">
-      <div class="search-input">
-        <i class="fas fa-search search-icon"></i>
-        <input type="text" placeholder="Buscar paquetes..." />
-      </div>
-      <div class="filter-select">
-        <select>
-          <option>Todos los tipos</option>
-          <option>Viaje Completo</option>
-          <option>Tour + Hotel</option>
-          <option>Vuelo + Hotel</option>
-        </select>
-      </div>
-    </div>
-
-    <table class="data-table">
-      <thead>
-        <tr>
-          <th>Paquete</th>
-          <th>Incluye</th>
-          <th>Precio</th>
-          <th>Duración</th>
-          <th>Ventas</th>
-          <th>Estado</th>
-          <th>Acciones</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td><span class="item-name">Perú Completo 7 días</span></td>
-          <td>Vuelo + Hotel + Tours</td>
-          <td>$1,299</td>
-          <td>7 días</td>
-          <td>45 reservas</td>
-          <td><span class="item-status active">Activo</span></td>
-          <td>
-            <div class="item-actions">
-              <button class="action-btn edit" title="Editar">
-                <i class="fas fa-edit"></i>
-              </button>
-              <button class="action-btn view" title="Ver">
-                <i class="fas fa-eye"></i>
-              </button>
-              <button class="action-btn delete" title="Eliminar">
-                <i class="fas fa-trash"></i>
-              </button>
-            </div>
-          </td>
-        </tr>
-        <tr>
-          <td><span class="item-name">Cusco y Valle Sagrado</span></td>
-          <td>Vuelo + Hotel + Tours</td>
-          <td>$799</td>
-          <td>5 días</td>
-          <td>82 reservas</td>
-          <td><span class="item-status active">Activo</span></td>
-          <td>
-            <div class="item-actions">
-              <button class="action-btn edit" title="Editar">
-                <i class="fas fa-edit"></i>
-              </button>
-              <button class="action-btn view" title="Ver">
-                <i class="fas fa-eye"></i>
-              </button>
-              <button class="action-btn delete" title="Eliminar">
-                <i class="fas fa-trash"></i>
-              </button>
-            </div>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+    <p>El módulo de Paquetes está deshabilitado temporalmente en el panel administrativo.</p>
   </section>
 </AdminLayout>

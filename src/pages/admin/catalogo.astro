@@ -1,0 +1,296 @@
+---
+import AdminLayout from "../../layouts/AdminLayout.astro";
+
+const title = "Catalogo y WhatsApp - Panel Admin";
+---
+
+<AdminLayout title={title}>
+  <section class="content-section">
+    <div class="section-header">
+      <h3>
+        <i class="fab fa-whatsapp"></i>
+        Catalogo y Reservas por WhatsApp
+      </h3>
+      <div class="section-actions">
+        <button class="btn btn-secondary" id="catalogResetBtn">
+          <i class="fas fa-rotate-left"></i>
+          Restaurar
+        </button>
+        <button class="btn btn-primary" id="catalogSaveBtn">
+          <i class="fas fa-floppy-disk"></i>
+          Guardar Configuracion
+        </button>
+      </div>
+    </div>
+
+    <div class="catalog-grid">
+      <article class="catalog-card">
+        <div class="catalog-card-title-row">
+          <h4>Canal de salida</h4>
+          <span class="catalog-chip">Produccion</span>
+        </div>
+        <p class="catalog-help">Define el telefono destino y la plantilla que recibira el cliente al tocar Reservar en el catalogo.</p>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="waPhone">Telefono de WhatsApp Business</label>
+            <input id="waPhone" type="text" placeholder="Ejemplo: 51999999999" value="51999999999" />
+          </div>
+          <div class="form-group">
+            <label for="waCountry">Pais / Prefijo</label>
+            <select id="waCountry">
+              <option value="51" selected>Peru (+51)</option>
+              <option value="57">Colombia (+57)</option>
+              <option value="56">Chile (+56)</option>
+              <option value="54">Argentina (+54)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="waTemplate">Plantilla automatica del mensaje</label>
+          <textarea id="waTemplate" rows="4">Hola, quiero reservar &#123;item&#125; del servicio &#123;servicio&#125;. Precio referencial: &#123;precio&#125;. Lo vi en el catalogo: &#123;link&#125;</textarea>
+          <small class="catalog-help-inline">Variables disponibles: &#123;servicio&#125;, &#123;item&#125;, &#123;precio&#125;, &#123;link&#125;</small>
+        </div>
+      </article>
+
+      <article class="catalog-card">
+        <div class="catalog-card-title-row">
+          <h4>Vista previa del mensaje</h4>
+          <span class="catalog-chip soft">Preview</span>
+        </div>
+        <div class="wa-preview">
+          <p class="wa-preview-label">Cliente -> WhatsApp Business</p>
+          <div class="wa-bubble" id="waPreviewBubble">
+            Hola, quiero reservar Machu Picchu Clasico del servicio Tours AT. Precio referencial: S/ 1,200. Lo vi en el catalogo: https://atravel.pe/tours-at
+          </div>
+          <div class="wa-preview-meta">
+            <span id="waPreviewPhone">Destino: 51999999999</span>
+            <span id="waPreviewState">Estado: activo</span>
+          </div>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section class="content-section">
+    <div class="section-header">
+      <h3>
+        <i class="fas fa-layer-group"></i>
+        Servicios visibles en el catalogo
+      </h3>
+    </div>
+
+    <table class="data-table service-table">
+      <thead>
+        <tr>
+          <th>Servicio</th>
+          <th>Visible</th>
+          <th>Mensaje rápido</th>
+          <th>Supervision</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr data-service-key="tours">
+          <td><span class="item-name">Tours AT</span></td>
+          <td><label class="switch"><input type="checkbox" checked data-visible-toggle="tours" /><span class="slider"></span></label></td>
+          <td>Quiero reservar un tour</td>
+          <td><span class="item-status active">Activo</span></td>
+        </tr>
+        <tr data-service-key="vuelos">
+          <td><span class="item-name">Vuelos</span></td>
+          <td><label class="switch"><input type="checkbox" checked data-visible-toggle="vuelos" /><span class="slider"></span></label></td>
+          <td>Necesito una cotizacion de vuelo</td>
+          <td><span class="item-status active">Activo</span></td>
+        </tr>
+        <tr data-service-key="hoteles">
+          <td><span class="item-name">Hoteles</span></td>
+          <td><label class="switch"><input type="checkbox" checked data-visible-toggle="hoteles" /><span class="slider"></span></label></td>
+          <td>Quiero reservar hotel</td>
+          <td><span class="item-status active">Activo</span></td>
+        </tr>
+        <tr data-service-key="paquetes">
+          <td><span class="item-name">Paquetes</span></td>
+          <td><label class="switch"><input type="checkbox" checked data-visible-toggle="paquetes" /><span class="slider"></span></label></td>
+          <td>Solicito paquete completo</td>
+          <td><span class="item-status active">Activo</span></td>
+        </tr>
+        <tr data-service-key="ofertas">
+          <td><span class="item-name">Ofertas</span></td>
+          <td><label class="switch"><input type="checkbox" checked data-visible-toggle="ofertas" /><span class="slider"></span></label></td>
+          <td>Me interesa una oferta</td>
+          <td><span class="item-status active">Activo</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section class="content-section">
+    <div class="section-header">
+      <h3>
+        <i class="fas fa-chart-simple"></i>
+        Supervision del flujo (maquetado)
+      </h3>
+    </div>
+
+    <div class="dashboard-grid">
+      <div class="stat-card">
+        <div class="stat-icon tours"><i class="fas fa-message"></i></div>
+        <p class="stat-label">Mensajes enviados hoy</p>
+        <p class="stat-value">82</p>
+        <p class="stat-change">+14% vs ayer</p>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon flights"><i class="fas fa-phone-volume"></i></div>
+        <p class="stat-label">Telefono activo</p>
+        <p class="stat-value" id="activePhoneCard">51999999999</p>
+        <p class="stat-change">Actualizado en este panel</p>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon hotels"><i class="fas fa-circle-check"></i></div>
+        <p class="stat-label">Servicios visibles</p>
+        <p class="stat-value" id="visibleServicesCard">5</p>
+        <p class="stat-change">Controlado por switches</p>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    // @ts-nocheck
+    const STORAGE_KEY = "atravelCatalogConfig";
+    const defaultConfig = {
+      whatsappPhone: "51999999999",
+      template: "Hola, quiero reservar {item} del servicio {servicio}. Precio referencial: {precio}. Lo vi en el catalogo: {link}",
+      visibility: {
+        tours: true,
+        vuelos: true,
+        hoteles: true,
+        paquetes: true,
+        ofertas: true
+      }
+    };
+
+    function sanitizePhone(phone) {
+      return String(phone || "").replace(/\D/g, "");
+    }
+
+    function safeReadConfig() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return { ...defaultConfig };
+        const parsed = JSON.parse(raw);
+        return {
+          whatsappPhone: sanitizePhone(parsed.whatsappPhone) || defaultConfig.whatsappPhone,
+          template: parsed.template || defaultConfig.template,
+          visibility: {
+            ...defaultConfig.visibility,
+            ...(parsed.visibility || {})
+          }
+        };
+      } catch {
+        return { ...defaultConfig };
+      }
+    }
+
+    function saveConfig(config) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(config));
+    }
+
+    function buildPreview(template) {
+      return template
+        .replaceAll("{servicio}", "Tours AT")
+        .replaceAll("{item}", "Machu Picchu Clasico")
+        .replaceAll("{precio}", "S/ 1,200")
+        .replaceAll("{link}", "https://atravel.pe/tours-at");
+    }
+
+    function countVisible(visibility) {
+      return Object.values(visibility).filter(Boolean).length;
+    }
+
+    function syncUI(config) {
+      const waPhone = document.getElementById("waPhone");
+      const waTemplate = document.getElementById("waTemplate");
+      const waPreviewBubble = document.getElementById("waPreviewBubble");
+      const waPreviewPhone = document.getElementById("waPreviewPhone");
+      const activePhoneCard = document.getElementById("activePhoneCard");
+      const visibleServicesCard = document.getElementById("visibleServicesCard");
+
+      if (waPhone) waPhone.value = config.whatsappPhone;
+      if (waTemplate) waTemplate.value = config.template;
+      if (waPreviewBubble) waPreviewBubble.textContent = buildPreview(config.template);
+      if (waPreviewPhone) waPreviewPhone.textContent = `Destino: ${config.whatsappPhone}`;
+      if (activePhoneCard) activePhoneCard.textContent = config.whatsappPhone;
+      if (visibleServicesCard) visibleServicesCard.textContent = String(countVisible(config.visibility));
+
+      document.querySelectorAll("[data-visible-toggle]").forEach((input) => {
+        const key = input.getAttribute("data-visible-toggle");
+        if (!key) return;
+        input.checked = Boolean(config.visibility[key]);
+      });
+    }
+
+    function collectFormConfig() {
+      const base = safeReadConfig();
+      const waPhoneInput = document.getElementById("waPhone");
+      const waTemplateInput = document.getElementById("waTemplate");
+
+      const visibility = { ...base.visibility };
+      document.querySelectorAll("[data-visible-toggle]").forEach((input) => {
+        const key = input.getAttribute("data-visible-toggle");
+        if (!key) return;
+        visibility[key] = Boolean(input.checked);
+      });
+
+      return {
+        whatsappPhone: sanitizePhone(waPhoneInput?.value) || defaultConfig.whatsappPhone,
+        template: (waTemplateInput?.value || "").trim() || defaultConfig.template,
+        visibility
+      };
+    }
+
+    const saveBtn = document.getElementById("catalogSaveBtn");
+    const resetBtn = document.getElementById("catalogResetBtn");
+    const waPhone = document.getElementById("waPhone");
+    const waTemplate = document.getElementById("waTemplate");
+
+    const initialConfig = safeReadConfig();
+    syncUI(initialConfig);
+
+    if (saveBtn) {
+      saveBtn.addEventListener("click", () => {
+        const config = collectFormConfig();
+        saveConfig(config);
+        syncUI(config);
+      });
+    }
+
+    if (resetBtn) {
+      resetBtn.addEventListener("click", () => {
+        saveConfig(defaultConfig);
+        syncUI(defaultConfig);
+      });
+    }
+
+    if (waPhone) {
+      waPhone.addEventListener("input", () => {
+        const config = collectFormConfig();
+        syncUI(config);
+      });
+    }
+
+    if (waTemplate) {
+      waTemplate.addEventListener("input", () => {
+        const config = collectFormConfig();
+        syncUI(config);
+      });
+    }
+
+    document.querySelectorAll("[data-visible-toggle]").forEach((input) => {
+      input.addEventListener("change", () => {
+        const config = collectFormConfig();
+        syncUI(config);
+      });
+    });
+  </script>
+</AdminLayout>

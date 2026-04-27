@@ -1,311 +1,82 @@
 ---
 import AppLayout from "../layouts/AppLayout.astro";
+import { getCatalogByService } from "../lib/catalog";
 
 const title = "Vuelos - ATRAVEL";
+const { items: vuelosData, error: vuelosError, source } = await getCatalogByService("vuelos");
+const ubicaciones = [...new Set(vuelosData.map((item) => item.ubicacion).filter(Boolean))];
 ---
 
 <AppLayout title={title}>
-<!-- Hero Section Vuelos -->
-    <section class="hero-section hero-secondary">
-        <div class="hero-background">
-            <video autoplay muted loop class="hero-video">
-                <source src="/assets/videos/Video1.mp4" type="video/mp4">
-                Tu navegador no soporta videos.
-            </video>
-        </div>
-        <div class="hero-overlay"></div>
-        <div class="hero-content">
-            <div class="hero-badge">Vuela a tu ritmo</div>
-            <h2 class="hero-title">Vuelos a los Mejores Destinos</h2>
-            <p class="hero-subtitle">Encuentra vuelos directos con las mejores aerolíneas del Perú hacia tus destinos favoritos</p>
-            
-            <div class="hero-features">
-                <div class="hero-feature-item">
-                    <i class="fas fa-plane feature-icon"></i>
-                    <span class="feature-text">50+ Rutas</span>
-                </div>
-                <div class="hero-feature-item">
-                    <i class="fas fa-wallet feature-icon"></i>
-                    <span class="feature-text">Mejores Precios</span>
-                </div>
-                <div class="hero-feature-item">
-                    <i class="fas fa-check-circle feature-icon"></i>
-                    <span class="feature-text">100% Confiable</span>
-                </div>
-            </div>
+  <section class="hero-section hero-secondary">
+    <div class="hero-background">
+      <video autoplay muted loop class="hero-video">
+        <source src="/assets/videos/Video1.mp4" type="video/mp4" />
+        Tu navegador no soporta videos.
+      </video>
+    </div>
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+      <div class="hero-badge">Vuela a tu ritmo</div>
+      <h2 class="hero-title">Vuelos disponibles en tiempo real</h2>
+      <p class="hero-subtitle">Todo el catalogo de vuelos ahora se carga desde base de datos.</p>
+      <div class="hero-actions">
+        <a class="btn-hero-primary" href="#vuelos-content">Ver vuelos</a>
+      </div>
+    </div>
+  </section>
 
-            <div class="hero-actions">
-                <button class="btn-hero-primary" onclick="document.querySelector('.vuelos-search-form').scrollIntoView({behavior: 'smooth'})">Buscar Vuelos</button>
-                <button class="btn-hero-secondary">Chat con Asesor</button>
-            </div>
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+    <section class="vuelos-search-form mb-12">
+      <h2 class="text-2xl font-bold mb-8 text-gray-900">Filtrar por ubicacion</h2>
+      <div class="filters-container">
+        <div class="filter-group">
+          <label class="filter-label">Origen / destino</label>
+          <select class="filter-select">
+            <option>Todos</option>
+            {ubicaciones.map((ubicacion) => <option>{ubicacion}</option>)}
+          </select>
         </div>
+        <button class="btn-filter-search" type="button">Filtrar</button>
+      </div>
     </section>
 
-    <!-- Main Content -->
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        
-        <!-- Search Form Section -->
-        <section class="vuelos-search-form mb-12">
-            <h2 class="text-2xl font-bold mb-8 text-gray-900">Busca tu Vuelo Ideal</h2>
-            <div class="filters-container">
-                <div class="filter-group">
-                    <label class="filter-label">Origen</label>
-                    <select class="filter-select">
-                        <option>Todos los orígenes</option>
-                        <option>Lima (LIM)</option>
-                        <option>Cusco (CUZ)</option>
-                        <option>Arequipa (AQP)</option>
-                        <option>Iquitos (IQI)</option>
-                        <option>Juliaca (JUL)</option>
-                    </select>
-                </div>
-                <div class="filter-group">
-                    <label class="filter-label">Destino</label>
-                    <select class="filter-select">
-                        <option>Todos los destinos</option>
-                        <option>Lima (LIM)</option>
-                        <option>Cusco (CUZ)</option>
-                        <option>Arequipa (AQP)</option>
-                        <option>Iquitos (IQI)</option>
-                        <option>Juliaca (JUL)</option>
-                    </select>
-                </div>
-                <div class="filter-group">
-                    <label class="filter-label">Fecha de Salida</label>
-                    <input type="date" class="filter-input">
-                </div>
-                <div class="filter-group">
-                    <label class="filter-label">Pasajeros</label>
-                    <select class="filter-select">
-                        <option>1 Pasajero</option>
-                        <option>2 Pasajeros</option>
-                        <option>3 Pasajeros</option>
-                        <option>4+ Pasajeros</option>
-                    </select>
-                </div>
-                <button class="btn-filter-search">Buscar</button>
+    <section id="vuelos-content" class="tours-section">
+      <h2 class="section-title mb-12">Vuelos del catalogo</h2>
+
+      {vuelosData.length === 0 && (
+        <div class="rounded-xl border border-red-200 bg-red-50 p-4 text-red-900 mb-6">
+          <p class="font-bold">No hay vuelos para mostrar.</p>
+          <p>Fuente: {source}</p>
+          {vuelosError && <p>Error: {vuelosError}</p>}
+          <p>Ejecuta la migracion y carga datos en Supabase para servicio = vuelos.</p>
+        </div>
+      )}
+
+      <div class="tours-grid">
+        {vuelosData.map((item) => (
+          <article class="tour-summary-card">
+            <div class="summary-image-wrap">
+              <img src={item.imagen_principal} alt={item.titulo} class="summary-image" loading="lazy" />
+              <div class="summary-badges">
+                {item.destacado && <span class="summary-badge destacado">Destacado</span>}
+                <span class={`summary-badge estado ${item.estado}`}>{item.estado}</span>
+              </div>
             </div>
-        </section>
-
-        <!-- Flights Grid Section -->
-        <section class="tours-section">
-            <h2 class="section-title mb-12">Vuelos Disponibles</h2>
-            <div class="tours-grid">
-                
-                <!-- Flight 1 -->
-                <div class="tour-card">
-                    <div class="tour-image">
-                        <img src="https://via.placeholder.com/400x250/667EEA/FFFFFF?text=Lima-Cusco" alt="Lima a Cusco">
-                        <div class="tour-badge tour-badge-popular">Popular</div>
-                    </div>
-                    <div class="tour-content">
-                        <h3 class="tour-title">Lima → Cusco</h3>
-                        <div class="tour-meta">
-                            <span class="tour-duration"><i class="fas fa-clock"></i> 1h 10min</span>
-                            <span class="tour-difficulty difficulty-facil">Directo</span>
-                        </div>
-                        <p class="tour-description">Vuelo directo a la capital inca. Incluye equipaje, servicio de comidas y entretenimiento a bordo.</p>
-                        <div class="tour-features">
-                            <span class="feature-tag">Equipaje incluido</span>
-                            <span class="feature-tag">Comida a bordo</span>
-                            <span class="feature-tag">WiFi gratis</span>
-                        </div>
-                        <div class="tour-footer">
-                            <div class="tour-price">
-                                <span class="price-label">Desde</span>
-                                <span class="price-value">S/ 280</span>
-                            </div>
-                            <button class="btn-tour-reserve" onclick="showNotification('Solicitud de reserva enviada', 'success')">Reservar</button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Flight 2 -->
-                <div class="tour-card">
-                    <div class="tour-image">
-                        <img src="https://via.placeholder.com/400x250/F093FB/FFFFFF?text=Lima-Arequipa" alt="Lima a Arequipa">
-                        <div class="tour-badge tour-badge-new">Nuevo</div>
-                    </div>
-                    <div class="tour-content">
-                        <h3 class="tour-title">Lima → Arequipa</h3>
-                        <div class="tour-meta">
-                            <span class="tour-duration"><i class="fas fa-clock"></i> 1h 15min</span>
-                            <span class="tour-difficulty difficulty-facil">Directo</span>
-                        </div>
-                        <p class="tour-description">Vuelo hacia la ciudad blanca con vistas espectaculares de la cordillera andina durante el viaje.</p>
-                        <div class="tour-features">
-                            <span class="feature-tag">Bagaje gratis</span>
-                            <span class="feature-tag">Asiento premium</span>
-                            <span class="feature-tag">Atención premium</span>
-                        </div>
-                        <div class="tour-footer">
-                            <div class="tour-price">
-                                <span class="price-label">Desde</span>
-                                <span class="price-value">S/ 220</span>
-                            </div>
-                            <button class="btn-tour-reserve" onclick="showNotification('Solicitud de reserva enviada', 'success')">Reservar</button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Flight 3 -->
-                <div class="tour-card">
-                    <div class="tour-image">
-                        <img src="https://via.placeholder.com/400x250/4FACFE/FFFFFF?text=Lima-Iquitos" alt="Lima a Iquitos">
-                    </div>
-                    <div class="tour-content">
-                        <h3 class="tour-title">Lima → Iquitos</h3>
-                        <div class="tour-meta">
-                            <span class="tour-duration"><i class="fas fa-clock"></i> 2h 30min</span>
-                            <span class="tour-difficulty difficulty-moderado">Directo</span>
-                        </div>
-                        <p class="tour-description">Acceso a la capital de la selva peruana para aventuras en la Amazonía con todas las comodidades.</p>
-                        <div class="tour-features">
-                            <span class="feature-tag">Maleta incluida</span>
-                            <span class="feature-tag">Asiento reservado</span>
-                            <span class="feature-tag">Seguro viaje</span>
-                        </div>
-                        <div class="tour-footer">
-                            <div class="tour-price">
-                                <span class="price-label">Desde</span>
-                                <span class="price-value">S/ 350</span>
-                            </div>
-                            <button class="btn-tour-reserve" onclick="showNotification('Solicitud de reserva enviada', 'success')">Reservar</button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Flight 4 -->
-                <div class="tour-card">
-                    <div class="tour-image">
-                        <img src="https://via.placeholder.com/400x250/00D4FF/FFFFFF?text=Cusco-Juliaca" alt="Cusco a Juliaca">
-                        <div class="tour-badge tour-badge-top">Top Rating</div>
-                    </div>
-                    <div class="tour-content">
-                        <h3 class="tour-title">Cusco → Juliaca</h3>
-                        <div class="tour-meta">
-                            <span class="tour-duration"><i class="fas fa-clock"></i> 45min</span>
-                            <span class="tour-difficulty difficulty-facil">Directo</span>
-                        </div>
-                        <p class="tour-description">Acceso rápido al Lago Titicaca desde Cusco. Vuelos puntuales con excelente servicio a bordo.</p>
-                        <div class="tour-features">
-                            <span class="feature-tag">Puntualidad 99%</span>
-                            <span class="feature-tag">Bagaje doble</span>
-                            <span class="feature-tag">Comida típica</span>
-                        </div>
-                        <div class="tour-footer">
-                            <div class="tour-price">
-                                <span class="price-label">Desde</span>
-                                <span class="price-value">S/ 180</span>
-                            </div>
-                            <button class="btn-tour-reserve" onclick="showNotification('Solicitud de reserva enviada', 'success')">Reservar</button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Flight 5 -->
-                <div class="tour-card">
-                    <div class="tour-image">
-                        <img src="https://via.placeholder.com/400x250/FF006E/FFFFFF?text=Arequipa-Tacna" alt="Arequipa a Tacna">
-                    </div>
-                    <div class="tour-content">
-                        <h3 class="tour-title">Arequipa → Tacna</h3>
-                        <div class="tour-meta">
-                            <span class="tour-duration"><i class="fas fa-clock"></i> 1h</span>
-                            <span class="tour-difficulty difficulty-facil">Directo</span>
-                        </div>
-                        <p class="tour-description">Conexión rápida hacia la ciudad fronteriza de Tacna, puerta a Bolivia y Chile.</p>
-                        <div class="tour-features">
-                            <span class="feature-tag">Tarifa reducida</span>
-                            <span class="feature-tag">Café cortesía</span>
-                            <span class="feature-tag">Cambio libre</span>
-                        </div>
-                        <div class="tour-footer">
-                            <div class="tour-price">
-                                <span class="price-label">Desde</span>
-                                <span class="price-value">S/ 150</span>
-                            </div>
-                            <button class="btn-tour-reserve" onclick="showNotification('Solicitud de reserva enviada', 'success')">Reservar</button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Flight 6 -->
-                <div class="tour-card">
-                    <div class="tour-image">
-                        <img src="https://via.placeholder.com/400x250/00B4D8/FFFFFF?text=Iquitos-Lima" alt="Iquitos a Lima">
-                    </div>
-                    <div class="tour-content">
-                        <h3 class="tour-title">Iquitos → Lima</h3>
-                        <div class="tour-meta">
-                            <span class="tour-duration"><i class="fas fa-clock"></i> 2h 15min</span>
-                            <span class="tour-difficulty difficulty-moderado">Directo</span>
-                        </div>
-                        <p class="tour-description">Regresa desde la Amazonía con comodidad garantizada. Horas convenientes de salida.</p>
-                        <div class="tour-features">
-                            <span class="feature-tag">Horarios flexibles</span>
-                            <span class="feature-tag">Lounge gratis</span>
-                            <span class="feature-tag">Asiento especial</span>
-                        </div>
-                        <div class="tour-footer">
-                            <div class="tour-price">
-                                <span class="price-label">Desde</span>
-                                <span class="price-value">S/ 320</span>
-                            </div>
-                            <button class="btn-tour-reserve" onclick="showNotification('Solicitud de reserva enviada', 'success')">Reservar</button>
-                        </div>
-                    </div>
-                </div>
-
+            <div class="summary-content">
+              <h3 class="summary-title">{item.titulo}</h3>
+              <p class="summary-meta"><i class="fas fa-location-dot"></i> {item.ubicacion} · <i class="fas fa-clock"></i> {item.duracion}</p>
+              <p class="summary-description">{item.descripcion}</p>
+              <div class="summary-footer">
+                <span class="summary-price">${item.precio}</span>
+                <button class="btn-summary-open" type="button" disabled={item.estado !== "activo"} onclick="showNotification('Solicitud de reserva enviada', 'success')">
+                  {item.estado === "activo" ? "Reservar" : "No disponible"}
+                </button>
+              </div>
             </div>
-        </section>
-
-        <!-- Why Choose Vuelos Section -->
-        <section class="why-choose-section mt-20">
-            <h2 class="section-title mb-12">¿Por qué elegir nuestros Vuelos?</h2>
-            <div class="why-choose-grid">
-                <div class="why-choose-card">
-                    <i class="fas fa-dollar-sign why-choose-icon"></i>
-                    <h3 class="why-choose-title">Mejores Precios</h3>
-                    <p class="why-choose-text">Garantizamos los precios más competitivos del mercado con opciones de pago flexible.</p>
-                </div>
-                <div class="why-choose-card">
-                    <i class="fas fa-snowflake why-choose-icon"></i>
-                    <h3 class="why-choose-title">Confort Premium</h3>
-                    <p class="why-choose-text">Asientos amplios, comidas de calidad y entretenimiento en todos nuestros vuelos.</p>
-                </div>
-                <div class="why-choose-card">
-                    <i class="fas fa-check-double why-choose-icon"></i>
-                    <h3 class="why-choose-title">Puntualidad Garantizada</h3>
-                    <p class="why-choose-text">Nuestros vuelos tienen el registro de puntualidad más alto del país.</p>
-                </div>
-                <div class="why-choose-card">
-                    <i class="fas fa-undo why-choose-icon"></i>
-                    <h3 class="why-choose-title">Cambios y Reembolsos</h3>
-                    <p class="why-choose-text">Modifica tus vuelos o solicita reembolso sin penalidades hasta 24h antes.</p>
-                </div>
-                <div class="why-choose-card">
-                    <i class="fas fa-plane-departure why-choose-icon"></i>
-                    <h3 class="why-choose-title">Múltiples Opciones</h3>
-                    <p class="why-choose-text">Elige entre diferentes horarios, aerolíneas y clases de vuelo según tu preferencia.</p>
-                </div>
-                <div class="why-choose-card">
-                    <i class="fas fa-headset why-choose-icon"></i>
-                    <h3 class="why-choose-title">Soporte en Viaje</h3>
-                    <p class="why-choose-text">Asistencia 24/7 durante todo tu viaje en caso de cambios o emergencias.</p>
-                </div>
-            </div>
-        </section>
-
-        <!-- CTA Section -->
-        <section class="cta-section mt-20 bg-gradient-to-r from-blue-600 to-cyan-500 rounded-2xl px-8 py-12 text-white">
-            <div class="max-w-2xl mx-auto text-center">
-                <h2 class="text-3xl font-bold mb-4">¿Listo para volar?</h2>
-                <p class="text-lg mb-8 text-blue-100">Reserva ahora y llega a tu destino con total tranquilidad</p>
-                <button class="btn-cta-primary" onclick="showNotification('Te contactaremos pronto', 'success')">Reservar Vuelo Ahora</button>
-            </div>
-        </section>
-    </main>
+          </article>
+        ))}
+      </div>
+    </section>
+  </main>
 </AppLayout>
-
-

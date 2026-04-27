@@ -1,101 +1,14 @@
 ---
 import AdminLayout from "../../layouts/AdminLayout.astro";
 
-const title = "Gestión de Hoteles - Panel Admin";
+const title = "Módulo deshabilitado - Hoteles";
 ---
 
 <AdminLayout title={title}>
-  <!-- Hoteles Section -->
   <section class="content-section">
     <div class="section-header">
-      <h3>
-        <i class="fas fa-hotel"></i>
-        Gestión de Hoteles
-      </h3>
-      <div class="section-actions">
-        <button class="btn btn-primary">
-          <i class="fas fa-plus"></i>
-          Nuevo Hotel
-        </button>
-        <button class="btn btn-secondary">
-          <i class="fas fa-download"></i>
-          Exportar
-        </button>
-      </div>
+      <h3><i class="fas fa-lock"></i> Módulo deshabilitado</h3>
     </div>
-
-    <div class="search-bar">
-      <div class="search-input">
-        <i class="fas fa-search search-icon"></i>
-        <input type="text" placeholder="Buscar hoteles..." />
-      </div>
-      <div class="filter-select">
-        <select>
-          <option>Todas las ciudades</option>
-          <option>Cusco</option>
-          <option>Lima</option>
-          <option>Iquitos</option>
-          <option>Arequipa</option>
-        </select>
-      </div>
-    </div>
-
-    <table class="data-table">
-      <thead>
-        <tr>
-          <th>Hotel</th>
-          <th>Ubicación</th>
-          <th>Estrellas</th>
-          <th>Precio/Noche</th>
-          <th>Disponibilidad</th>
-          <th>Estado</th>
-          <th>Acciones</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td><span class="item-name">Hotel Machu Picchu Paradise</span></td>
-          <td>Aguas Calientes</td>
-          <td>⭐⭐⭐⭐⭐</td>
-          <td>$280</td>
-          <td>12 habitaciones</td>
-          <td><span class="item-status active">Activo</span></td>
-          <td>
-            <div class="item-actions">
-              <button class="action-btn edit" title="Editar">
-                <i class="fas fa-edit"></i>
-              </button>
-              <button class="action-btn view" title="Ver">
-                <i class="fas fa-eye"></i>
-              </button>
-              <button class="action-btn delete" title="Eliminar">
-                <i class="fas fa-trash"></i>
-              </button>
-            </div>
-          </td>
-        </tr>
-        <tr>
-          <td><span class="item-name">Hotel Cusco Grand</span></td>
-          <td>Cusco - Centro Histórico</td>
-          <td>⭐⭐⭐⭐</td>
-          <td>$150</td>
-          <td>25 habitaciones</td>
-          <td><span class="item-status active">Activo</span></td>
-          <td>
-            <div class="item-actions">
-              <button class="action-btn edit" title="Editar">
-                <i class="fas fa-edit"></i>
-              </button>
-              <button class="action-btn view" title="Ver">
-                <i class="fas fa-eye"></i>
-              </button>
-              <button class="action-btn delete" title="Eliminar">
-                <i class="fas fa-trash"></i>
-              </button>
-            </div>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+    <p>El módulo de Hoteles está deshabilitado temporalmente en el panel administrativo.</p>
   </section>
 </AdminLayout>
