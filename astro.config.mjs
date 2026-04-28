@@ -1,9 +1,10 @@
 import { defineConfig } from "astro/config";
-import vercel from "@astrojs/vercel";
 
 export default defineConfig({
-  output: "server",
-  adapter: vercel(),
+  output: "static",
+  build: {
+    outDir: "docs"
+  },
   server: {
     port: 4321,
     host: true

@@ -40,7 +40,7 @@ const tourLocations = [...new Set(toursAtData.map((tour) => tour.ubicacion).filt
 
             <div class="hero-actions">
                 <a class="btn-hero-primary" href="#tours-content">Ver Todos</a>
-                <button class="btn-hero-secondary">Consultar Disponibilidad</button>
+                <a class="btn-hero-secondary" href="#tours-content">Consultar tours</a>
             </div>
         </div>
     </section>
@@ -91,7 +91,7 @@ const tourLocations = [...new Set(toursAtData.map((tour) => tour.ubicacion).filt
                     <h3>No se encontraron tours para mostrar</h3>
                     <p>Fuente consultada: {toursSource}</p>
                     {toursLoadError && <p>Error detectado: {toursLoadError}</p>}
-                    <p>Revisa el diagnóstico en /api/health/supabase y confirma que existan filas activas en la base de datos.</p>
+                    <p>Confirma que existan filas activas en la base de datos para mostrar el catálogo.</p>
                 </div>
             )}
             <div class="tours-summary-grid">

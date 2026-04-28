@@ -1,0 +1,30 @@
+{
+  "connected": true,
+  "env": {
+    "hasProjectId": true,
+    "hasPublicUrl": true,
+    "hasPublishableKey": true
+  },
+  "view": {
+    "ok": true,
+    "count": 3,
+    "error": null
+  },
+  "catalogView": {
+    "ok": true,
+    "count": 0,
+    "error": null
+  },
+  "toursTable": {
+    "ok": false,
+    "count": 0,
+    "error": ""
+  },
+  "activeTours": {
+    "ok": false,
+    "count": 0,
+    "error": ""
+  },
+  "sampleRows": [],
+  "sampleError": "permission denied for table tours"
+}

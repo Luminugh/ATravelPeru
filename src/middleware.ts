@@ -7,13 +7,6 @@ import {
   isIdleExpired,
 } from "./lib/admin-auth";
 
-const DISABLED_ADMIN_ROUTES = new Set([
-  "/admin/vuelos",
-  "/admin/hoteles",
-  "/admin/paquetes",
-  "/admin/ofertas",
-]);
-
 function redirectToLogin(url: URL) {
   const nextUrl = encodeURIComponent(url.pathname + url.search);
   return new Response(null, {
@@ -33,15 +26,6 @@ export const onRequest = defineMiddleware(async (context, next) => {
 
   if (pathname === "/admin/login") {
     return next();
-  }
-
-  if (DISABLED_ADMIN_ROUTES.has(pathname)) {
-    return new Response(null, {
-      status: 302,
-      headers: {
-        Location: "/admin?module=disabled",
-      },
-    });
   }
 
   const token = context.cookies.get(ADMIN_ACCESS_COOKIE)?.value;

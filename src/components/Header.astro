@@ -15,25 +15,16 @@ const isActive = (path: string) => currentPath === path;
         <h1 class="logo-text">ATRAVEL</h1>
       </a>
 
-      <button class="hamburger-menu" onclick="toggleMobileMenu()">
-        <i class="fas fa-bars"></i>
-      </button>
-
       <nav class="nav-menu">
         <a href="/" class={`nav-link ${isActive("/") ? "active" : ""}`}>Principal</a>
-        <a href="/tours-at" class={`nav-link ${isActive("/tours-at") ? "active" : ""}`}>Tours AT</a>
-        <span class="nav-link nav-link-disabled" aria-disabled="true" title="Disponible pronto">Vuelos</span>
-        <span class="nav-link nav-link-disabled" aria-disabled="true" title="Disponible pronto">Hoteles</span>
-        <span class="nav-link nav-link-disabled" aria-disabled="true" title="Disponible pronto">Paquetes</span>
-        <span class="nav-link nav-link-disabled" aria-disabled="true" title="Disponible pronto">Ofertas</span>
+        <a href="/tours-at#tours-content" class={`nav-link ${isActive("/tours-at") ? "active" : ""}`}>Tours</a>
       </nav>
 
       <div class="header-actions">
-        <a href="/ayuda" class="help-link">Ayuda</a>
-        <button class="cart-btn" onclick="showNotification('Carrito en desarrollo')">
-          <i class="fas fa-shopping-cart"></i>
-          <span>Carrito</span>
-        </button>
+        <a href="/tours-at#tours-content" class="cart-btn">
+          <i class="fas fa-whatsapp"></i>
+          <span>Reservar tours</span>
+        </a>
       </div>
     </div>
   </div>

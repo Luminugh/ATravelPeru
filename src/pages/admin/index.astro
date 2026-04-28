@@ -1,6 +1,8 @@
 ---
 import AdminLayout from "../../layouts/AdminLayout.astro";
 
+export const prerender = false;
+
 const title = "Panel Administrativo - ATRAVEL";
 ---
 
@@ -13,27 +15,9 @@ const title = "Panel Administrativo - ATRAVEL";
         <div class="stat-icon">
           <i class="fas fa-map"></i>
         </div>
-        <p class="stat-label">Tours Activos</p>
-        <p class="stat-value">48</p>
-        <p class="stat-change">📈 12% desde el mes pasado</p>
-      </div>
-
-      <div class="stat-card stat-card-flights">
-        <div class="stat-icon">
-          <i class="fas fa-plane"></i>
-        </div>
-        <p class="stat-label">Vuelos Disponibles</p>
-        <p class="stat-value">256</p>
-        <p class="stat-change">📈 8% desde el mes pasado</p>
-      </div>
-
-      <div class="stat-card stat-card-hotels">
-        <div class="stat-icon">
-          <i class="fas fa-hotel"></i>
-        </div>
-        <p class="stat-label">Hoteles Registrados</p>
-        <p class="stat-value">132</p>
-        <p class="stat-change">📈 5% desde el mes pasado</p>
+        <p class="stat-label">Tours disponibles</p>
+        <p class="stat-value">Gestión activa</p>
+        <p class="stat-change">Administra tours y revisa su publicación en el catálogo</p>
       </div>
     </div>
 
@@ -47,11 +31,11 @@ const title = "Panel Administrativo - ATRAVEL";
       </div>
       <div class="info-card-content">
         <p style="color: #555; margin-bottom: 15px; line-height: 1.6;">
-          Utiliza el menú lateral para administrar el catálogo visual y el canal de reservas por WhatsApp.
+          Utiliza el menú lateral para administrar tours, destinos y el acceso al catálogo público.
         </p>
         <ul style="color: #666; margin: 0 0 20px 0; padding-left: 20px; line-height: 1.8;">
-          <li><strong style="color: #667eea;">Gestión de Contenido:</strong> Tours AT, Vuelos, Hoteles, Paquetes y Ofertas</li>
-          <li><strong style="color: #667eea;">Catálogo y WhatsApp:</strong> Teléfono de negocio, plantilla automática y visibilidad de servicios</li>
+          <li><strong style="color: #667eea;">Gestión de Contenido:</strong> Tours AT y destinos</li>
+          <li><strong style="color: #667eea;">Reservas:</strong> Flujo de WhatsApp asociado al catálogo público de tours</li>
         </ul>
         <a href="/admin/tours" class="btn-primary-inline" style="display: inline-flex; align-items: center; gap: 8px; padding: 0.75rem 1.5rem; text-decoration: none; border-radius: 8px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; font-weight: 600; transition: all 0.3s ease;">
           <i class="fas fa-arrow-right"></i> Ir al Gestor de Tours AT
@@ -101,14 +85,6 @@ const title = "Panel Administrativo - ATRAVEL";
       background: linear-gradient(90deg, #667eea, #764ba2);
     }
 
-    .stat-card-flights::before {
-      background: linear-gradient(90deg, #f093fb, #f5576c);
-    }
-
-    .stat-card-hotels::before {
-      background: linear-gradient(90deg, #4facfe, #00f2fe);
-    }
-
     .stat-icon {
       width: 50px;
       height: 50px;
@@ -123,14 +99,6 @@ const title = "Panel Administrativo - ATRAVEL";
 
     .stat-card-tours .stat-icon {
       background: linear-gradient(135deg, #667eea, #764ba2);
-    }
-
-    .stat-card-flights .stat-icon {
-      background: linear-gradient(135deg, #f093fb, #f5576c);
-    }
-
-    .stat-card-hotels .stat-icon {
-      background: linear-gradient(135deg, #4facfe, #00f2fe);
     }
 
     .stat-label {

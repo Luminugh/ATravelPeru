@@ -8,6 +8,8 @@ import {
   isIdleExpired,
 } from "../../../../lib/admin-auth";
 
+export const prerender = false;
+
 export const GET: APIRoute = async ({ cookies }) => {
   const token = cookies.get(ADMIN_ACCESS_COOKIE)?.value;
   const lastActivity = cookies.get(ADMIN_ACTIVITY_COOKIE)?.value;

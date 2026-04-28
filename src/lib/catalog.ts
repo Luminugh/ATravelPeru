@@ -1,6 +1,6 @@
 import { getSupabaseServerClient } from "./supabase";
 
-export type CatalogService = "tours" | "vuelos" | "hoteles" | "paquetes" | "ofertas";
+export type CatalogService = "tours";
 
 export interface CatalogItem {
   id: number;
@@ -60,38 +60,34 @@ export async function getCatalogByService(service: CatalogService): Promise<{ it
     .order("id", { ascending: true });
 
   if (error) {
-    if (service === "tours") {
-      const fallback = await supabase
-        .from("v_tours_catalogo")
-        .select("id,titulo,descripcion,precio,duracion,ubicacion,incluye,no_incluye,itinerario,imagen_principal,galeria,destacado,estado,vendedor_id")
-        .order("id", { ascending: true });
+    const fallback = await supabase
+      .from("v_tours_catalogo")
+      .select("id,titulo,descripcion,precio,duracion,ubicacion,incluye,no_incluye,itinerario,imagen_principal,galeria,destacado,estado,vendedor_id")
+      .order("id", { ascending: true });
 
-      if (fallback.error) {
-        return { items: [], error: fallback.error.message, source: "none" };
-      }
-
-      const fallbackItems = (fallback.data ?? []).map((row) => ({
-        id: row.id,
-        titulo: row.titulo,
-        descripcion: row.descripcion,
-        precio: formatPrice(row.precio),
-        duracion: row.duracion,
-        ubicacion: row.ubicacion,
-        incluye: row.incluye,
-        no_incluye: row.no_incluye,
-        itinerario: row.itinerario,
-        imagen_principal: row.imagen_principal,
-        galeria: normalizeGallery(row.galeria),
-        destacado: Boolean(row.destacado),
-        estado: row.estado,
-        vendedor_id: row.vendedor_id,
-        servicio: "tours" as const,
-      }));
-
-      return { items: fallbackItems, error: null, source: "v_tours_catalogo" };
+    if (fallback.error) {
+      return { items: [], error: fallback.error.message, source: "none" };
     }
 
-    return { items: [], error: error.message, source: "none" };
+    const fallbackItems = (fallback.data ?? []).map((row) => ({
+      id: row.id,
+      titulo: row.titulo,
+      descripcion: row.descripcion,
+      precio: formatPrice(row.precio),
+      duracion: row.duracion,
+      ubicacion: row.ubicacion,
+      incluye: row.incluye,
+      no_incluye: row.no_incluye,
+      itinerario: row.itinerario,
+      imagen_principal: row.imagen_principal,
+      galeria: normalizeGallery(row.galeria),
+      destacado: Boolean(row.destacado),
+      estado: row.estado,
+      vendedor_id: row.vendedor_id,
+      servicio: "tours" as const,
+    }));
+
+    return { items: fallbackItems, error: null, source: "v_tours_catalogo" };
   }
 
   const items = (data ?? []).map((row) => ({

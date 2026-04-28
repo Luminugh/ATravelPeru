@@ -25,7 +25,15 @@ const navClass = (...paths: string[]) => (paths.includes(currentPath) ? "nav-ite
     <script src="https://cdn.tailwindcss.com"></script>
   </head>
   <body class="admin-body">
-    <div class="admin-container">
+    <!-- Loading screen para verificación de autenticación -->
+    <div id="authLoadingScreen" class="auth-loading-screen">
+      <div class="auth-loading-content">
+        <div class="auth-loading-spinner"></div>
+        <p class="auth-loading-text">Verificando autenticación...</p>
+      </div>
+    </div>
+
+    <div class="admin-container" id="adminContainer" style="display: none;">
       <!-- Sidebar -->
       <aside class="admin-sidebar">
         <div class="sidebar-header">
@@ -48,30 +56,6 @@ const navClass = (...paths: string[]) => (paths.includes(currentPath) ? "nav-ite
             <a href="/admin/tours" class={navClass("/admin/tours")}>
               <i class="fas fa-map"></i>
               <span>Tours AT</span>
-            </a>
-            <span class="nav-item nav-item-disabled" aria-disabled="true" title="Módulo deshabilitado">
-              <i class="fas fa-plane"></i>
-              <span>Vuelos (deshabilitado)</span>
-            </span>
-            <span class="nav-item nav-item-disabled" aria-disabled="true" title="Módulo deshabilitado">
-              <i class="fas fa-hotel"></i>
-              <span>Hoteles (deshabilitado)</span>
-            </span>
-            <span class="nav-item nav-item-disabled" aria-disabled="true" title="Módulo deshabilitado">
-              <i class="fas fa-box"></i>
-              <span>Paquetes (deshabilitado)</span>
-            </span>
-            <span class="nav-item nav-item-disabled" aria-disabled="true" title="Módulo deshabilitado">
-              <i class="fas fa-tag"></i>
-              <span>Ofertas (deshabilitado)</span>
-            </span>
-          </div>
-
-          <div class="nav-section">
-            <span class="nav-section-title">Canales y Ventas</span>
-            <a href="/admin/catalogo" class={navClass("/admin/catalogo")}>
-              <i class="fab fa-whatsapp"></i>
-              <span>Catalogo y WhatsApp</span>
             </a>
           </div>
 
@@ -114,34 +98,10 @@ const navClass = (...paths: string[]) => (paths.includes(currentPath) ? "nav-ite
 
     <script>
       // @ts-nocheck
-      // Sidebar toggle functionality
-      const sidebarToggle = document.getElementById('sidebarToggle');
-      const adminSidebar = document.querySelector('.admin-sidebar');
-      const adminContainer = document.querySelector('.admin-container');
-
-      if (sidebarToggle && adminContainer) {
-        sidebarToggle.addEventListener('click', () => {
-          adminContainer.classList.toggle('sidebar-collapsed');
-        });
-      }
-
-      // Navigation items click handlers
-      const navItems = document.querySelectorAll('a.nav-item');
-      navItems.forEach(item => {
-        item.addEventListener('click', (e) => {
-          // Remove active class from all items
-          navItems.forEach(i => i.classList.remove('active'));
-          // Add active class to clicked item
-          item.classList.add('active');
-          
-          // Update page title
-          const title = item.textContent.trim();
-          const pageTitle = document.getElementById('pageTitle');
-          if (pageTitle) {
-            pageTitle.textContent = title;
-          }
-        });
-      });
+      
+      // Variables globales
+      const adminContainer = document.getElementById('adminContainer');
+      const authLoadingScreen = document.getElementById('authLoadingScreen');
 
       async function logoutAndRedirect() {
         try {
@@ -153,71 +113,178 @@ const navClass = (...paths: string[]) => (paths.includes(currentPath) ? "nav-ite
         }
       }
 
-      // Session info for top-right profile button
-      const adminProfileName = document.getElementById('adminProfileName');
-      const adminAvatar = document.getElementById('adminAvatar');
-      fetch('/api/admin/auth/me')
-        .then((res) => res.json())
-        .then((payload) => {
+      // VERIFICACIÓN DE AUTENTICACIÓN - DEBE EJECUTARSE PRIMERO
+      async function verifyAuthentication() {
+        try {
+          const response = await fetch('/api/admin/auth/me');
+          const payload = await response.json();
+
           if (!payload?.ok || !payload?.user) {
+            // No autenticado - redirigir a login
             window.location.href = '/admin/login';
+            return false;
+          }
+
+          // Autenticado - mostrar contenido
+          if (authLoadingScreen) {
+            authLoadingScreen.style.display = 'none';
+          }
+          if (adminContainer) {
+            adminContainer.style.display = 'block';
+          }
+
+          return true;
+        } catch (error) {
+          console.error('Error verificando autenticación:', error);
+          window.location.href = '/admin/login';
+          return false;
+        }
+      }
+
+      // Ejecutar verificación inmediatamente
+      verifyAuthentication().then((isAuthenticated) => {
+        if (!isAuthenticated) return;
+
+        // Solo ejecutar el resto del código si está autenticado
+        
+        // Sidebar toggle functionality
+        const sidebarToggle = document.getElementById('sidebarToggle');
+
+        if (sidebarToggle && adminContainer) {
+          sidebarToggle.addEventListener('click', () => {
+            adminContainer.classList.toggle('sidebar-collapsed');
+          });
+        }
+
+        // Navigation items click handlers
+        const navItems = document.querySelectorAll('a.nav-item');
+        navItems.forEach(item => {
+          item.addEventListener('click', (e) => {
+            // Remove active class from all items
+            navItems.forEach(i => i.classList.remove('active'));
+            // Add active class to clicked item
+            item.classList.add('active');
+            
+            // Update page title
+            const title = item.textContent.trim();
+            const pageTitle = document.getElementById('pageTitle');
+            if (pageTitle) {
+              pageTitle.textContent = title;
+            }
+          });
+        });
+
+        // Session info for top-right profile button
+        const adminProfileName = document.getElementById('adminProfileName');
+        const adminAvatar = document.getElementById('adminAvatar');
+        
+        fetch('/api/admin/auth/me')
+          .then((res) => res.json())
+          .then((payload) => {
+            if (!payload?.ok || !payload?.user) {
+              window.location.href = '/admin/login';
+              return;
+            }
+
+            const displayName = payload.user.nombre || payload.user.email || 'Admin User';
+            if (adminProfileName) {
+              adminProfileName.textContent = displayName;
+            }
+            if (adminAvatar instanceof HTMLImageElement) {
+              adminAvatar.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=0D8ABC&color=fff`;
+            }
+          })
+          .catch(() => {
+            window.location.href = '/admin/login';
+          });
+
+        const adminSessionButton = document.getElementById('adminSessionButton');
+        if (adminSessionButton) {
+          adminSessionButton.addEventListener('click', logoutAndRedirect);
+        }
+
+        // Inactivity control: if user stops interacting, session closes automatically.
+        const ADMIN_IDLE_TIMEOUT_MS = 15 * 60 * 1000;
+        const ADMIN_PING_THROTTLE_MS = 60 * 1000;
+        let idleTimer = null;
+        let lastPingAt = 0;
+
+        function scheduleIdleLogout() {
+          if (idleTimer) {
+            clearTimeout(idleTimer);
+          }
+          idleTimer = setTimeout(() => {
+            logoutAndRedirect();
+          }, ADMIN_IDLE_TIMEOUT_MS);
+        }
+
+        function pingSession() {
+          const now = Date.now();
+          if (now - lastPingAt < ADMIN_PING_THROTTLE_MS) {
             return;
           }
+          lastPingAt = now;
+          fetch('/api/admin/auth/ping', { method: 'POST' }).catch(() => {
+            window.location.href = '/admin/login';
+          });
+        }
 
-          const displayName = payload.user.nombre || payload.user.email || 'Admin User';
-          if (adminProfileName) {
-            adminProfileName.textContent = displayName;
-          }
-          if (adminAvatar instanceof HTMLImageElement) {
-            adminAvatar.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=0D8ABC&color=fff`;
-          }
-        })
-        .catch(() => {
-          window.location.href = '/admin/login';
+        function onUserActivity() {
+          scheduleIdleLogout();
+          pingSession();
+        }
+
+        ['click', 'mousemove', 'keydown', 'scroll', 'touchstart'].forEach((eventName) => {
+          window.addEventListener(eventName, onUserActivity, { passive: true });
         });
 
-      const adminSessionButton = document.getElementById('adminSessionButton');
-      if (adminSessionButton) {
-        adminSessionButton.addEventListener('click', logoutAndRedirect);
-      }
-
-      // Inactivity control: if user stops interacting, session closes automatically.
-      const ADMIN_IDLE_TIMEOUT_MS = 15 * 60 * 1000;
-      const ADMIN_PING_THROTTLE_MS = 60 * 1000;
-      let idleTimer = null;
-      let lastPingAt = 0;
-
-      function scheduleIdleLogout() {
-        if (idleTimer) {
-          clearTimeout(idleTimer);
-        }
-        idleTimer = setTimeout(() => {
-          logoutAndRedirect();
-        }, ADMIN_IDLE_TIMEOUT_MS);
-      }
-
-      function pingSession() {
-        const now = Date.now();
-        if (now - lastPingAt < ADMIN_PING_THROTTLE_MS) {
-          return;
-        }
-        lastPingAt = now;
-        fetch('/api/admin/auth/ping', { method: 'POST' }).catch(() => {
-          window.location.href = '/admin/login';
-        });
-      }
-
-      function onUserActivity() {
         scheduleIdleLogout();
         pingSession();
+      });
+    </script>
+
+    <style>
+      .auth-loading-screen {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
       }
 
-      ['click', 'mousemove', 'keydown', 'scroll', 'touchstart'].forEach((eventName) => {
-        window.addEventListener(eventName, onUserActivity, { passive: true });
-      });
+      .auth-loading-content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 20px;
+      }
 
-      scheduleIdleLogout();
-      pingSession();
-    </script>
+      .auth-loading-spinner {
+        width: 50px;
+        height: 50px;
+        border: 4px solid rgba(255, 255, 255, 0.3);
+        border-top-color: white;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+
+      .auth-loading-text {
+        color: white;
+        font-size: 18px;
+        font-weight: 600;
+        margin: 0;
+      }
+
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+    </style>
   </body>
 </html>

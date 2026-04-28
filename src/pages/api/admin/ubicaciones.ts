@@ -1,6 +1,8 @@
 import type { APIRoute } from "astro";
 import { createSupabasePublicClient } from "../../../lib/admin-auth";
 
+export const prerender = false;
+
 export const GET: APIRoute = async () => {
   const supabase = createSupabasePublicClient();
   const { data, error } = await supabase.from("ubicaciones").select("id,nombre").order("nombre");

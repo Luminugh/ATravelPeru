@@ -80,51 +80,8 @@ textarea {
     }
   }
 
-  .hamburger-menu {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 44px;
-    height: 44px;
-    border-radius: $radius-md;
-    background: rgba(255, 255, 255, 0.12);
-  }
-
-  .nav-menu,
-  .help-link {
+  .nav-menu {
     display: none !important;
-  }
-
-  .mobile-menu {
-    top: 64px;
-    left: 12px;
-    right: 12px;
-    width: auto;
-    border-radius: 18px;
-    overflow: hidden;
-    box-shadow: 0 20px 50px rgba(15, 23, 42, 0.28);
-  }
-
-  .mobile-nav {
-    padding: 10px;
-    gap: 8px;
-    max-height: calc(100vh - 88px);
-    overflow-y: auto;
-  }
-
-  .mobile-nav-link,
-  .mobile-btn {
-    min-height: 48px;
-    border-radius: 14px;
-    border-bottom: none;
-  }
-
-  .mobile-nav-link.active {
-    border-left-width: 3px;
-  }
-
-  .mobile-btn {
-    text-align: center;
   }
 
   .hero-section {
@@ -289,11 +246,6 @@ textarea {
     padding: 16px;
     border-radius: 18px;
   }
-
-  .notification-close {
-    min-width: 32px;
-    height: 32px;
-  }
 }
 
 /* Tablets */
@@ -337,10 +289,6 @@ textarea {
 @media (min-width: 1025px) {
   .header-premium {
     padding: 0 40px;
-  }
-
-  .mobile-menu {
-    display: none !important;
   }
 
   .hero-title {

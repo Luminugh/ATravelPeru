@@ -1,6 +1,8 @@
 ---
 import AdminLayout from "../../layouts/AdminLayout.astro";
 
+export const prerender = false;
+
 const title = "Gestión de Tours AT - Panel Admin";
 ---
 
@@ -131,7 +133,7 @@ const title = "Gestión de Tours AT - Panel Admin";
           
           <div class="form-row gallery-row">
             <label>Array JSON con imágenes</label>
-            <small>Copiar array JSON. Ej. [{"imagen","url1","orden",1}]</small>
+            <small>{"Copiar array JSON. Ej. [{\"imagen\":\"https://...\",\"orden\":1}]"}</small>
             <textarea name="galeria" rows="3" placeholder='[{"imagen":"https://...","orden":1}]'></textarea>
           </div>
         </div>
