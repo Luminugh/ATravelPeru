@@ -3,7 +3,6 @@
   "devCommand": "npm run dev",
   "installCommand": "npm install",
   "framework": "astro",
-  "nodeVersion": "22.x",
   "outputDirectory": "./dist",
   "env": {
     "VITE_SUPABASE_URL": "@vercel-supabase-url",
