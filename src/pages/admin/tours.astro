@@ -1,10 +1,39 @@
 ---
 import AdminLayout from "../../layouts/AdminLayout.astro";
 
+export const prerender = true;
+
 const title = "Gestión de Tours AT - Panel Admin";
 ---
 
 <AdminLayout title={title}>
+  <!-- Auth Check Script -->
+  <script>
+    // Verificar autenticación en el cliente
+    const token = localStorage.getItem('admin_token');
+    const lastActivity = localStorage.getItem('admin_lastActivity');
+    
+    // Si no hay token, redirigir a login
+    if (!token) {
+      window.location.href = '/admin/login';
+    }
+    
+    // Verificar si la sesión expiró (1 hora de inactividad)
+    if (lastActivity) {
+      const now = Date.now();
+      const lastActivityTime = parseInt(lastActivity);
+      const oneHourInMs = 60 * 60 * 1000;
+      
+      if (now - lastActivityTime > oneHourInMs) {
+        localStorage.removeItem('admin_token');
+        localStorage.removeItem('admin_lastActivity');
+        window.location.href = '/admin/login';
+      }
+    }
+    
+    // Actualizar tiempo de última actividad
+    localStorage.setItem('admin_lastActivity', Date.now().toString());
+  </script>
   <!-- Tours Section -->
   <section class="content-section">
     <div class="section-header" style="margin-bottom: 2rem;">
