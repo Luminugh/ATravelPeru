@@ -1,11 +1,13 @@
 ---
-import AppLayout from "../layouts/AppLayout.astro";
-import { getCatalogByService } from "../lib/catalog";
+import AppLayout from "../../layouts/AppLayout.astro";
+import { getToursCatalog } from "../../lib/catalog";
+import { faWhatsapp } from "@fortawesome/free-brands-svg-icons";
 
 const title = "Tours AT - Recorridos Turísticos";
+const whatsappPath = Array.isArray(faWhatsapp.icon[4]) ? faWhatsapp.icon[4].join(" ") : faWhatsapp.icon[4];
+const whatsappViewBox = `0 0 ${faWhatsapp.icon[0]} ${faWhatsapp.icon[1]}`;
 
-const { items: toursAtData, error: toursLoadError, source: toursSource } = await getCatalogByService("tours");
-const tourLocations = [...new Set(toursAtData.map((tour) => tour.ubicacion).filter(Boolean))];
+const { items: toursAtData, error: toursLoadError, source: toursSource } = await getToursCatalog();
 ---
 
 <AppLayout title={title}>
@@ -48,41 +50,6 @@ const tourLocations = [...new Set(toursAtData.map((tour) => tour.ubicacion).filt
     <!-- Main Content -->
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         
-        <!-- Filtros Section -->
-        <section class="filters-section mb-12">
-            <h2 class="text-2xl font-bold mb-8 text-gray-900">Encuentra tu Recorrido Ideal</h2>
-            <div class="filters-container">
-                <div class="filter-group">
-                    <label class="filter-label">Destino</label>
-                    <select class="filter-select">
-                        <option>Todos los destinos</option>
-                        {tourLocations.map((ubicacion) => <option>{ubicacion}</option>)}
-                    </select>
-                </div>
-                <div class="filter-group">
-                    <label class="filter-label">Duración</label>
-                    <select class="filter-select">
-                        <option>Cualquier duración</option>
-                        <option>1 día</option>
-                        <option>2-3 días</option>
-                        <option>4-5 días</option>
-                        <option>6+ días</option>
-                    </select>
-                </div>
-                <div class="filter-group">
-                    <label class="filter-label">Dificultad</label>
-                    <select class="filter-select">
-                        <option>Cualquier nivel</option>
-                        <option>Fácil</option>
-                        <option>Moderado</option>
-                        <option>Difícil</option>
-                        <option>Extremo</option>
-                    </select>
-                </div>
-                <button class="btn-filter-search">Buscar</button>
-            </div>
-        </section>
-
         <!-- Tours Grid Section -->
         <section id="tours-content" class="tours-section">
             <h2 class="section-title mb-12">Recorridos disponibles</h2>
@@ -214,7 +181,9 @@ const tourLocations = [...new Set(toursAtData.map((tour) => tour.ubicacion).filt
             <div class="tour-detail-footer">
                 <strong id="tourDetailPrice" class="tour-detail-price"></strong>
                 <button type="button" id="tourDetailReserve" class="btn-tour-reserve-modal">
-                    <i class="fas fa-whatsapp"></i>
+                    <svg class="btn-tour-reserve-icon" viewBox={whatsappViewBox} aria-hidden="true" focusable="false">
+                        <path d={whatsappPath}></path>
+                    </svg>
                     Reservar este tour
                 </button>
             </div>

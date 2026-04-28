@@ -1,7 +1,5 @@
 import { getSupabaseServerClient } from "./supabase";
 
-export type CatalogService = "tours";
-
 export interface CatalogItem {
   id: number;
   titulo: string;
@@ -17,7 +15,6 @@ export interface CatalogItem {
   destacado: boolean;
   estado: string;
   vendedor_id: string;
-  servicio: CatalogService;
 }
 
 function formatPrice(value: unknown): string {
@@ -50,44 +47,16 @@ function normalizeGallery(galeria: unknown): string[] {
     .filter((url): url is string => Boolean(url));
 }
 
-export async function getCatalogByService(service: CatalogService): Promise<{ items: CatalogItem[]; error: string | null; source: string }> {
+export async function getToursCatalog(): Promise<{ items: CatalogItem[]; error: string | null; source: string }> {
   const supabase = getSupabaseServerClient();
 
   const { data, error } = await supabase
-    .from("v_catalogo_servicios")
-    .select("id,titulo,descripcion,precio,duracion,ubicacion,incluye,no_incluye,itinerario,imagen_principal,galeria,destacado,estado,vendedor_id,servicio")
-    .eq("servicio", service)
+    .from("v_tours_catalogo")
+    .select("id,titulo,descripcion,precio,duracion,ubicacion,incluye,no_incluye,itinerario,imagen_principal,galeria,destacado,estado,vendedor_id")
     .order("id", { ascending: true });
 
   if (error) {
-    const fallback = await supabase
-      .from("v_tours_catalogo")
-      .select("id,titulo,descripcion,precio,duracion,ubicacion,incluye,no_incluye,itinerario,imagen_principal,galeria,destacado,estado,vendedor_id")
-      .order("id", { ascending: true });
-
-    if (fallback.error) {
-      return { items: [], error: fallback.error.message, source: "none" };
-    }
-
-    const fallbackItems = (fallback.data ?? []).map((row) => ({
-      id: row.id,
-      titulo: row.titulo,
-      descripcion: row.descripcion,
-      precio: formatPrice(row.precio),
-      duracion: row.duracion,
-      ubicacion: row.ubicacion,
-      incluye: row.incluye,
-      no_incluye: row.no_incluye,
-      itinerario: row.itinerario,
-      imagen_principal: row.imagen_principal,
-      galeria: normalizeGallery(row.galeria),
-      destacado: Boolean(row.destacado),
-      estado: row.estado,
-      vendedor_id: row.vendedor_id,
-      servicio: "tours" as const,
-    }));
-
-    return { items: fallbackItems, error: null, source: "v_tours_catalogo" };
+    return { items: [], error: error.message, source: "none" };
   }
 
   const items = (data ?? []).map((row) => ({
@@ -105,8 +74,7 @@ export async function getCatalogByService(service: CatalogService): Promise<{ it
     destacado: Boolean(row.destacado),
     estado: row.estado,
     vendedor_id: row.vendedor_id,
-    servicio: row.servicio,
   }));
 
-  return { items, error: null, source: "v_catalogo_servicios" };
+  return { items, error: null, source: "v_tours_catalogo" };
 }

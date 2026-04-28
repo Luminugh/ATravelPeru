@@ -2,7 +2,6 @@ import type { APIRoute } from "astro";
 import {
   ADMIN_ACCESS_COOKIE,
   createSupabaseAuthedClient,
-  createSupabasePublicClient,
 } from "../../../lib/admin-auth";
 
 export const prerender = false;
@@ -108,5 +107,3 @@ export const DELETE: APIRoute = async ({ request, cookies }) => {
 
   return new Response(JSON.stringify({ ok: true }), { headers: { "Content-Type": "application/json" } });
 };
-// Referencial API admin: tours
-// Pendiente de implementacion de endpoints.

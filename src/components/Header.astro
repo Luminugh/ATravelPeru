@@ -1,10 +1,8 @@
 ---
-interface Props {
-  currentPath: string;
-}
-
-const { currentPath } = Astro.props;
-const isActive = (path: string) => currentPath === path;
+const navigationLinks = [
+  { href: '/', label: 'Principal' },
+  { href: '/tours', label: 'Tours' }
+];
 ---
 
 <header class="header-premium">
@@ -16,13 +14,16 @@ const isActive = (path: string) => currentPath === path;
       </a>
 
       <nav class="nav-menu">
-        <a href="/" class={`nav-link ${isActive("/") ? "active" : ""}`}>Principal</a>
-        <a href="/tours-at#tours-content" class={`nav-link ${isActive("/tours-at") ? "active" : ""}`}>Tours</a>
+        {navigationLinks.map(link => (
+          <a href={link.href} class="nav-link">
+            {link.label}
+          </a>
+        ))}
       </nav>
 
       <div class="header-actions">
-        <a href="/tours-at#tours-content" class="cart-btn">
-          <i class="fas fa-whatsapp"></i>
+        <a href="/tours" class="cart-btn">
+          <i class="fab fa-whatsapp"></i>
           <span>Reservar tours</span>
         </a>
       </div>

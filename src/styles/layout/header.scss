@@ -117,6 +117,14 @@
     }
 }
 
+.cart-btn-icon {
+    width: 1rem;
+    height: 1rem;
+    fill: currentColor;
+    flex-shrink: 0;
+    display: inline-block;
+}
+
 // Responsive
 @media (max-width: 1100px) {
     .header-content {
