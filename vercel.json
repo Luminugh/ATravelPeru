@@ -1,0 +1,38 @@
+{
+  "buildCommand": "npm run build",
+  "devCommand": "npm run dev",
+  "installCommand": "npm install",
+  "framework": "astro",
+  "nodeVersion": "22.x",
+  "outputDirectory": "./dist",
+  "env": {
+    "VITE_SUPABASE_URL": "@vercel-supabase-url",
+    "VITE_SUPABASE_ANON_KEY": "@vercel-supabase-key"
+  },
+  "rewrites": [
+    {
+      "source": "/api/v0/auth/callback",
+      "destination": "/api/v0/auth/callback"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=3600, s-maxage=3600"
+        }
+      ]
+    },
+    {
+      "source": "/assets/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
+    }
+  ]
+}
