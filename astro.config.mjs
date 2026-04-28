@@ -3,7 +3,7 @@ import vercel from "@astrojs/vercel/static";
 
 export default defineConfig({
   adapter: vercel(),
-  output: "static",
+  output: "hybrid",
   server: {
     port: 4321,
     host: true
