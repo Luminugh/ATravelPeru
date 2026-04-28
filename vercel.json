@@ -3,51 +3,8 @@
   "devCommand": "npm run dev",
   "installCommand": "npm install",
   "framework": "astro",
-  "outputDirectory": "./dist",
-  "rewrites": [
-    {
-      "source": "/api/v0/auth/callback",
-      "destination": "/api/v0/auth/callback"
-    }
-  ],
-  "headers": [
-    {
-      "source": "/(.*)",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "public, max-age=3600, s-maxage=3600"
-        }
-      ]
-    },
-    {
-      "source": "/assets/(.*)",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "public, max-age=31536000, immutable"
-        }
-      ]
-    }
-  ]
+  "outputDirectory": "./dist"
 }
-  "rewrites": [
-    {
-      "source": "/api/v0/auth/callback",
-      "destination": "/api/v0/auth/callback"
-    }
-  ],
-  "headers": [
-    {
-      "source": "/(.*)",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "public, max-age=3600, s-maxage=3600"
-        }
-      ]
-    },
-    {
       "source": "/assets/(.*)",
       "headers": [
         {
