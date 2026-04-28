@@ -50,6 +50,11 @@ function normalizeGallery(galeria: unknown): string[] {
 export async function getToursCatalog(): Promise<{ items: CatalogItem[]; error: string | null; source: string }> {
   const supabase = getSupabaseServerClient();
 
+  // If Supabase is not available (e.g., during static build), return empty
+  if (!supabase) {
+    return { items: [], error: "Supabase not available during build", source: "none" };
+  }
+
   const { data, error } = await supabase
     .from("v_tours_catalogo")
     .select("id,titulo,descripcion,precio,duracion,ubicacion,incluye,no_incluye,itinerario,imagen_principal,galeria,destacado,estado,vendedor_id")

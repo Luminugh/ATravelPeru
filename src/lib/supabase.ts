@@ -10,9 +10,8 @@ export function getSupabaseServerClient() {
     import.meta.env.SUPABASE_ANON_KEY;
 
   if (!url || !key) {
-    throw new Error(
-      "Missing Supabase env vars. Define SUPABASE_PROJECT_ID and SUPABASE_PUBLISHABLE_KEY (or PUBLIC_SUPABASE_URL + PUBLIC_SUPABASE_PUBLISHABLE_KEY)."
-    );
+    // During build time, return null instead of throwing
+    return null;
   }
 
   return createClient(url, key, {
