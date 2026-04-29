@@ -1,5 +1,5 @@
 <div style="background: #f5f5f5; padding: 20px; margin: 20px; border-radius: 8px; font-family: monospace; font-size: 12px;">
-  <div style="color: #333; margin-bottom: 10px;"><strong>🔍 Diagnóstico de Configuración</strong></div>
+  <div style="color: #333; margin-bottom: 10px;"><strong>Diagnostico de Configuracion</strong></div>
   
   <div style="background: white; padding: 10px; margin: 5px 0; border-radius: 4px; border-left: 4px solid #ddd;">
     <div>PUBLIC_SUPABASE_URL: <span id="status-url" style="color: #666;">Verificando...</span></div>
@@ -10,7 +10,7 @@
   </div>
   
   <div id="supabase-status" style="background: white; padding: 10px; margin: 5px 0; border-radius: 4px; border-left: 4px solid #ddd; display: none;">
-    <div>Estado de conexión: <span id="connection-status" style="color: #666;">Verificando...</span></div>
+    <div>Estado de conexion: <span id="connection-status" style="color: #666;">Verificando...</span></div>
   </div>
 </div>
 
@@ -25,12 +25,12 @@
   const connEl = document.getElementById('connection-status');
   
   if (urlEl) {
-    urlEl.textContent = hasUrl ? '✅ Configurado' : '❌ Falta';
+    urlEl.textContent = hasUrl ? '[OK]' : '[FALTA]';
     urlEl.style.color = hasUrl ? '#22863a' : '#cb2431';
   }
   
   if (keyEl) {
-    keyEl.textContent = hasKey ? '✅ Configurado' : '❌ Falta';
+    keyEl.textContent = hasKey ? '[OK]' : '[FALTA]';
     keyEl.style.color = hasKey ? '#22863a' : '#cb2431';
   }
   
@@ -46,14 +46,14 @@
         );
         const { data, error } = await client.from('v_tours_catalogo').select('count', { count: 'exact' }).limit(1);
         if (error) {
-          connEl.textContent = '❌ Error: ' + error.message;
+          connEl.textContent = '[ERROR] ' + error.message;
           connEl.style.color = '#cb2431';
         } else {
-          connEl.textContent = '✅ Conectado';
+          connEl.textContent = '[CONECTADO]';
           connEl.style.color = '#22863a';
         }
       } catch (e) {
-        connEl.textContent = '❌ ' + (e instanceof Error ? e.message : 'Error desconocido');
+        connEl.textContent = '[ERROR] ' + (e instanceof Error ? e.message : 'Error desconocido');
         connEl.style.color = '#cb2431';
       }
     };
