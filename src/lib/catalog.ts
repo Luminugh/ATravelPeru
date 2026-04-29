@@ -54,14 +54,16 @@ export async function getToursCatalog(): Promise<{ items: CatalogItem[]; error: 
   // Try to fetch from Supabase
   if (supabase) {
     try {
+      console.log("[Tours] Fetching from Supabase...");
       const { data, error } = await supabase
         .from("v_tours_catalogo")
         .select("id,titulo,descripcion,precio,duracion,ubicacion,incluye,no_incluye,itinerario,imagen_principal,galeria,destacado,estado,vendedor_id")
         .order("id", { ascending: true });
 
       if (error) {
-        console.warn("Supabase error, falling back to cache:", error.message);
+        console.warn("[Tours] Supabase error:", error.message);
       } else if (data && data.length > 0) {
+        console.log(`[Tours] Got ${data.length} tours from Supabase`);
         const items = data.map((row) => ({
           id: row.id,
           titulo: row.titulo,
@@ -80,25 +82,38 @@ export async function getToursCatalog(): Promise<{ items: CatalogItem[]; error: 
         }));
         
         // Try to save to cache for future builds
-        await saveCachedTours(items);
+        try {
+          await saveCachedTours(items);
+        } catch (cacheErr) {
+          console.log("[Tours] Could not save cache:", cacheErr);
+        }
         
-        return { items, error: null, source: "v_tours_catalogo" };
+        return { items, error: null, source: "supabase" };
+      } else {
+        console.log("[Tours] Supabase returned empty data");
       }
     } catch (err) {
-      console.warn("Supabase fetch failed:", err);
+      console.warn("[Tours] Supabase fetch failed:", err instanceof Error ? err.message : String(err));
     }
+  } else {
+    console.log("[Tours] Supabase client not available");
   }
 
   // Fallback to cached tours
   try {
+    console.log("[Tours] Trying to load from cache...");
     const cachedItems = await loadCachedTours();
     if (cachedItems.length > 0) {
+      console.log(`[Tours] Got ${cachedItems.length} tours from cache`);
       return { items: cachedItems, error: null, source: "cache" };
+    } else {
+      console.log("[Tours] Cache is empty");
     }
   } catch (err) {
-    console.warn("Could not load cache:", err);
+    console.warn("[Tours] Could not load cache:", err instanceof Error ? err.message : String(err));
   }
 
   // No data available
-  return { items: [], error: "No data available from Supabase or cache", source: "none" };
+  console.log("[Tours] No data available from Supabase or cache");
+  return { items: [], error: "No data available - check Supabase connection and credentials", source: "none" };
 }

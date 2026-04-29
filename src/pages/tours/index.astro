@@ -1,6 +1,7 @@
 ---
 import AppLayout from "../../layouts/AppLayout.astro";
 import { getToursCatalog } from "../../lib/catalog";
+import DiagnosticPanel from "../../components/DiagnosticPanel.astro";
 import { faWhatsapp } from "@fortawesome/free-brands-svg-icons";
 
 const title = "Tours AT - Recorridos Turísticos";
@@ -54,12 +55,15 @@ const { items: toursAtData, error: toursLoadError, source: toursSource } = await
         <section id="tours-content" class="tours-section">
             <h2 class="section-title mb-12">Recorridos disponibles</h2>
             {toursAtData.length === 0 && (
-                <div class="tour-empty-state">
-                    <h3>No se encontraron tours para mostrar</h3>
-                    <p>Fuente consultada: {toursSource}</p>
-                    {toursLoadError && <p>Error detectado: {toursLoadError}</p>}
-                    <p>Confirma que existan filas activas en la base de datos para mostrar el catálogo.</p>
-                </div>
+                <>
+                    <div class="tour-empty-state">
+                        <h3>No se encontraron tours para mostrar</h3>
+                        <p>Fuente consultada: {toursSource}</p>
+                        {toursLoadError && <p>Error detectado: {toursLoadError}</p>}
+                        <p>Confirma que existan filas activas en la base de datos para mostrar el catálogo.</p>
+                    </div>
+                    <DiagnosticPanel />
+                </>
             )}
             <div class="tours-summary-grid">
                 {toursAtData.map((tour) => (
