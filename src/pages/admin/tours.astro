@@ -1,7 +1,7 @@
 ---
 import AdminLayout from "../../layouts/AdminLayout.astro";
 
-export const prerender = true;
+export const prerender = false;
 
 const title = "Gestión de Tours AT - Panel Admin";
 ---
@@ -9,30 +9,25 @@ const title = "Gestión de Tours AT - Panel Admin";
 <AdminLayout title={title}>
   <!-- Auth Check Script -->
   <script>
-    // Verificar autenticación en el cliente
-    const token = localStorage.getItem('admin_token');
-    const lastActivity = localStorage.getItem('admin_lastActivity');
-    
-    // Si no hay token, redirigir a login
-    if (!token) {
-      window.location.href = '/admin/login';
-    }
-    
-    // Verificar si la sesión expiró (1 hora de inactividad)
-    if (lastActivity) {
-      const now = Date.now();
-      const lastActivityTime = parseInt(lastActivity);
-      const oneHourInMs = 60 * 60 * 1000;
-      
-      if (now - lastActivityTime > oneHourInMs) {
-        localStorage.removeItem('admin_token');
-        localStorage.removeItem('admin_lastActivity');
+    // Verificar autenticación en el servidor
+    async function checkAuth() {
+      try {
+        const response = await fetch('/api/admin/auth/me');
+        if (!response.ok) {
+          // No autenticado, redirigir a login
+          window.location.href = '/admin/login';
+        }
+      } catch (error) {
+        console.error('Error checking auth:', error);
         window.location.href = '/admin/login';
       }
     }
     
-    // Actualizar tiempo de última actividad
-    localStorage.setItem('admin_lastActivity', Date.now().toString());
+    // Verificar autenticación al cargar la página
+    checkAuth();
+    
+    // Verificar periódicamente (cada 5 minutos)
+    setInterval(checkAuth, 5 * 60 * 1000);
   </script>
   <!-- Tours Section -->
   <section class="content-section">

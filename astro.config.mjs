@@ -7,7 +7,7 @@ export default defineConfig({
       enabled: true
     }
   }),
-  output: "static",
+  output: "hybrid",
   server: {
     port: 4321,
     host: true
