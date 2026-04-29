@@ -5,9 +5,6 @@ import DiagnosticPanel from "../../components/DiagnosticPanel.astro";
 import { contactConfig, toursPageConfig } from "../../lib/site-config";
 import { faWhatsapp } from "@fortawesome/free-brands-svg-icons";
 
-// Renderizar dinámicamente para obtener tours actualizados en cada request
-export const prerender = false;
-
 const title = toursPageConfig.title;
 const whatsappPath = Array.isArray(faWhatsapp.icon[4]) ? faWhatsapp.icon[4].join(" ") : faWhatsapp.icon[4];
 const whatsappViewBox = `0 0 ${faWhatsapp.icon[0]} ${faWhatsapp.icon[1]}`;
@@ -132,6 +129,68 @@ const { items: toursAtData, error: toursLoadError, source: toursSource } = await
     </div>
 
     <script define:vars={{ toursAtData, whatsappDigits }}>
+        // Cargar tours dinámicamente desde la API para obtener datos actualizados
+        let toursData = toursAtData || [];
+        
+        async function loadToursFromAPI() {
+            try {
+                const response = await fetch('/api/tours');
+                const result = await response.json();
+                if (result.ok && Array.isArray(result.items)) {
+                    toursData = result.items;
+                    // Actualizar la grilla de tours
+                    updateToursGrid(toursData);
+                }
+            } catch (error) {
+                console.error('Error loading tours from API:', error);
+                // Si falla, usar los datos del build
+            }
+        }
+
+        function updateToursGrid(tours) {
+            const grid = document.querySelector('.tours-summary-grid');
+            if (!grid) return;
+
+            // Limpiar la grilla actual
+            grid.innerHTML = '';
+
+            if (tours.length === 0) {
+                grid.innerHTML = '<div class="tour-empty-state"><h3>No se encontraron tours para mostrar</h3></div>';
+                return;
+            }
+
+            // Renderizar cada tour
+            tours.forEach((tour) => {
+                const article = document.createElement('article');
+                article.className = 'tour-summary-card';
+                article.setAttribute('data-tour-id', tour.id);
+                article.innerHTML = `
+                    <div class="summary-image-wrap">
+                        <img src="${tour.imagen_principal}" alt="${tour.titulo}" class="summary-image" loading="lazy" />
+                        <div class="summary-badges">
+                            ${tour.destacado ? '<span class="summary-badge destacado">Destacado</span>' : ''}
+                            <span class="summary-badge estado ${tour.estado}">${tour.estado}</span>
+                        </div>
+                    </div>
+                    <div class="summary-content">
+                        <h3 class="summary-title">${tour.titulo}</h3>
+                        <p class="summary-meta"><i class="fas fa-location-dot"></i> ${tour.ubicacion} · <i class="fas fa-clock"></i> ${tour.duracion}</p>
+                        <p class="summary-description">${tour.descripcion}</p>
+                        <div class="summary-footer">
+                            <span class="summary-price">${tour.precio}</span>
+                            <button class="btn-summary-open" type="button" data-open-tour="${tour.id}" ${tour.estado !== 'activo' ? 'disabled' : ''}>
+                                ${tour.estado === 'activo' ? 'Ver detalles' : 'No disponible'}
+                            </button>
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(article);
+            });
+
+            // Re-asignar event listeners a los botones actualizados
+            attachEventListeners();
+        }
+
         const modal = document.getElementById('tourDetailModal');
         const titleEl = document.getElementById('tourDetailTitle');
         const metaEl = document.getElementById('tourDetailMeta');
@@ -151,7 +210,7 @@ const { items: toursAtData, error: toursLoadError, source: toursSource } = await
         let selectedTour = null;
 
         function openTourDetail(tourId) {
-            const found = toursAtData.find((tour) => String(tour.id) === String(tourId));
+            const found = toursData.find((tour) => String(tour.id) === String(tourId));
             if (!found || found.estado !== 'activo') {
                 return;
             }
@@ -206,6 +265,18 @@ const { items: toursAtData, error: toursLoadError, source: toursSource } = await
             });
         });
 
+        function attachEventListeners() {
+            document.querySelectorAll('[data-open-tour]').forEach((button) => {
+                button.addEventListener('click', () => {
+                    openTourDetail(button.getAttribute('data-open-tour'));
+                });
+            });
+
+            document.querySelectorAll('[data-close-modal]').forEach((button) => {
+                button.addEventListener('click', closeTourDetail);
+            });
+        }
+
         document.querySelectorAll('[data-close-modal]').forEach((button) => {
             button.addEventListener('click', closeTourDetail);
         });
@@ -225,6 +296,13 @@ const { items: toursAtData, error: toursLoadError, source: toursSource } = await
             const whatsappUrl = `https://wa.me/${whatsappDigits}?text=${encodeURIComponent(message)}`;
             window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
         });
+
+        // Cargar tours dinámicamente cuando la página se carga
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', loadToursFromAPI);
+        } else {
+            loadToursFromAPI();
+        }
     </script>
 
 </AppLayout>
