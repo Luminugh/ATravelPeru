@@ -104,15 +104,17 @@
   /* Topbar - Compacto para móvil */
   .admin-topbar {
     padding: 12px 12px;
-    flex-wrap: wrap;
     gap: 10px;
+    align-items: center;
+    justify-content: space-between;
 
     .topbar-left {
       gap: 10px;
-      width: 100%;
       display: flex;
       align-items: center;
       justify-content: flex-start;
+      flex: 1;
+      min-width: 0;
 
       .sidebar-toggle {
         font-size: 20px;
@@ -122,6 +124,7 @@
         display: flex;
         align-items: center;
         justify-content: center;
+        flex-shrink: 0;
       }
 
       .page-title {
@@ -134,14 +137,16 @@
     }
 
     .topbar-right {
-      width: 100%;
       display: flex;
+      align-items: center;
       justify-content: flex-end;
+      flex-shrink: 0;
 
       .admin-profile {
         gap: 8px;
         padding: 8px 12px;
-        max-width: 100%;
+        display: flex;
+        align-items: center;
         width: fit-content;
 
         .profile-avatar {
@@ -178,6 +183,11 @@
     gap: 16px;
     padding: 18px;
     border-radius: 18px;
+  }
+
+  .account-hero-copy {
+    width: 100%;
+    overflow: hidden;
   }
 
   .account-hero-top {
@@ -219,12 +229,9 @@
   .account-edit-actions,
   .account-actions {
     width: 100%;
-  }
-
-  .account-actions,
-  .account-edit-actions {
     display: grid;
     grid-template-columns: 1fr;
+    gap: 12px;
   }
 
   .account-actions .account-action-btn,
@@ -235,10 +242,12 @@
     box-sizing: border-box;
     white-space: normal;
     text-align: center;
+    display: block;
   }
 
   .account-actions--hero .account-action-btn {
     flex: none;
+    display: block;
   }
 
   .account-grid {
