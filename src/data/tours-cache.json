@@ -1,1 +1,53 @@
-[]
+[
+  {
+    "id": 1,
+    "titulo": "Machu Picchu Express",
+    "descripcion": "Explora la maravilla del mundo en una experiencia inolvidable con transporte, guia y alojamiento.",
+    "precio": "S/ 1,300",
+    "duracion": "3 dias",
+    "ubicacion": "Cusco",
+    "incluye": "Transporte en tren, entradas, guia bilingue, hotel y comidas principales.",
+    "no_incluye": "Vuelos nacionales, seguro de viaje y gastos personales.",
+    "itinerario": "Dia 1: llegada y city tour. Dia 2: Valle Sagrado y tren. Dia 3: visita guiada a Machu Picchu y retorno.",
+    "imagen_principal": "https://images.unsplash.com/photo-1587595431973-160d0d94add1?auto=format&fit=crop&w=1100&q=80",
+    "galeria": [],
+    "destacado": true,
+    "estado": "activo",
+    "vendedor_id": "38a05e7a-8ca1-4047-a6a5-237b51b02e7b"
+  },
+  {
+    "id": 2,
+    "titulo": "Valle Sagrado Full Day",
+    "descripcion": "Ruta cultural por Ollantaytambo, Pisac y mercados tradicionales con guia local.",
+    "precio": "S/ 450",
+    "duracion": "1 dia",
+    "ubicacion": "Cusco",
+    "incluye": "Movilidad turistica, guia profesional y almuerzo buffet tipico.",
+    "no_incluye": "Snacks, bebidas alcoholicas y compras de artesania.",
+    "itinerario": "Salida 7:00 AM. Pisac, mercado artesanal, almuerzo y Ollantaytambo. Retorno 6:30 PM.",
+    "imagen_principal": "https://images.unsplash.com/photo-1580618672591-eb180b1a973f?auto=format&fit=crop&w=1100&q=80",
+    "galeria": [
+      "https://images.unsplash.com/photo-1595587637401-9b3f7fbb65be?auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1600112356915-089abb8fc71a?auto=format&fit=crop&w=900&q=80"
+    ],
+    "destacado": false,
+    "estado": "activo",
+    "vendedor_id": "38a05e7a-8ca1-4047-a6a5-237b51b02e7b"
+  },
+  {
+    "id": 3,
+    "titulo": "Lima Historica y Gastronomica",
+    "descripcion": "Una experiencia urbana entre centro historico, costa y sabores peruanos de autor.",
+    "precio": "S/ 680",
+    "duracion": "2 dias",
+    "ubicacion": "Cusco",
+    "incluye": "Traslados internos, entradas, guia en espanol y degustacion gastronomica.",
+    "no_incluye": "Vuelos a Lima, alojamiento adicional y propinas.",
+    "itinerario": "Dia 1: centro historico y museo. Dia 2: circuito gastronomico y miradores costeros.",
+    "imagen_principal": "https://images.unsplash.com/photo-1531968455001-5c5272a41129?auto=format&fit=crop&w=1100&q=80",
+    "galeria": [],
+    "destacado": false,
+    "estado": "activo",
+    "vendedor_id": "38a05e7a-8ca1-4047-a6a5-237b51b02e7b"
+  }
+]

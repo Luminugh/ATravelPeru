@@ -1,8 +1,7 @@
 ---
-const navigationLinks = [
-  { href: '/', label: 'Principal' },
-  { href: '/tours', label: 'Tours' }
-];
+import { headerConfig, siteIdentity } from "../lib/site-config";
+
+const { navigationLinks, reserveHref, reserveLabel } = headerConfig;
 ---
 
 <header class="header-premium">
@@ -10,7 +9,7 @@ const navigationLinks = [
     <div class="header-content">
       <a href="/" class="logo-brand">
         <i class="fas fa-plane logo-icon"></i>
-        <h1 class="logo-text">ATRAVEL</h1>
+        <h1 class="logo-text">{siteIdentity.brand}</h1>
       </a>
 
       <nav class="nav-menu">
@@ -22,9 +21,9 @@ const navigationLinks = [
       </nav>
 
       <div class="header-actions">
-        <a href="/tours" class="cart-btn">
+        <a href={reserveHref} class="cart-btn">
           <i class="fab fa-whatsapp"></i>
-          <span>Reservar tours</span>
+          <span>{reserveLabel}</span>
         </a>
       </div>
     </div>

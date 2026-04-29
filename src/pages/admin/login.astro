@@ -1,7 +1,8 @@
 ---
-export const prerender = false;
+export const prerender = true;
+import { siteIdentity } from "../../lib/site-config";
 
-const title = "Login Admin - ATRAVEL";
+const title = `Login Admin - ${siteIdentity.brand}`;
 const next = "/admin";
 ---
 
@@ -183,7 +184,7 @@ const next = "/admin";
       
       <div class="login-form-container">
         <div class="login-brand">
-          <i class="fas fa-compass"></i> ATRAVEL Admin
+          <i class="fas fa-compass"></i> {siteIdentity.adminBrand}
         </div>
         <h1>Iniciar sesión</h1>
         <p class="subtitle">Ingresa tus credenciales para continuar.</p>

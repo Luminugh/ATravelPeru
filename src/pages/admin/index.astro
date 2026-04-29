@@ -1,34 +1,13 @@
 ---
 import AdminLayout from "../../layouts/AdminLayout.astro";
+import { siteIdentity } from "../../lib/site-config";
 
-export const prerender = false;
+export const prerender = true;
 
-const title = "Panel Administrativo - ATRAVEL";
+const title = siteIdentity.adminTitleDefault;
 ---
 
 <AdminLayout title={title}>
-  <!-- Auth Check Script -->
-  <script>
-    // Verificar autenticación en el servidor
-    async function checkAuth() {
-      try {
-        const response = await fetch('/api/admin/auth/me');
-        if (!response.ok) {
-          // No autenticado, redirigir a login
-          window.location.href = '/admin/login';
-        }
-      } catch (error) {
-        console.error('Error checking auth:', error);
-        window.location.href = '/admin/login';
-      }
-    }
-    
-    // Verificar autenticación al cargar la página
-    checkAuth();
-    
-    // Verificar periódicamente (cada 5 minutos)
-    setInterval(checkAuth, 5 * 60 * 1000);
-  </script>
   <!-- Dashboard Section -->
   <section id="dashboard-section" class="dashboard-section">
     <!-- Stats Cards -->

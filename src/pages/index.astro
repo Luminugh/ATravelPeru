@@ -1,7 +1,8 @@
 ---
 import AppLayout from "../layouts/AppLayout.astro";
+import { homePageConfig } from "../lib/site-config";
 
-const title = "ATRAVEL - Tu próximo viaje espera";
+const title = homePageConfig.title;
 ---
 
 <AppLayout title={title}>
@@ -15,28 +16,22 @@ const title = "ATRAVEL - Tu próximo viaje espera";
         </div>
         <div class="hero-overlay"></div>
         <div class="hero-content">
-            <div class="hero-badge">Viajes increíbles te esperan</div>
-            <h2 class="hero-title">Descubre el Perú sin límites</h2>
-            <p class="hero-subtitle">Empieza aquí: toca Ver Tours y elige tu siguiente viaje en un solo paso</p>
+            <div class="hero-badge">{homePageConfig.heroBadge}</div>
+            <h2 class="hero-title">{homePageConfig.heroTitle}</h2>
+            <p class="hero-subtitle">{homePageConfig.heroSubtitle}</p>
             
             <div class="hero-features">
-                <div class="hero-feature-item">
-                    <i class="fas fa-globe feature-icon"></i>
-                    <span class="feature-text">150+ Destinos</span>
-                </div>
-                <div class="hero-feature-item">
-                    <i class="fas fa-star feature-icon"></i>
-                    <span class="feature-text">5 Estrellas</span>
-                </div>
-                <div class="hero-feature-item">
-                    <i class="fas fa-users feature-icon"></i>
-                    <span class="feature-text">50K+ Viajeros</span>
-                </div>
+                {homePageConfig.heroFeatures.map((feature) => (
+                    <div class="hero-feature-item">
+                        <i class={`${feature.icon} feature-icon`}></i>
+                        <span class="feature-text">{feature.label}</span>
+                    </div>
+                ))}
             </div>
 
             <div class="hero-actions">
-                <a class="btn-hero-primary" href="/tours#tours-content">Ver Tours</a>
-                <a class="btn-hero-secondary" href="/tours#tours-content">Reservar ahora</a>
+                <a class="btn-hero-primary" href={homePageConfig.primaryAction.href}>{homePageConfig.primaryAction.label}</a>
+                <a class="btn-hero-secondary" href={homePageConfig.secondaryAction.href}>{homePageConfig.secondaryAction.label}</a>
             </div>
         </div>
     </section>
@@ -46,28 +41,15 @@ const title = "ATRAVEL - Tu próximo viaje espera";
         
         <!-- Features Section -->
         <section class="features-section">
-            <h2 class="features-title">¿Por qué elegir ATRAVEL?</h2>
+            <h2 class="features-title">{homePageConfig.featuresTitle}</h2>
             <div class="features-grid">
-                <div class="feature-card">
-                    <i class="fas fa-coins feature-card-icon"></i>
-                    <h3 class="feature-heading">Mejores Precios</h3>
-                    <p class="feature-text">Garantizamos los precios más competitivos sin comprometer la calidad de tu viaje</p>
-                </div>
-                <div class="feature-card">
-                    <i class="fas fa-lock feature-card-icon"></i>
-                    <h3 class="feature-heading">100% Seguro</h3>
-                    <p class="feature-text">Todas nuestras agencias son certificadas y tus viajes están asegurados</p>
-                </div>
-                <div class="feature-card">
-                    <i class="fas fa-headset feature-card-icon"></i>
-                    <h3 class="feature-heading">Soporte 24/7</h3>
-                    <p class="feature-text">Equipo disponible en todo momento durante tu experiencia de viaje</p>
-                </div>
-                <div class="feature-card">
-                    <i class="fas fa-check-circle feature-card-icon"></i>
-                    <h3 class="feature-heading">Verificado</h3>
-                    <p class="feature-text">Miles de viajeros satisfechos nos recomiendan cada año</p>
-                </div>
+                {homePageConfig.featureCards.map((card) => (
+                    <div class="feature-card">
+                        <i class={`${card.icon} feature-card-icon`}></i>
+                        <h3 class="feature-heading">{card.title}</h3>
+                        <p class="feature-text">{card.text}</p>
+                    </div>
+                ))}
             </div>
         </section>
 

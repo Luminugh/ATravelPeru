@@ -2,7 +2,14 @@ import { createClient } from "@supabase/supabase-js";
 
 export const ADMIN_ACCESS_COOKIE = "admin_access_token";
 export const ADMIN_ACTIVITY_COOKIE = "admin_last_activity";
-export const ADMIN_IDLE_TIMEOUT_MS = 15 * 60 * 1000;
+
+function envNumber(name: string, fallback: number): number {
+  const raw = import.meta.env[name];
+  const parsed = Number(raw);
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback;
+}
+
+export const ADMIN_IDLE_TIMEOUT_MS = envNumber("PUBLIC_ADMIN_IDLE_TIMEOUT_MS", 15 * 60 * 1000);
 
 function resolveSupabaseEnv() {
   const projectId = import.meta.env.SUPABASE_PROJECT_ID;

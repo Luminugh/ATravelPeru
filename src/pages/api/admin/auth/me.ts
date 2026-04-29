@@ -1,5 +1,22 @@
 import type { APIRoute } from "astro";
-import { ADMIN_ACCESS_COOKIE, isIdleExpired, ADMIN_ACTIVITY_COOKIE } from "@lib/admin-auth";
+import {
+  ADMIN_ACCESS_COOKIE,
+  ADMIN_ACTIVITY_COOKIE,
+  createSupabasePublicClient,
+  getCookieSecurityOptions,
+  isIdleExpired,
+} from "../../../../lib/admin-auth";
+
+export const prerender = false;
+
+function unauthorized(cookies: Parameters<APIRoute>[0]["cookies"], message = "No autenticado") {
+  cookies.delete(ADMIN_ACCESS_COOKIE, { path: "/" });
+  cookies.delete(ADMIN_ACTIVITY_COOKIE, { path: "/" });
+  return new Response(JSON.stringify({ ok: false, error: message }), {
+    status: 401,
+    headers: { "Content-Type": "application/json" },
+  });
+}
 
 export const GET: APIRoute = async ({ cookies }) => {
   try {
@@ -7,43 +24,47 @@ export const GET: APIRoute = async ({ cookies }) => {
     const lastActivity = cookies.get(ADMIN_ACTIVITY_COOKIE)?.value;
 
     if (!accessToken) {
-      return new Response(
-        JSON.stringify({ authenticated: false, error: "No token found" }),
-        { status: 401, headers: { "Content-Type": "application/json" } }
-      );
+      return unauthorized(cookies);
     }
 
-    // Verificar inactividad
     if (isIdleExpired(lastActivity)) {
-      cookies.delete(ADMIN_ACCESS_COOKIE);
-      cookies.delete(ADMIN_ACTIVITY_COOKIE);
-      return new Response(
-        JSON.stringify({ authenticated: false, error: "Session expired" }),
-        { status: 401, headers: { "Content-Type": "application/json" } }
-      );
+      return unauthorized(cookies, "Sesion expirada por inactividad");
     }
 
-    // Actualizar actividad
-    cookies.set(
-      ADMIN_ACTIVITY_COOKIE,
-      Date.now().toString(),
-      {
-        httpOnly: false,
-        sameSite: "lax",
-        secure: import.meta.env.PROD,
-        path: "/",
-      }
-    );
+    const client = createSupabasePublicClient();
+    const { data, error } = await client.auth.getUser(accessToken);
+
+    if (error || !data?.user) {
+      return unauthorized(cookies);
+    }
+
+    const options = getCookieSecurityOptions();
+    cookies.set(ADMIN_ACTIVITY_COOKIE, Date.now().toString(), {
+      ...options,
+      httpOnly: false,
+    });
 
     return new Response(
-      JSON.stringify({ authenticated: true }),
-      { status: 200, headers: { "Content-Type": "application/json" } }
+      JSON.stringify({
+        ok: true,
+        user: {
+          id: data.user.id,
+          email: data.user.email ?? null,
+          nombre: (data.user.user_metadata?.nombre as string | undefined) ?? null,
+        },
+      }),
+      {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      },
     );
   } catch (error) {
-    console.error("Error checking auth:", error);
     return new Response(
-      JSON.stringify({ authenticated: false, error: "Server error" }),
-      { status: 500, headers: { "Content-Type": "application/json" } }
+      JSON.stringify({
+        ok: false,
+        error: error instanceof Error ? error.message : "Error interno del servidor",
+      }),
+      { status: 500, headers: { "Content-Type": "application/json" } },
     );
   }
 };

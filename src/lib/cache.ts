@@ -1,6 +1,8 @@
 import type { CatalogItem } from "./catalog";
+import { cacheConfig } from "./site-config";
 
-const CACHE_FILE = "./src/data/tours-cache.json";
+const CACHE_FILE = cacheConfig.filePath;
+const CACHE_DIR = cacheConfig.directoryPath;
 
 export async function loadCachedTours(): Promise<CatalogItem[]> {
   try {
@@ -18,11 +20,10 @@ export async function loadCachedTours(): Promise<CatalogItem[]> {
 export async function saveCachedTours(items: CatalogItem[]): Promise<void> {
   try {
     const fs = await import("fs/promises");
-    const dir = "./src/data";
     
     // Create directory if it doesn't exist
     try {
-      await fs.mkdir(dir, { recursive: true });
+      await fs.mkdir(CACHE_DIR, { recursive: true });
     } catch (e) {
       // Directory might already exist
     }

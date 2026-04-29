@@ -1,14 +1,17 @@
 ---
 import "../styles/pages/admin/index.scss";
+import { adminSessionConfig, siteIdentity } from "../lib/site-config";
 
 interface Props {
   title?: string;
 }
 
-const { title = "Panel Administrativo - ATRAVEL" } = Astro.props;
+const { title = siteIdentity.adminTitleDefault } = Astro.props;
 const currentPath = Astro.url.pathname;
 
 const navClass = (...paths: string[]) => (paths.includes(currentPath) ? "nav-item active" : "nav-item");
+const defaultProfileName = adminSessionConfig.defaultDisplayName;
+const defaultAvatarSrc = `https://ui-avatars.com/api/?name=${encodeURIComponent(defaultProfileName)}&background=${adminSessionConfig.avatarBackground}&color=${adminSessionConfig.avatarColor}`;
 ---
 
 <!doctype html>
@@ -37,7 +40,7 @@ const navClass = (...paths: string[]) => (paths.includes(currentPath) ? "nav-ite
       <aside class="admin-sidebar">
         <div class="sidebar-header">
           <h1 class="sidebar-logo">
-            <i class="fas fa-compass"></i> ATRAVEL Admin
+            <i class="fas fa-compass"></i> {siteIdentity.adminBrand}
           </h1>
         </div>
 
@@ -79,9 +82,9 @@ const navClass = (...paths: string[]) => (paths.includes(currentPath) ? "nav-ite
           </div>
           <div class="topbar-right">
             <button class="admin-profile" id="adminSessionButton" type="button" title="Cerrar sesión">
-              <img src="https://ui-avatars.com/api/?name=Admin+User&background=0D8ABC&color=fff" alt="Admin" class="profile-avatar" id="adminAvatar" />
+              <img src={defaultAvatarSrc} alt="Admin" class="profile-avatar" id="adminAvatar" />
               <div class="profile-info">
-                <p class="profile-name" id="adminProfileName">Admin User</p>
+                <p class="profile-name" id="adminProfileName">{defaultProfileName}</p>
                 <p class="profile-meta" id="adminProfileMeta">Panel principal · Cerrar sesión</p>
               </div>
             </button>
@@ -95,7 +98,7 @@ const navClass = (...paths: string[]) => (paths.includes(currentPath) ? "nav-ite
       </main>
     </div>
 
-    <script>
+    <script define:vars={{ adminSessionConfig, defaultProfileName }}>
       // @ts-nocheck
       
       // Variables globales
@@ -185,12 +188,12 @@ const navClass = (...paths: string[]) => (paths.includes(currentPath) ? "nav-ite
               return;
             }
 
-            const displayName = payload.user.nombre || payload.user.email || 'Admin User';
+            const displayName = payload.user.nombre || payload.user.email || defaultProfileName;
             if (adminProfileName) {
               adminProfileName.textContent = displayName;
             }
             if (adminAvatar instanceof HTMLImageElement) {
-              adminAvatar.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=0D8ABC&color=fff`;
+              adminAvatar.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=${adminSessionConfig.avatarBackground}&color=${adminSessionConfig.avatarColor}`;
             }
           })
           .catch(() => {
@@ -203,8 +206,8 @@ const navClass = (...paths: string[]) => (paths.includes(currentPath) ? "nav-ite
         }
 
         // Inactivity control: if user stops interacting, session closes automatically.
-        const ADMIN_IDLE_TIMEOUT_MS = 15 * 60 * 1000;
-        const ADMIN_PING_THROTTLE_MS = 60 * 1000;
+        const ADMIN_IDLE_TIMEOUT_MS = adminSessionConfig.idleTimeoutMs;
+        const ADMIN_PING_THROTTLE_MS = adminSessionConfig.pingThrottleMs;
         let idleTimer = null;
         let lastPingAt = 0;
 

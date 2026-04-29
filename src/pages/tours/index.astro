@@ -2,11 +2,13 @@
 import AppLayout from "../../layouts/AppLayout.astro";
 import { getToursCatalog } from "../../lib/catalog";
 import DiagnosticPanel from "../../components/DiagnosticPanel.astro";
+import { contactConfig, toursPageConfig } from "../../lib/site-config";
 import { faWhatsapp } from "@fortawesome/free-brands-svg-icons";
 
-const title = "Tours AT - Recorridos Turísticos";
+const title = toursPageConfig.title;
 const whatsappPath = Array.isArray(faWhatsapp.icon[4]) ? faWhatsapp.icon[4].join(" ") : faWhatsapp.icon[4];
 const whatsappViewBox = `0 0 ${faWhatsapp.icon[0]} ${faWhatsapp.icon[1]}`;
+const whatsappDigits = contactConfig.whatsappDigits;
 
 const { items: toursAtData, error: toursLoadError, source: toursSource } = await getToursCatalog();
 ---
@@ -22,28 +24,22 @@ const { items: toursAtData, error: toursLoadError, source: toursSource } = await
         </div>
         <div class="hero-overlay"></div>
         <div class="hero-content">
-            <div class="hero-badge">Experiencias únicas garantizadas</div>
-            <h2 class="hero-title">Recorridos Turísticos Tours AT</h2>
-            <p class="hero-subtitle">Descubre nuestros recorridos predeterminados diseñados especialmente para enamorarte del Perú</p>
+            <div class="hero-badge">{toursPageConfig.heroBadge}</div>
+            <h2 class="hero-title">{toursPageConfig.heroTitle}</h2>
+            <p class="hero-subtitle">{toursPageConfig.heroSubtitle}</p>
             
             <div class="hero-features">
-                <div class="hero-feature-item">
-                    <i class="fas fa-route feature-icon"></i>
-                    <span class="feature-text">25+ Rutas</span>
-                </div>
-                <div class="hero-feature-item">
-                    <i class="fas fa-calendar-days feature-icon"></i>
-                    <span class="feature-text">Salidas Diarias</span>
-                </div>
-                <div class="hero-feature-item">
-                    <i class="fas fa-thumbs-up feature-icon"></i>
-                    <span class="feature-text">98% Rating</span>
-                </div>
+                {toursPageConfig.heroFeatures.map((feature) => (
+                    <div class="hero-feature-item">
+                        <i class={`${feature.icon} feature-icon`}></i>
+                        <span class="feature-text">{feature.label}</span>
+                    </div>
+                ))}
             </div>
 
             <div class="hero-actions">
-                <a class="btn-hero-primary" href="#tours-content">Ver Todos</a>
-                <a class="btn-hero-secondary" href="#tours-content">Consultar tours</a>
+                <a class="btn-hero-primary" href="#tours-content">{toursPageConfig.primaryActionLabel}</a>
+                <a class="btn-hero-secondary" href="#tours-content">{toursPageConfig.secondaryActionLabel}</a>
             </div>
         </div>
     </section>
@@ -53,7 +49,7 @@ const { items: toursAtData, error: toursLoadError, source: toursSource } = await
         
         <!-- Tours Grid Section -->
         <section id="tours-content" class="tours-section">
-            <h2 class="section-title mb-12">Recorridos disponibles</h2>
+            <h2 class="section-title mb-12">{toursPageConfig.sectionTitle}</h2>
             {toursAtData.length === 0 && (
                 <>
                     <div class="tour-empty-state">
@@ -93,47 +89,15 @@ const { items: toursAtData, error: toursLoadError, source: toursSource } = await
 
         <!-- Why Choose Tours AT Section -->
         <section class="why-choose-section mt-20">
-            <h2 class="section-title mb-12">¿Por qué elegir Tours AT?</h2>
+            <h2 class="section-title mb-12">{toursPageConfig.whyChooseTitle}</h2>
             <div class="why-choose-grid">
-                <div class="why-choose-card">
-                    <i class="fas fa-shield-check why-choose-icon"></i>
-                    <h3 class="why-choose-title">100% Asegurado</h3>
-                    <p class="why-choose-text">Todos nuestros tours están completamente asegurados. Tu seguridad es nuestra prioridad.</p>
-                </div>
-                <div class="why-choose-card">
-                    <i class="fas fa-user-tie why-choose-icon"></i>
-                    <h3 class="why-choose-title">Guías Expertos</h3>
-                    <p class="why-choose-text">Guías locales certificados con años de experiencia en cada ruta que ofrecemos.</p>
-                </div>
-                <div class="why-choose-card">
-                    <i class="fas fa-utensils why-choose-icon"></i>
-                    <h3 class="why-choose-title">Comida Incluida</h3>
-                    <p class="why-choose-text">Disfruta de la auténtica gastronomía peruana en cada recorrido que realizamos.</p>
-                </div>
-                <div class="why-choose-card">
-                    <i class="fas fa-check-circle why-choose-icon"></i>
-                    <h3 class="why-choose-title">Cancelación Gratuita</h3>
-                    <p class="why-choose-text">Cancela tu reserva hasta 48 horas antes sin cargos adicionales.</p>
-                </div>
-                <div class="why-choose-card">
-                    <i class="fas fa-headset why-choose-icon"></i>
-                    <h3 class="why-choose-title">Soporte 24/7</h3>
-                    <p class="why-choose-text">Equipo disponible en todo momento durante tu viaje para cualquier necesidad.</p>
-                </div>
-                <div class="why-choose-card">
-                    <i class="fas fa-star why-choose-icon"></i>
-                    <h3 class="why-choose-title">Experiencias Premium</h3>
-                    <p class="why-choose-text">Acceso exclusivo a lugares no turísticos y experiencias auténticas únicamente en Tours AT.</p>
-                </div>
-            </div>
-        </section>
-
-        <!-- CTA Section -->
-        <section class="cta-section mt-20 bg-gradient-to-r from-green-600 to-green-500 rounded-2xl px-8 py-12 text-white">
-            <div class="max-w-2xl mx-auto text-center">
-                <h2 class="text-3xl font-bold mb-4">¿Listo para vivir una aventura?</h2>
-                <p class="text-lg mb-8 text-green-100">Con Tours AT, cada recorrido es una historia que deseará contar una y otra vez</p>
-                <a href="#tours-content" class="btn-hero-primary">Explorar Tours Disponibles</a>
+                {toursPageConfig.whyChooseCards.map((card) => (
+                    <div class="why-choose-card">
+                        <i class={`${card.icon} why-choose-icon`}></i>
+                        <h3 class="why-choose-title">{card.title}</h3>
+                        <p class="why-choose-text">{card.text}</p>
+                    </div>
+                ))}
             </div>
         </section>
 
@@ -194,7 +158,7 @@ const { items: toursAtData, error: toursLoadError, source: toursSource } = await
         </div>
     </div>
 
-    <script define:vars={{ toursAtData }}>
+    <script define:vars={{ toursAtData, whatsappDigits }}>
         const modal = document.getElementById('tourDetailModal');
         const titleEl = document.getElementById('tourDetailTitle');
         const metaEl = document.getElementById('tourDetailMeta');
@@ -285,7 +249,7 @@ const { items: toursAtData, error: toursLoadError, source: toursSource } = await
             }
 
             const message = `Hola, quiero reservar ${selectedTour.titulo} (${selectedTour.duracion}) por ${selectedTour.precio}.`;
-            const whatsappUrl = `https://wa.me/51987654321?text=${encodeURIComponent(message)}`;
+            const whatsappUrl = `https://wa.me/${whatsappDigits}?text=${encodeURIComponent(message)}`;
             window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
         });
     </script>
