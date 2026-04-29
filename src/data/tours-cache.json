@@ -3,14 +3,18 @@
     "id": 1,
     "titulo": "Machu Picchu Express",
     "descripcion": "Explora la maravilla del mundo en una experiencia inolvidable con transporte, guia y alojamiento.",
-    "precio": "S/ 1,300",
+    "precio": "S/ 1,200",
     "duracion": "3 dias",
     "ubicacion": "Cusco",
     "incluye": "Transporte en tren, entradas, guia bilingue, hotel y comidas principales.",
     "no_incluye": "Vuelos nacionales, seguro de viaje y gastos personales.",
     "itinerario": "Dia 1: llegada y city tour. Dia 2: Valle Sagrado y tren. Dia 3: visita guiada a Machu Picchu y retorno.",
     "imagen_principal": "https://images.unsplash.com/photo-1587595431973-160d0d94add1?auto=format&fit=crop&w=1100&q=80",
-    "galeria": [],
+    "galeria": [
+      "https://images.unsplash.com/photo-1526392060635-9d6019884377?auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1577717903315-1691ae25ab3f?auto=format&fit=crop&w=900&q=80",
+      "https://images.unsplash.com/photo-1601597111158-2fceff292cdc?auto=format&fit=crop&w=900&q=80"
+    ],
     "destacado": true,
     "estado": "activo",
     "vendedor_id": "38a05e7a-8ca1-4047-a6a5-237b51b02e7b"
@@ -40,46 +44,17 @@
     "descripcion": "Una experiencia urbana entre centro historico, costa y sabores peruanos de autor.",
     "precio": "S/ 680",
     "duracion": "2 dias",
-    "ubicacion": "Cusco",
+    "ubicacion": "Lima",
     "incluye": "Traslados internos, entradas, guia en espanol y degustacion gastronomica.",
     "no_incluye": "Vuelos a Lima, alojamiento adicional y propinas.",
     "itinerario": "Dia 1: centro historico y museo. Dia 2: circuito gastronomico y miradores costeros.",
     "imagen_principal": "https://images.unsplash.com/photo-1531968455001-5c5272a41129?auto=format&fit=crop&w=1100&q=80",
-    "galeria": [],
+    "galeria": [
+      "https://images.unsplash.com/photo-1594007654729-407eedc4be65?auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1518509562904-e7ef99cdcc86?auto=format&fit=crop&w=900&q=80"
+    ],
     "destacado": false,
-    "estado": "activo",
-    "vendedor_id": "38a05e7a-8ca1-4047-a6a5-237b51b02e7b"
-  },
-  {
-    "id": 8,
-    "titulo": "Test",
-    "descripcion": "Hola",
-    "precio": "S/ 1,200",
-    "duracion": "3 dias",
-    "ubicacion": "Lima",
-    "incluye": "Transporte",
-    "no_incluye": "No",
-    "itinerario": "Nd",
-    "imagen_principal": "https://images.unsplash.com/photo-1587595431973-160d0d94add1?auto=format&fit=crop&w=1100&q=80",
-    "galeria": [],
-    "destacado": true,
-    "estado": "activo",
-    "vendedor_id": "38a05e7a-8ca1-4047-a6a5-237b51b02e7b"
-  },
-  {
-    "id": 9,
-    "titulo": "sadsa",
-    "descripcion": "dsadsa",
-    "precio": "S/ 3,243",
-    "duracion": "2 dias",
-    "ubicacion": "Lima",
-    "incluye": "sdad",
-    "no_incluye": "dsad",
-    "itinerario": "asd",
-    "imagen_principal": "https://images.unsplash.com/photo-1531968455001-5c5272a41129?auto=format&fit=crop&w=1100&q=80",
-    "galeria": [],
-    "destacado": true,
-    "estado": "activo",
+    "estado": "inactivo",
     "vendedor_id": "38a05e7a-8ca1-4047-a6a5-237b51b02e7b"
   }
 ]

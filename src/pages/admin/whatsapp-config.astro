@@ -1,0 +1,460 @@
+---
+import AdminLayout from "../../layouts/AdminLayout.astro";
+
+export const prerender = true;
+
+const title = "Configuración de WhatsApp";
+---
+
+<AdminLayout title={title}>
+  <section class="whatsapp-config-page">
+    <!-- Hero Section -->
+    <div class="whatsapp-hero">
+      <div class="whatsapp-hero-copy">
+        <div class="whatsapp-badge"><i class="fab fa-whatsapp"></i> Configuración de WhatsApp</div>
+        <h1 class="whatsapp-hero-title">Personaliza tu canal de reservas</h1>
+        <p class="whatsapp-hero-text">
+          Configura el mensaje inicial y el número de teléfono que se usarán cuando los clientes quieran hacer reservas a través de WhatsApp desde el catálogo de tours.
+        </p>
+
+        <div class="whatsapp-badge-row">
+          <span class="whatsapp-badge-pill"><i class="fas fa-comments"></i> Mensaje personalizado</span>
+          <span class="whatsapp-badge-pill"><i class="fas fa-phone"></i> Número de vendedor</span>
+          <span class="whatsapp-badge-pill"><i class="fas fa-mobile-screen-button"></i> Optimizado para móvil</span>
+        </div>
+
+        <div class="whatsapp-actions whatsapp-actions--hero">
+          <button type="button" id="editWhatsappBtn" class="whatsapp-action-btn whatsapp-action-btn--primary">
+            <i class="fas fa-pen"></i> Configurar
+          </button>
+          <a href="/admin" class="whatsapp-action-btn whatsapp-action-btn--secondary">
+            <i class="fas fa-arrow-left"></i> Volver
+          </a>
+        </div>
+      </div>
+
+      <div class="whatsapp-hero-panel">
+        <div class="whatsapp-icon">
+          <i class="fab fa-whatsapp"></i>
+        </div>
+        <div class="whatsapp-status">
+          <p class="whatsapp-status-label">Estado</p>
+          <p class="whatsapp-status-value" id="whatsappStatusValue">Cargando...</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Loading State -->
+    <div id="whatsappLoading" class="whatsapp-card">
+      <div style="display: flex; align-items: center; gap: 12px; justify-content: center;">
+        <i class="fas fa-spinner fa-spin" style="font-size: 20px; color: #10b981;"></i>
+        <span>Cargando configuración...</span>
+      </div>
+    </div>
+
+    <!-- Content Grid -->
+    <div id="whatsappContent" class="whatsapp-grid" hidden>
+      <!-- Config Card 1: Message -->
+      <article class="whatsapp-card whatsapp-card--message">
+        <div class="whatsapp-card-header">
+          <div>
+            <h3><i class="fas fa-comments"></i> Mensaje Inicial</h3>
+            <p class="whatsapp-note">Este mensaje aparecerá al iniciar la conversación con el cliente (mensaje base, independiente del tour).</p>
+          </div>
+          <span class="whatsapp-status-chip" id="messageStatusChip">
+            <i class="fas fa-circle-check"></i> Configurado
+          </span>
+        </div>
+
+        <div class="whatsapp-message-display" id="messageDisplay">
+          <p id="messagePreview">-</p>
+        </div>
+
+        <form id="messageEditForm" class="whatsapp-edit-form" hidden>
+          <div class="form-group">
+            <label for="whatsappMessageInput">Mensaje personalizado</label>
+            <textarea
+              id="whatsappMessageInput"
+              name="whatsapp_message"
+              rows="4"
+              maxlength="500"
+              placeholder="Escribe el mensaje que aparecerá cuando los clientes te contacten..."
+            ></textarea>
+            <div class="char-counter">
+              <span id="charCount">0</span> / 500
+            </div>
+          </div>
+
+          <div class="whatsapp-edit-actions">
+            <button type="submit" class="whatsapp-action-btn whatsapp-action-btn--primary">
+              <i class="fas fa-save"></i> Guardar mensaje
+            </button>
+            <button type="button" id="cancelMessageBtn" class="whatsapp-action-btn whatsapp-action-btn--secondary">
+              <i class="fas fa-xmark"></i> Cancelar
+            </button>
+          </div>
+        </form>
+
+        <button type="button" id="editMessageBtn" class="whatsapp-card-action" hidden>
+          <i class="fas fa-pen"></i> Editar
+        </button>
+      </article>
+
+      <!-- Config Card 2: Phone -->
+      <article class="whatsapp-card whatsapp-card--phone">
+        <div class="whatsapp-card-header">
+          <div>
+            <h3><i class="fas fa-phone"></i> Número de Teléfono</h3>
+            <p class="whatsapp-note">Selecciona el número que se usará para las reservas (del catálogo de vendedores).</p>
+          </div>
+          <span class="whatsapp-status-chip" id="phoneStatusChip">
+            <i class="fas fa-circle-exclamation"></i> Por configurar
+          </span>
+        </div>
+
+        <div class="whatsapp-phone-display" id="phoneDisplay">
+          <div class="phone-info">
+            <span class="phone-label">Número:</span>
+            <p class="phone-value" id="phonePreview">-</p>
+          </div>
+        </div>
+
+        <form id="phoneEditForm" class="whatsapp-edit-form" hidden>
+          <div class="form-group">
+            <label for="whatsappPhoneSelect">Selecciona número de vendedor</label>
+            <select id="whatsappPhoneSelect" name="whatsapp_phone" required>
+              <option value="">-- Selecciona un número --</option>
+            </select>
+            <p class="form-hint">Estos números se obtienen de tu perfil y otros vendedores del sistema.</p>
+          </div>
+
+          <div class="whatsapp-edit-actions">
+            <button type="submit" class="whatsapp-action-btn whatsapp-action-btn--primary">
+              <i class="fas fa-save"></i> Guardar número
+            </button>
+            <button type="button" id="cancelPhoneBtn" class="whatsapp-action-btn whatsapp-action-btn--secondary">
+              <i class="fas fa-xmark"></i> Cancelar
+            </button>
+          </div>
+        </form>
+
+        <button type="button" id="editPhoneBtn" class="whatsapp-card-action" hidden>
+          <i class="fas fa-pen"></i> Editar
+        </button>
+      </article>
+
+      <!-- Info Card: Preview -->
+      <article class="whatsapp-card whatsapp-card--preview whatsapp-card--full">
+        <div class="whatsapp-card-header">
+          <div>
+            <h3><i class="fas fa-eye"></i> Vista Previa</h3>
+            <p class="whatsapp-note">Así verán tu configuración los clientes en el catálogo de tours.</p>
+          </div>
+        </div>
+
+        <div class="whatsapp-preview-box">
+          <div class="whatsapp-phone-mockup">
+            <div class="phone-header">
+              <span class="phone-time" id="previewTime">13:45</span>
+              <div class="phone-status">
+                <i class="fas fa-signal"></i>
+                <i class="fas fa-wifi"></i>
+                <i class="fas fa-battery-three-quarters"></i>
+              </div>
+            </div>
+
+            <div class="phone-chat">
+              <div class="chat-message chat-message-yours">
+                <p id="previewChatMessage">Configurando...</p>
+                <span class="message-time">13:45</span>
+              </div>
+            </div>
+
+            <div class="phone-input-area">
+              <input type="text" placeholder="Escribe un mensaje..." disabled />
+              <button type="button" disabled><i class="fas fa-paper-plane"></i></button>
+            </div>
+          </div>
+        </div>
+      </article>
+    </div>
+
+    <!-- Error State -->
+    <div id="whatsappError" class="whatsapp-card whatsapp-error-card" hidden></div>
+  </section>
+
+  <script>
+    // @ts-nocheck
+
+    function getEl(id: string) {
+      return document.getElementById(id);
+    }
+
+    let whatsappState = {
+      message: '',
+      phone: '',
+      allVendors: [],
+    };
+
+    function formatPhoneForDisplay(phone: string) {
+      if (!phone) return 'No configurado';
+      // Remove non-digit characters and format
+      const cleaned = phone.replace(/\D/g, '');
+      if (cleaned.length >= 9) {
+        return `+51 ${cleaned.slice(-9)}`;
+      }
+      return phone;
+    }
+
+    function updateCharCount() {
+      const textarea = getEl('whatsappMessageInput');
+      const counter = getEl('charCount');
+      if (textarea && counter && textarea instanceof HTMLTextAreaElement) {
+        counter.textContent = String(textarea.value.length);
+      }
+    }
+
+    function setMessageEditMode(enabled: boolean) {
+      const form = getEl('messageEditForm');
+      const editBtn = getEl('editMessageBtn');
+      const textarea = getEl('whatsappMessageInput');
+
+      if (form) form.hidden = !enabled;
+      if (editBtn) editBtn.hidden = enabled;
+      if (enabled && textarea && textarea instanceof HTMLTextAreaElement) {
+        textarea.focus();
+      }
+    }
+
+    function setPhoneEditMode(enabled: boolean) {
+      const form = getEl('phoneEditForm');
+      const editBtn = getEl('editPhoneBtn');
+      const select = getEl('whatsappPhoneSelect');
+
+      if (form) form.hidden = !enabled;
+      if (editBtn) editBtn.hidden = enabled;
+      if (enabled && select && select instanceof HTMLSelectElement) {
+        select.focus();
+      }
+    }
+
+    function updatePreview() {
+      const chatMessage = getEl('previewChatMessage');
+      if (chatMessage) {
+        chatMessage.textContent = whatsappState.message || 'Mensaje no configurado...';
+      }
+
+      // Update status chips
+      const messageChip = getEl('messageStatusChip');
+      const phoneChip = getEl('phoneStatusChip');
+
+      if (messageChip) {
+        if (whatsappState.message) {
+          messageChip.innerHTML = '<i class="fas fa-circle-check"></i> Configurado';
+          messageChip.classList.remove('error');
+        } else {
+          messageChip.innerHTML = '<i class="fas fa-circle-exclamation"></i> Por configurar';
+          messageChip.classList.add('error');
+        }
+      }
+
+      if (phoneChip) {
+        if (whatsappState.phone) {
+          phoneChip.innerHTML = '<i class="fas fa-circle-check"></i> Configurado';
+          phoneChip.classList.remove('error');
+        } else {
+          phoneChip.innerHTML = '<i class="fas fa-circle-exclamation"></i> Por configurar';
+          phoneChip.classList.add('error');
+        }
+      }
+    }
+
+    async function loadConfig() {
+      const loading = getEl('whatsappLoading');
+      const content = getEl('whatsappContent');
+      const error = getEl('whatsappError');
+
+      if (!loading || !content || !error) return;
+
+      try {
+        const response = await fetch('/api/admin/whatsapp-config');
+        const payload = await response.json();
+
+        if (!response.ok || !payload?.ok) {
+          throw new Error(payload?.error || 'No fue posible cargar la configuración');
+        }
+
+        whatsappState = {
+          message: payload.data?.message || '',
+          phone: payload.data?.phone || '',
+          allVendors: payload.data?.vendors || [],
+        };
+
+        // Render config
+        const messagePreview = getEl('messagePreview');
+        const phonePreview = getEl('phonePreview');
+        const messageInput = getEl('whatsappMessageInput');
+        const phoneSelect = getEl('whatsappPhoneSelect');
+
+        if (messagePreview) {
+          messagePreview.textContent = whatsappState.message || 'Mensaje no configurado';
+        }
+
+        if (phonePreview) {
+          phonePreview.textContent = formatPhoneForDisplay(whatsappState.phone);
+        }
+
+        if (messageInput && messageInput instanceof HTMLTextAreaElement) {
+          messageInput.value = whatsappState.message;
+          updateCharCount();
+        }
+
+        // Populate phone select
+        if (phoneSelect && phoneSelect instanceof HTMLSelectElement) {
+          whatsappState.allVendors.forEach((vendor) => {
+            const option = document.createElement('option');
+            option.value = vendor.phone || '';
+            option.textContent = `${vendor.name} (${vendor.phone || 'Sin teléfono'})`;
+            option.selected = vendor.phone === whatsappState.phone;
+            phoneSelect.appendChild(option);
+          });
+        }
+
+        updatePreview();
+
+        loading.hidden = true;
+        content.hidden = false;
+      } catch (err) {
+        loading.hidden = true;
+        error.hidden = false;
+        error.innerHTML = `<strong>Error:</strong> ${err instanceof Error ? err.message : 'No fue posible cargar la configuración'}`;
+      }
+    }
+
+    async function saveMessage(ev) {
+      ev.preventDefault();
+      const textarea = getEl('whatsappMessageInput');
+      const value = textarea && textarea instanceof HTMLTextAreaElement ? textarea.value.trim() : '';
+
+      if (!value) {
+        alert('El mensaje no puede estar vacío.');
+        return;
+      }
+
+      try {
+        const response = await fetch('/api/admin/whatsapp-config', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message: value }),
+        });
+
+        const payload = await response.json();
+
+        if (!response.ok || !payload?.ok) {
+          throw new Error(payload?.error || 'Error al guardar el mensaje');
+        }
+
+        whatsappState.message = value;
+        updatePreview();
+        setMessageEditMode(false);
+
+        const messagePreview = getEl('messagePreview');
+        if (messagePreview) {
+          messagePreview.textContent = value;
+        }
+      } catch (err) {
+        alert(`Error: ${err instanceof Error ? err.message : 'Ocurrió un error'}`);
+      }
+    }
+
+    async function savePhone(ev) {
+      ev.preventDefault();
+      const select = getEl('whatsappPhoneSelect');
+      const value = select && select instanceof HTMLSelectElement ? select.value.trim() : '';
+
+      if (!value) {
+        alert('Debes seleccionar un número de teléfono.');
+        return;
+      }
+
+      try {
+        const response = await fetch('/api/admin/whatsapp-config', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ phone: value }),
+        });
+
+        const payload = await response.json();
+
+        if (!response.ok || !payload?.ok) {
+          throw new Error(payload?.error || 'Error al guardar el número');
+        }
+
+        whatsappState.phone = value;
+        updatePreview();
+        setPhoneEditMode(false);
+
+        const phonePreview = getEl('phonePreview');
+        if (phonePreview) {
+          phonePreview.textContent = formatPhoneForDisplay(value);
+        }
+      } catch (err) {
+        alert(`Error: ${err instanceof Error ? err.message : 'Ocurrió un error'}`);
+      }
+    }
+
+    // Initialize when page loads
+    loadConfig();
+
+    // Event Listeners
+    const editWhatsappBtn = getEl('editWhatsappBtn');
+    if (editWhatsappBtn) {
+      editWhatsappBtn.addEventListener('click', () => {
+        setMessageEditMode(true);
+      });
+    }
+
+    const editMessageBtn = getEl('editMessageBtn');
+    if (editMessageBtn) {
+      editMessageBtn.addEventListener('click', () => {
+        setMessageEditMode(true);
+      });
+    }
+
+    const cancelMessageBtn = getEl('cancelMessageBtn');
+    if (cancelMessageBtn) {
+      cancelMessageBtn.addEventListener('click', () => {
+        setMessageEditMode(false);
+      });
+    }
+
+    const messageForm = getEl('messageEditForm');
+    if (messageForm && messageForm instanceof HTMLFormElement) {
+      messageForm.addEventListener('submit', saveMessage);
+    }
+
+    const messageInput = getEl('whatsappMessageInput');
+    if (messageInput) {
+      messageInput.addEventListener('input', updateCharCount);
+    }
+
+    const editPhoneBtn = getEl('editPhoneBtn');
+    if (editPhoneBtn) {
+      editPhoneBtn.addEventListener('click', () => {
+        setPhoneEditMode(true);
+      });
+    }
+
+    const cancelPhoneBtn = getEl('cancelPhoneBtn');
+    if (cancelPhoneBtn) {
+      cancelPhoneBtn.addEventListener('click', () => {
+        setPhoneEditMode(false);
+      });
+    }
+
+    const phoneForm = getEl('phoneEditForm');
+    if (phoneForm && phoneForm instanceof HTMLFormElement) {
+      phoneForm.addEventListener('submit', savePhone);
+    }
+  </script>
+</AdminLayout>

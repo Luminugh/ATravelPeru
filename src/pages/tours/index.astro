@@ -292,8 +292,11 @@ const { items: toursAtData, error: toursLoadError, source: toursSource } = await
                 return;
             }
 
+            // Usar el número configurado del vendedor, o el fallback si no está configurado
+            const whatsappNumber = selectedTour.whatsapp_phone || whatsappDigits;
+            
             const message = `Hola, quiero reservar ${selectedTour.titulo} (${selectedTour.duracion}) por ${selectedTour.precio}.`;
-            const whatsappUrl = `https://wa.me/${whatsappDigits}?text=${encodeURIComponent(message)}`;
+            const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
             window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
         });
 

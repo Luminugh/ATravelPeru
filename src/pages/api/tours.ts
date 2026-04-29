@@ -19,6 +19,7 @@ interface TourItem {
   destacado: boolean;
   estado: string;
   vendedor_id: string;
+  whatsapp_phone: string | null;
 }
 
 function formatPrice(value: unknown): string {
@@ -84,6 +85,23 @@ export const GET: APIRoute = async () => {
       );
     }
 
+    // Obtener datos de WhatsApp de los vendedores
+    const vendorIds = Array.from(new Set((data ?? []).map((row) => row.vendedor_id)));
+    const vendorDataMap: Record<string, string | null> = {};
+
+    if (vendorIds.length > 0) {
+      const { data: vendorsData } = await supabase
+        .from("vendedores")
+        .select("id, whatsapp_phone")
+        .in("id", vendorIds);
+
+      if (vendorsData) {
+        vendorsData.forEach((v) => {
+          vendorDataMap[v.id] = v.whatsapp_phone || null;
+        });
+      }
+    }
+
     const items: TourItem[] = (data ?? []).map((row) => ({
       id: row.id,
       titulo: row.titulo,
@@ -99,6 +117,7 @@ export const GET: APIRoute = async () => {
       destacado: Boolean(row.destacado),
       estado: row.estado,
       vendedor_id: row.vendedor_id,
+      whatsapp_phone: vendorDataMap[row.vendedor_id] || null,
     }));
 
     return new Response(JSON.stringify({ ok: true, items }), {
