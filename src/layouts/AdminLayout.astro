@@ -36,6 +36,7 @@ const defaultAvatarSrc = `https://ui-avatars.com/api/?name=${encodeURIComponent(
     </div>
 
     <div class="admin-container" id="adminContainer" style="display: none;">
+      <div class="admin-backdrop" id="adminBackdrop"></div>
       <!-- Sidebar -->
       <aside class="admin-sidebar">
         <div class="sidebar-header">
@@ -59,6 +60,10 @@ const defaultAvatarSrc = `https://ui-avatars.com/api/?name=${encodeURIComponent(
               <i class="fas fa-map"></i>
               <span>Tours AT</span>
             </a>
+            <a href="/admin/account" class={navClass("/admin/account")}>
+              <i class="fas fa-user-shield"></i>
+              <span>Mi Cuenta</span>
+            </a>
           </div>
 
           <div class="nav-section">
@@ -81,11 +86,11 @@ const defaultAvatarSrc = `https://ui-avatars.com/api/?name=${encodeURIComponent(
             <h2 class="page-title" id="pageTitle">Dashboard</h2>
           </div>
           <div class="topbar-right">
-            <button class="admin-profile" id="adminSessionButton" type="button" title="Cerrar sesión">
+            <button class="admin-profile" id="adminAccountButton" type="button" title="Ver cuenta">
               <img src={defaultAvatarSrc} alt="Admin" class="profile-avatar" id="adminAvatar" />
               <div class="profile-info">
                 <p class="profile-name" id="adminProfileName">{defaultProfileName}</p>
-                <p class="profile-meta" id="adminProfileMeta">Panel principal · Cerrar sesión</p>
+                <p class="profile-meta" id="adminProfileMeta">Cuenta del vendedor</p>
               </div>
             </button>
           </div>
@@ -104,6 +109,8 @@ const defaultAvatarSrc = `https://ui-avatars.com/api/?name=${encodeURIComponent(
       // Variables globales
       const adminContainer = document.getElementById('adminContainer');
       const authLoadingScreen = document.getElementById('authLoadingScreen');
+      const adminBackdrop = document.getElementById('adminBackdrop');
+      const adminAccountButton = document.getElementById('adminAccountButton');
 
       async function logoutAndRedirect() {
         try {
@@ -151,11 +158,41 @@ const defaultAvatarSrc = `https://ui-avatars.com/api/?name=${encodeURIComponent(
         
         // Sidebar toggle functionality
         const sidebarToggle = document.getElementById('sidebarToggle');
+        const isMobile = () => window.matchMedia('(max-width: 768px)').matches;
+
+        function closeSidebar() {
+          if (!adminContainer) return;
+          adminContainer.classList.remove('sidebar-active');
+          adminContainer.classList.remove('sidebar-collapsed');
+          document.body.classList.remove('admin-drawer-open');
+        }
+
+        function openSidebar() {
+          if (!adminContainer) return;
+          adminContainer.classList.add('sidebar-active');
+          document.body.classList.add('admin-drawer-open');
+        }
+
+        function toggleSidebar() {
+          if (!adminContainer) return;
+          if (isMobile()) {
+            if (adminContainer.classList.contains('sidebar-active')) {
+              closeSidebar();
+            } else {
+              openSidebar();
+            }
+            return;
+          }
+
+          adminContainer.classList.toggle('sidebar-collapsed');
+        }
 
         if (sidebarToggle && adminContainer) {
-          sidebarToggle.addEventListener('click', () => {
-            adminContainer.classList.toggle('sidebar-collapsed');
-          });
+          sidebarToggle.addEventListener('click', toggleSidebar);
+        }
+
+        if (adminBackdrop) {
+          adminBackdrop.addEventListener('click', closeSidebar);
         }
 
         // Navigation items click handlers
@@ -166,6 +203,10 @@ const defaultAvatarSrc = `https://ui-avatars.com/api/?name=${encodeURIComponent(
             navItems.forEach(i => i.classList.remove('active'));
             // Add active class to clicked item
             item.classList.add('active');
+
+            if (isMobile()) {
+              closeSidebar();
+            }
             
             // Update page title
             const title = item.textContent.trim();
@@ -188,7 +229,7 @@ const defaultAvatarSrc = `https://ui-avatars.com/api/?name=${encodeURIComponent(
               return;
             }
 
-            const displayName = payload.user.nombre || payload.user.email || defaultProfileName;
+            const displayName = payload.vendedor?.nombre?.trim() || payload.user.nombre || payload.user.email || defaultProfileName;
             if (adminProfileName) {
               adminProfileName.textContent = displayName;
             }
@@ -200,10 +241,18 @@ const defaultAvatarSrc = `https://ui-avatars.com/api/?name=${encodeURIComponent(
             window.location.href = '/admin/login';
           });
 
-        const adminSessionButton = document.getElementById('adminSessionButton');
-        if (adminSessionButton) {
-          adminSessionButton.addEventListener('click', logoutAndRedirect);
+        if (adminAccountButton) {
+          adminAccountButton.addEventListener('click', () => {
+            window.location.href = '/admin/account';
+          });
         }
+
+        window.addEventListener('resize', () => {
+          if (!isMobile()) {
+            document.body.classList.remove('admin-drawer-open');
+            adminContainer?.classList.remove('sidebar-active');
+          }
+        });
 
         // Inactivity control: if user stops interacting, session closes automatically.
         const ADMIN_IDLE_TIMEOUT_MS = adminSessionConfig.idleTimeoutMs;
@@ -280,6 +329,14 @@ const defaultAvatarSrc = `https://ui-avatars.com/api/?name=${encodeURIComponent(
         font-size: 18px;
         font-weight: 600;
         margin: 0;
+      }
+
+      .admin-backdrop {
+        display: none;
+      }
+
+      .admin-drawer-open {
+        overflow: hidden;
       }
 
       @keyframes spin {

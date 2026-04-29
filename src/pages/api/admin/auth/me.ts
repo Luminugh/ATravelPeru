@@ -2,7 +2,7 @@ import type { APIRoute } from "astro";
 import {
   ADMIN_ACCESS_COOKIE,
   ADMIN_ACTIVITY_COOKIE,
-  createSupabasePublicClient,
+  createSupabaseAuthedClient,
   getCookieSecurityOptions,
   isIdleExpired,
 } from "../../../../lib/admin-auth";
@@ -31,7 +31,7 @@ export const GET: APIRoute = async ({ cookies }) => {
       return unauthorized(cookies, "Sesion expirada por inactividad");
     }
 
-    const client = createSupabasePublicClient();
+    const client = createSupabaseAuthedClient(accessToken);
     const { data, error } = await client.auth.getUser(accessToken);
 
     if (error || !data?.user) {
@@ -44,14 +44,21 @@ export const GET: APIRoute = async ({ cookies }) => {
       httpOnly: false,
     });
 
+    const sellerRes = await client.from("vendedores").select("id,nombre,telefono,created_at").eq("id", data.user.id).maybeSingle();
+
+    const sellerName = sellerRes.data?.nombre?.trim() || (data.user.user_metadata?.nombre as string | undefined) || null;
+
     return new Response(
       JSON.stringify({
         ok: true,
         user: {
           id: data.user.id,
           email: data.user.email ?? null,
-          nombre: (data.user.user_metadata?.nombre as string | undefined) ?? null,
+          nombre: sellerName,
         },
+        vendedor: sellerRes.data
+          ? { ...sellerRes.data, nombre: sellerName }
+          : null,
       }),
       {
         status: 200,

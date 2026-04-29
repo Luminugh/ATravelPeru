@@ -1,0 +1,327 @@
+---
+import AdminLayout from "../../layouts/AdminLayout.astro";
+
+export const prerender = true;
+
+const title = "Cuenta del Vendedor";
+---
+
+<AdminLayout title={title}>
+  <section class="admin-account-page">
+    <div class="account-hero">
+      <div class="account-hero-copy">
+        <div class="account-badge"><i class="fas fa-user-shield"></i> Cuenta del vendedor</div>
+        <h1 class="account-hero-title">Tu perfil administrativo</h1>
+        <p class="account-hero-text">
+          Administra el nombre visible y el teléfono de tu vendedor. El nombre configurado será el que se muestre en el panel cuando exista.
+        </p>
+
+        <div class="account-badge-row">
+          <span class="account-badge-pill"><i class="fas fa-pen-to-square"></i> Editar datos</span>
+          <span class="account-badge-pill"><i class="fas fa-bolt"></i> Vista rápida</span>
+          <span class="account-badge-pill"><i class="fas fa-mobile-screen-button"></i> Optimizado para móvil</span>
+        </div>
+
+        <div class="account-actions account-actions--hero">
+          <button type="button" id="editAccountBtn" class="account-action-btn account-action-btn--primary"><i class="fas fa-pen"></i> Editar</button>
+          <a href="/admin/tours" class="account-action-btn account-action-btn--secondary"><i class="fas fa-map"></i> Ir a Tours</a>
+          <button type="button" id="logoutAccountBtn" class="account-action-btn account-action-btn--danger"><i class="fas fa-right-from-bracket"></i> Cerrar sesión</button>
+        </div>
+      </div>
+
+      <div class="account-hero-panel">
+        <div class="account-avatar" id="accountAvatar">T</div>
+        <div class="account-identity">
+          <strong id="sellerDisplayNameCard">-</strong>
+          <span id="sellerEmailCard">-</span>
+        </div>
+        <div class="account-hero-mini-grid">
+          <div class="mini-metric">
+            <span>Tours</span>
+            <strong id="sellerToursCountHero">-</strong>
+          </div>
+          <div class="mini-metric">
+            <span>Teléfono</span>
+            <strong id="sellerPhoneHero">-</strong>
+          </div>
+          <div class="mini-metric">
+            <span>Cuenta</span>
+            <strong id="sellerCreatedHero">-</strong>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="accountLoading" class="account-card">Cargando datos de la cuenta...</div>
+
+    <div id="accountContent" class="account-grid" hidden>
+      <article class="account-card account-card--profile">
+        <div class="account-card-header">
+          <div>
+            <h3><i class="fas fa-id-card"></i> Perfil</h3>
+            <p class="account-note">Si tienes un nombre configurado, se mostrará en lugar del correo.</p>
+          </div>
+          <span class="account-status-chip"><i class="fas fa-circle-check"></i> Activo</span>
+        </div>
+        <div class="account-list">
+          <div class="account-item"><span>Nombre visible</span><strong id="sellerDisplayName">-</strong></div>
+          <div class="account-item"><span>Email</span><strong id="sellerEmail">-</strong></div>
+          <div class="account-item"><span>Teléfono</span><strong id="sellerPhone">-</strong></div>
+          <div class="account-item account-item--masked">
+            <span>ID de usuario</span>
+            <div class="account-item-value">
+              <strong id="sellerId">-</strong>
+              <button type="button" id="toggleSellerIdBtn" class="account-id-toggle">Ver</button>
+            </div>
+          </div>
+        </div>
+
+        <form id="accountEditForm" class="account-edit-form" hidden>
+          <div class="form-group">
+            <label for="displayNameInput">Nombre visible</label>
+            <input id="displayNameInput" name="nombre" type="text" maxlength="120" placeholder="Escribe tu nombre" />
+          </div>
+          <div class="form-group">
+            <label for="phoneInput">Teléfono</label>
+            <input id="phoneInput" name="telefono" type="tel" maxlength="30" placeholder="Escribe tu teléfono" />
+          </div>
+          <div class="account-edit-actions">
+            <button type="submit" class="account-action-btn account-action-btn--primary"><i class="fas fa-save"></i> Guardar</button>
+            <button type="button" id="cancelEditBtn" class="account-action-btn account-action-btn--secondary"><i class="fas fa-xmark"></i> Cancelar</button>
+          </div>
+        </form>
+      </article>
+
+      <article class="account-card account-card--summary">
+        <div class="account-card-header">
+          <div>
+            <h3><i class="fas fa-chart-simple"></i> Resumen</h3>
+            <p class="account-note">Datos clave para revisar tu actividad y antigüedad.</p>
+          </div>
+        </div>
+
+        <div class="account-stats-grid">
+          <div class="account-stat-card">
+            <span>Tours asociados</span>
+            <strong id="sellerToursCount">-</strong>
+          </div>
+          <div class="account-stat-card">
+            <span>Cuenta creada</span>
+            <strong id="sellerCreatedAt">-</strong>
+          </div>
+          <div class="account-stat-card account-stat-card--soft">
+            <span>Registro vendedor</span>
+            <strong id="sellerVendorCreatedAt">-</strong>
+          </div>
+        </div>
+      </article>
+    </div>
+
+    <div id="accountError" class="account-card account-error-card" hidden></div>
+  </section>
+
+  <script>
+    // @ts-nocheck
+
+    function getEl(id: string) {
+      return document.getElementById(id);
+    }
+
+    let accountState = {
+      user: null,
+      vendedor: null,
+      metrics: null,
+    };
+
+    function getVisibleName(user, vendedor) {
+      return vendedor?.nombre?.trim() || user?.nombre?.trim() || user?.email || 'Sin nombre';
+    }
+
+    function isCompactViewport() {
+      return window.matchMedia('(max-width: 767px)').matches;
+    }
+
+    function formatAccountDate(dateValue, compact = false) {
+      if (!dateValue) return 'No disponible';
+
+      const parsedDate = new Date(dateValue);
+
+      if (compact) {
+        return parsedDate.toLocaleDateString('es-PE');
+      }
+
+      return parsedDate.toLocaleString('es-PE');
+    }
+
+    function maskIdentifier(value) {
+      if (!value) return '-';
+
+      const cleanedValue = String(value);
+      if (cleanedValue.length <= 10) return cleanedValue;
+
+      return `${cleanedValue.slice(0, 4)}••••••••${cleanedValue.slice(-4)}`;
+    }
+
+    function syncHeaderName(name) {
+      const headerName = getEl('adminProfileName');
+      const headerMeta = getEl('adminProfileMeta');
+      if (headerName) headerName.textContent = name;
+      if (headerMeta) headerMeta.textContent = 'Cuenta del vendedor';
+    }
+
+    function setEditMode(enabled: boolean) {
+      const form = getEl('accountEditForm');
+      const editBtn = getEl('editAccountBtn');
+      const input = getEl('displayNameInput');
+      const phoneInput = getEl('phoneInput');
+
+      if (form) form.hidden = !enabled;
+      if (editBtn) editBtn.hidden = enabled;
+      if (enabled && input && input instanceof HTMLInputElement) {
+        input.focus();
+        input.select();
+      } else if (enabled && phoneInput && phoneInput instanceof HTMLInputElement) {
+        phoneInput.focus();
+      }
+    }
+
+    function renderAccount(payload) {
+      const { user, vendedor, metrics } = payload;
+      accountState = { user, vendedor, metrics };
+
+      const displayName = getVisibleName(user, vendedor);
+      const sellerDisplayName = getEl('sellerDisplayName');
+      const sellerDisplayNameCard = getEl('sellerDisplayNameCard');
+      const sellerEmail = getEl('sellerEmail');
+      const sellerEmailCard = getEl('sellerEmailCard');
+      const sellerPhone = getEl('sellerPhone');
+      const sellerPhoneHero = getEl('sellerPhoneHero');
+      const sellerId = getEl('sellerId');
+      const sellerToursCount = getEl('sellerToursCount');
+      const sellerToursCountHero = getEl('sellerToursCountHero');
+      const sellerCreatedAt = getEl('sellerCreatedAt');
+      const sellerCreatedHero = getEl('sellerCreatedHero');
+      const sellerVendorCreatedAt = getEl('sellerVendorCreatedAt');
+      const displayNameInput = getEl('displayNameInput');
+      const phoneInput = getEl('phoneInput');
+      const accountAvatar = getEl('accountAvatar');
+      const toggleSellerIdBtn = getEl('toggleSellerIdBtn');
+      const fullSellerId = user?.id || '-';
+
+      if (sellerDisplayName) sellerDisplayName.textContent = displayName;
+      if (sellerDisplayNameCard) sellerDisplayNameCard.textContent = displayName;
+      if (sellerEmail) sellerEmail.textContent = user?.email || 'Sin email';
+      if (sellerEmailCard) sellerEmailCard.textContent = user?.email || 'Sin email';
+      if (sellerPhone) sellerPhone.textContent = vendedor?.telefono || 'No registrado';
+      if (sellerPhoneHero) sellerPhoneHero.textContent = vendedor?.telefono || 'No registrado';
+      if (sellerId) sellerId.textContent = maskIdentifier(fullSellerId);
+      if (sellerToursCount) sellerToursCount.textContent = String(metrics?.tours ?? 0);
+      if (sellerToursCountHero) sellerToursCountHero.textContent = String(metrics?.tours ?? 0);
+      if (sellerCreatedAt) sellerCreatedAt.textContent = formatAccountDate(user?.created_at, isCompactViewport());
+      if (sellerCreatedHero) sellerCreatedHero.textContent = formatAccountDate(user?.created_at, true);
+      if (sellerVendorCreatedAt) sellerVendorCreatedAt.textContent = formatAccountDate(vendedor?.created_at, isCompactViewport());
+      if (displayNameInput && displayNameInput instanceof HTMLInputElement) {
+        displayNameInput.value = vendedor?.nombre || user?.nombre || '';
+      }
+      if (phoneInput && phoneInput instanceof HTMLInputElement) {
+        phoneInput.value = vendedor?.telefono || '';
+      }
+      if (accountAvatar) {
+        accountAvatar.textContent = displayName
+          .split(' ')
+          .filter(Boolean)
+          .slice(0, 2)
+          .map((part) => part.charAt(0).toUpperCase())
+          .join('') || 'T';
+      }
+
+      if (toggleSellerIdBtn instanceof HTMLButtonElement) {
+        const state = toggleSellerIdBtn.dataset.state || 'masked';
+        toggleSellerIdBtn.textContent = state === 'revealed' ? 'Ocultar' : 'Ver';
+        sellerId.textContent = state === 'revealed' ? fullSellerId : maskIdentifier(fullSellerId);
+
+        toggleSellerIdBtn.onclick = () => {
+          const nextState = toggleSellerIdBtn.dataset.state === 'revealed' ? 'masked' : 'revealed';
+          toggleSellerIdBtn.dataset.state = nextState;
+          toggleSellerIdBtn.textContent = nextState === 'revealed' ? 'Ocultar' : 'Ver';
+          if (sellerId) {
+            sellerId.textContent = nextState === 'revealed' ? fullSellerId : maskIdentifier(fullSellerId);
+          }
+        };
+      }
+
+      syncHeaderName(displayName);
+    }
+
+    async function loadAccount() {
+      const loading = getEl('accountLoading');
+      const content = getEl('accountContent');
+      const errorBox = getEl('accountError');
+
+      if (!loading || !content || !errorBox) {
+        return;
+      }
+
+      try {
+        const response = await fetch('/api/admin/account');
+        const payload = await response.json();
+
+        if (!response.ok || !payload?.ok) {
+          throw new Error(payload?.error || 'No fue posible cargar la cuenta');
+        }
+
+        renderAccount(payload.data);
+
+        loading.hidden = true;
+        content.hidden = false;
+      } catch (error) {
+        loading.hidden = true;
+        errorBox.hidden = false;
+        errorBox.innerHTML = `<strong>Error:</strong> ${error instanceof Error ? error.message : 'No fue posible cargar la cuenta'}`;
+      }
+    }
+
+    async function logoutAndRedirect() {
+      try {
+        await fetch('/api/admin/auth/logout', { method: 'POST' });
+      } finally {
+        window.location.href = '/admin/login';
+      }
+    }
+
+    async function saveAccount(ev) {
+      ev.preventDefault();
+      const input = getEl('displayNameInput');
+      const phoneInput = getEl('phoneInput');
+      const value = input && input instanceof HTMLInputElement ? input.value.trim() : '';
+      const phoneValue = phoneInput && phoneInput instanceof HTMLInputElement ? phoneInput.value.trim() : '';
+
+      if (!value) {
+        alert('El nombre no puede estar vacío.');
+        return;
+      }
+
+      const res = await fetch('/api/admin/account', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nombre: value, telefono: phoneValue }),
+      });
+
+      const payload = await res.json();
+      if (!res.ok || !payload?.ok) {
+        alert(payload?.error || 'No fue posible actualizar la cuenta');
+        return;
+      }
+
+      accountState.vendedor = { ...(accountState.vendedor || {}), nombre: value, telefono: phoneValue || null };
+      renderAccount({ ...accountState });
+      setEditMode(false);
+    }
+
+    document.getElementById('logoutAccountBtn')?.addEventListener('click', logoutAndRedirect);
+    document.getElementById('editAccountBtn')?.addEventListener('click', () => setEditMode(true));
+    document.getElementById('cancelEditBtn')?.addEventListener('click', () => setEditMode(false));
+    document.getElementById('accountEditForm')?.addEventListener('submit', saveAccount);
+    loadAccount();
+  </script>
+</AdminLayout>
