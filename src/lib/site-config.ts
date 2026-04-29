@@ -105,7 +105,7 @@ export const toursPageConfig = {
   primaryActionLabel: "Ver Todos",
   secondaryActionLabel: "Consultar tours",
   sectionTitle: "Recorridos disponibles",
-  whyChooseTitle: "Por que elegir Tours AT?",
+  whyChooseTitle: "Por que elegir Atravel?",
   whyChooseCards: [
     { icon: "fas fa-shield-check", title: "100% Asegurado", text: "Todos nuestros tours estan completamente asegurados. Tu seguridad es nuestra prioridad." },
     { icon: "fas fa-user-tie", title: "Guias Expertos", text: "Guias locales certificados con anos de experiencia en cada ruta que ofrecemos." },

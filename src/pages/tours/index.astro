@@ -14,36 +14,6 @@ const { items: toursAtData, error: toursLoadError, source: toursSource } = await
 ---
 
 <AppLayout title={title}>
-<!-- Hero Section Tours AT -->
-    <section class="hero-section hero-secondary">
-        <div class="hero-background">
-            <video autoplay muted loop class="hero-video">
-                <source src="/assets/videos/Video1.mp4" type="video/mp4">
-                Tu navegador no soporta videos.
-            </video>
-        </div>
-        <div class="hero-overlay"></div>
-        <div class="hero-content">
-            <div class="hero-badge">{toursPageConfig.heroBadge}</div>
-            <h2 class="hero-title">{toursPageConfig.heroTitle}</h2>
-            <p class="hero-subtitle">{toursPageConfig.heroSubtitle}</p>
-            
-            <div class="hero-features">
-                {toursPageConfig.heroFeatures.map((feature) => (
-                    <div class="hero-feature-item">
-                        <i class={`${feature.icon} feature-icon`}></i>
-                        <span class="feature-text">{feature.label}</span>
-                    </div>
-                ))}
-            </div>
-
-            <div class="hero-actions">
-                <a class="btn-hero-primary" href="#tours-content">{toursPageConfig.primaryActionLabel}</a>
-                <a class="btn-hero-secondary" href="#tours-content">{toursPageConfig.secondaryActionLabel}</a>
-            </div>
-        </div>
-    </section>
-
     <!-- Main Content -->
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         
