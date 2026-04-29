@@ -5,6 +5,9 @@ import DiagnosticPanel from "../../components/DiagnosticPanel.astro";
 import { contactConfig, toursPageConfig } from "../../lib/site-config";
 import { faWhatsapp } from "@fortawesome/free-brands-svg-icons";
 
+// Renderizar dinámicamente para obtener tours actualizados en cada request
+export const prerender = false;
+
 const title = toursPageConfig.title;
 const whatsappPath = Array.isArray(faWhatsapp.icon[4]) ? faWhatsapp.icon[4].join(" ") : faWhatsapp.icon[4];
 const whatsappViewBox = `0 0 ${faWhatsapp.icon[0]} ${faWhatsapp.icon[1]}`;

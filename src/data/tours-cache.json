@@ -49,5 +49,37 @@
     "destacado": false,
     "estado": "activo",
     "vendedor_id": "38a05e7a-8ca1-4047-a6a5-237b51b02e7b"
+  },
+  {
+    "id": 8,
+    "titulo": "Test",
+    "descripcion": "Hola",
+    "precio": "S/ 1,200",
+    "duracion": "3 dias",
+    "ubicacion": "Lima",
+    "incluye": "Transporte",
+    "no_incluye": "No",
+    "itinerario": "Nd",
+    "imagen_principal": "https://images.unsplash.com/photo-1587595431973-160d0d94add1?auto=format&fit=crop&w=1100&q=80",
+    "galeria": [],
+    "destacado": true,
+    "estado": "activo",
+    "vendedor_id": "38a05e7a-8ca1-4047-a6a5-237b51b02e7b"
+  },
+  {
+    "id": 9,
+    "titulo": "sadsa",
+    "descripcion": "dsadsa",
+    "precio": "S/ 3,243",
+    "duracion": "2 dias",
+    "ubicacion": "Lima",
+    "incluye": "sdad",
+    "no_incluye": "dsad",
+    "itinerario": "asd",
+    "imagen_principal": "https://images.unsplash.com/photo-1531968455001-5c5272a41129?auto=format&fit=crop&w=1100&q=80",
+    "galeria": [],
+    "destacado": true,
+    "estado": "activo",
+    "vendedor_id": "38a05e7a-8ca1-4047-a6a5-237b51b02e7b"
   }
 ]
