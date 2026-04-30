@@ -34,10 +34,6 @@ export const siteIdentity = {
   adminTitleDefault: import.meta.env.PUBLIC_ADMIN_TITLE_DEFAULT ?? `Panel Administrativo - ${import.meta.env.PUBLIC_BRAND_NAME ?? defaultBrand}`,
 };
 
-export const contactConfig = {
-  whatsappDigits: normalizeWhatsappDigits(import.meta.env.PUBLIC_WHATSAPP_RESERVAS, "51987654321"),
-};
-
 export const adminSessionConfig = {
   idleTimeoutMs: envNumber("PUBLIC_ADMIN_IDLE_TIMEOUT_MS", 15 * 60 * 1000),
   pingThrottleMs: envNumber("PUBLIC_ADMIN_PING_THROTTLE_MS", 60 * 1000),
@@ -123,4 +119,8 @@ export const footerConfig = {
 export const cacheConfig = {
   filePath: import.meta.env.TOURS_CACHE_FILE ?? "./src/data/tours-cache.json",
   directoryPath: import.meta.env.TOURS_CACHE_DIR ?? "./src/data",
+};
+
+export const contactConfig = {
+  whatsappDigits: normalizeWhatsappDigits(import.meta.env.PUBLIC_WHATSAPP_DIGITS as string | undefined, ""),
 };

@@ -29,10 +29,10 @@
     "incluye": "Movilidad turistica, guia profesional y almuerzo buffet tipico.",
     "no_incluye": "Snacks, bebidas alcoholicas y compras de artesania.",
     "itinerario": "Salida 7:00 AM. Pisac, mercado artesanal, almuerzo y Ollantaytambo. Retorno 6:30 PM.",
-    "imagen_principal": "https://www.ollantaytambo.org/img/cusco-sacred-valley-machu-picchu-007-01.jpg",
+    "imagen_principal": "https://images.unsplash.com/photo-1580618672591-eb180b1a973f?auto=format&fit=crop&w=1100&q=80",
     "galeria": [
-      "https://images.unsplash.com/photo-1595587637401-9b3f7fbb65be?auto=format&fit=crop&w=1200&q=80",
-      "https://images.unsplash.com/photo-1600112356915-089abb8fc71a?auto=format&fit=crop&w=900&q=80"
+      "https://www.ollantaytambo.org/img/cusco-sacred-valley-machu-picchu-007-01.jpg",
+      "https://www.ollantaytambo.org/img/cusco-sacred-valley-machu-picchu-007-01.jpg"
     ],
     "destacado": false,
     "estado": "activo",

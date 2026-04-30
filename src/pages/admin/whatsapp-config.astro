@@ -12,14 +12,14 @@ const title = "Configuración de WhatsApp";
     <div class="whatsapp-hero">
       <div class="whatsapp-hero-copy">
         <div class="whatsapp-badge"><i class="fab fa-whatsapp"></i> Configuración de WhatsApp</div>
-        <h1 class="whatsapp-hero-title">Personaliza tu canal de reservas</h1>
+        <h1 class="whatsapp-hero-title">Número único de reservas</h1>
         <p class="whatsapp-hero-text">
-          Configura el mensaje inicial y el número de teléfono que se usarán cuando los clientes quieran hacer reservas a través de WhatsApp desde el catálogo de tours.
+          Configura el número de WhatsApp que usarán todos los clientes cuando reserven tours desde el catálogo público. Este es un número global para todo el sistema.
         </p>
 
         <div class="whatsapp-badge-row">
-          <span class="whatsapp-badge-pill"><i class="fas fa-comments"></i> Mensaje personalizado</span>
-          <span class="whatsapp-badge-pill"><i class="fas fa-phone"></i> Número de vendedor</span>
+          <span class="whatsapp-badge-pill"><i class="fas fa-phone"></i> Número único global</span>
+          <span class="whatsapp-badge-pill"><i class="fas fa-database"></i> Guardado en BD</span>
           <span class="whatsapp-badge-pill"><i class="fas fa-mobile-screen-button"></i> Optimizado para móvil</span>
         </div>
 
@@ -38,74 +38,28 @@ const title = "Configuración de WhatsApp";
           <i class="fab fa-whatsapp"></i>
         </div>
         <div class="whatsapp-status">
-          <p class="whatsapp-status-label">Estado</p>
+          <p class="whatsapp-status-label">Número configurado</p>
           <p class="whatsapp-status-value" id="whatsappStatusValue">Cargando...</p>
         </div>
       </div>
     </div>
 
     <!-- Loading State -->
-    <div id="whatsappLoading" class="whatsapp-card">
+    <div id="whatsappLoading" class="whatsapp-card" hidden>
       <div style="display: flex; align-items: center; gap: 12px; justify-content: center;">
         <i class="fas fa-spinner fa-spin" style="font-size: 20px; color: #10b981;"></i>
         <span>Cargando configuración...</span>
       </div>
     </div>
 
-    <!-- Content Grid -->
-    <div id="whatsappContent" class="whatsapp-grid" hidden>
-      <!-- Config Card 1: Message -->
-      <article class="whatsapp-card whatsapp-card--message">
+    <!-- Content -->
+    <div id="whatsappContent" class="whatsapp-grid">
+      <!-- Config Card: Phone -->
+      <article class="whatsapp-card whatsapp-card--phone whatsapp-card--full">
         <div class="whatsapp-card-header">
           <div>
-            <h3><i class="fas fa-comments"></i> Mensaje Inicial</h3>
-            <p class="whatsapp-note">Este mensaje aparecerá al iniciar la conversación con el cliente (mensaje base, independiente del tour).</p>
-          </div>
-          <span class="whatsapp-status-chip" id="messageStatusChip">
-            <i class="fas fa-circle-check"></i> Configurado
-          </span>
-        </div>
-
-        <div class="whatsapp-message-display" id="messageDisplay">
-          <p id="messagePreview">-</p>
-        </div>
-
-        <form id="messageEditForm" class="whatsapp-edit-form" hidden>
-          <div class="form-group">
-            <label for="whatsappMessageInput">Mensaje personalizado</label>
-            <textarea
-              id="whatsappMessageInput"
-              name="whatsapp_message"
-              rows="4"
-              maxlength="500"
-              placeholder="Escribe el mensaje que aparecerá cuando los clientes te contacten..."
-            ></textarea>
-            <div class="char-counter">
-              <span id="charCount">0</span> / 500
-            </div>
-          </div>
-
-          <div class="whatsapp-edit-actions">
-            <button type="submit" class="whatsapp-action-btn whatsapp-action-btn--primary">
-              <i class="fas fa-save"></i> Guardar mensaje
-            </button>
-            <button type="button" id="cancelMessageBtn" class="whatsapp-action-btn whatsapp-action-btn--secondary">
-              <i class="fas fa-xmark"></i> Cancelar
-            </button>
-          </div>
-        </form>
-
-        <button type="button" id="editMessageBtn" class="whatsapp-card-action" hidden>
-          <i class="fas fa-pen"></i> Editar
-        </button>
-      </article>
-
-      <!-- Config Card 2: Phone -->
-      <article class="whatsapp-card whatsapp-card--phone">
-        <div class="whatsapp-card-header">
-          <div>
-            <h3><i class="fas fa-phone"></i> Número de Teléfono</h3>
-            <p class="whatsapp-note">Selecciona el número que se usará para las reservas (del catálogo de vendedores).</p>
+            <h3><i class="fas fa-phone"></i> Número de WhatsApp Global</h3>
+            <p class="whatsapp-note">Este número se usará en todas las reservas del catálogo público. Un único número para todo el sistema.</p>
           </div>
           <span class="whatsapp-status-chip" id="phoneStatusChip">
             <i class="fas fa-circle-exclamation"></i> Por configurar
@@ -114,18 +68,23 @@ const title = "Configuración de WhatsApp";
 
         <div class="whatsapp-phone-display" id="phoneDisplay">
           <div class="phone-info">
-            <span class="phone-label">Número:</span>
+            <span class="phone-label">Número actual:</span>
             <p class="phone-value" id="phonePreview">-</p>
           </div>
         </div>
 
         <form id="phoneEditForm" class="whatsapp-edit-form" hidden>
           <div class="form-group">
-            <label for="whatsappPhoneSelect">Selecciona número de vendedor</label>
-            <select id="whatsappPhoneSelect" name="whatsapp_phone" required>
-              <option value="">-- Selecciona un número --</option>
-            </select>
-            <p class="form-hint">Estos números se obtienen de tu perfil y otros vendedores del sistema.</p>
+            <label for="whatsappPhoneInput">Ingresa el número de WhatsApp</label>
+            <input
+              id="whatsappPhoneInput"
+              type="tel"
+              name="whatsapp_phone"
+              placeholder="Ej: 987654321 o +51987654321"
+              maxlength="20"
+              required
+            />
+            <p class="form-hint">Ingresa solo dígitos. Se aceptan números con o sin el código de país. Mínimo 9 dígitos.</p>
           </div>
 
           <div class="whatsapp-edit-actions">
@@ -148,14 +107,14 @@ const title = "Configuración de WhatsApp";
         <div class="whatsapp-card-header">
           <div>
             <h3><i class="fas fa-eye"></i> Vista Previa</h3>
-            <p class="whatsapp-note">Así verán tu configuración los clientes en el catálogo de tours.</p>
+            <p class="whatsapp-note">Así verán los clientes el número cuando reserven desde el catálogo.</p>
           </div>
         </div>
 
         <div class="whatsapp-preview-box">
           <div class="whatsapp-phone-mockup">
             <div class="phone-header">
-              <span class="phone-time" id="previewTime">13:45</span>
+              <span class="phone-time">13:45</span>
               <div class="phone-status">
                 <i class="fas fa-signal"></i>
                 <i class="fas fa-wifi"></i>
@@ -165,7 +124,7 @@ const title = "Configuración de WhatsApp";
 
             <div class="phone-chat">
               <div class="chat-message chat-message-yours">
-                <p id="previewChatMessage">Configurando...</p>
+                <p id="previewChatMessage">Hola, quiero reservar Machu Picchu Express (3 dias) por S/ 1,300</p>
                 <span class="message-time">13:45</span>
               </div>
             </div>
@@ -191,14 +150,11 @@ const title = "Configuración de WhatsApp";
     }
 
     let whatsappState = {
-      message: '',
       phone: '',
-      allVendors: [],
     };
 
     function formatPhoneForDisplay(phone: string) {
       if (!phone) return 'No configurado';
-      // Remove non-digit characters and format
       const cleaned = phone.replace(/\D/g, '');
       if (cleaned.length >= 9) {
         return `+51 ${cleaned.slice(-9)}`;
@@ -206,57 +162,20 @@ const title = "Configuración de WhatsApp";
       return phone;
     }
 
-    function updateCharCount() {
-      const textarea = getEl('whatsappMessageInput');
-      const counter = getEl('charCount');
-      if (textarea && counter && textarea instanceof HTMLTextAreaElement) {
-        counter.textContent = String(textarea.value.length);
-      }
-    }
-
-    function setMessageEditMode(enabled: boolean) {
-      const form = getEl('messageEditForm');
-      const editBtn = getEl('editMessageBtn');
-      const textarea = getEl('whatsappMessageInput');
-
-      if (form) form.hidden = !enabled;
-      if (editBtn) editBtn.hidden = enabled;
-      if (enabled && textarea && textarea instanceof HTMLTextAreaElement) {
-        textarea.focus();
-      }
-    }
-
     function setPhoneEditMode(enabled: boolean) {
       const form = getEl('phoneEditForm');
       const editBtn = getEl('editPhoneBtn');
-      const select = getEl('whatsappPhoneSelect');
+      const input = getEl('whatsappPhoneInput');
 
       if (form) form.hidden = !enabled;
       if (editBtn) editBtn.hidden = enabled;
-      if (enabled && select && select instanceof HTMLSelectElement) {
-        select.focus();
+      if (enabled && input && input instanceof HTMLInputElement) {
+        input.focus();
       }
     }
 
     function updatePreview() {
-      const chatMessage = getEl('previewChatMessage');
-      if (chatMessage) {
-        chatMessage.textContent = whatsappState.message || 'Mensaje no configurado...';
-      }
-
-      // Update status chips
-      const messageChip = getEl('messageStatusChip');
       const phoneChip = getEl('phoneStatusChip');
-
-      if (messageChip) {
-        if (whatsappState.message) {
-          messageChip.innerHTML = '<i class="fas fa-circle-check"></i> Configurado';
-          messageChip.classList.remove('error');
-        } else {
-          messageChip.innerHTML = '<i class="fas fa-circle-exclamation"></i> Por configurar';
-          messageChip.classList.add('error');
-        }
-      }
 
       if (phoneChip) {
         if (whatsappState.phone) {
@@ -270,118 +189,106 @@ const title = "Configuración de WhatsApp";
     }
 
     async function loadConfig() {
+      console.log('[WhatsApp Config] Iniciando carga...');
       const loading = getEl('whatsappLoading');
       const content = getEl('whatsappContent');
       const error = getEl('whatsappError');
 
-      if (!loading || !content || !error) return;
-
       try {
-        const response = await fetch('/api/admin/whatsapp-config');
+        // Fetch with 5-second timeout
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 5000);
+
+        console.log('[WhatsApp Config] Fetching /api/admin/app-config...');
+        const response = await fetch('/api/admin/app-config', { signal: controller.signal });
+        clearTimeout(timeout);
+
+        console.log('[WhatsApp Config] Response status:', response.status);
         const payload = await response.json();
+        console.log('[WhatsApp Config] Payload:', payload);
 
         if (!response.ok || !payload?.ok) {
           throw new Error(payload?.error || 'No fue posible cargar la configuración');
         }
 
-        whatsappState = {
-          message: payload.data?.message || '',
-          phone: payload.data?.phone || '',
-          allVendors: payload.data?.vendors || [],
-        };
+        whatsappState.phone = payload.phone || '';
+        console.log('[WhatsApp Config] Phone:', whatsappState.phone);
 
-        // Render config
-        const messagePreview = getEl('messagePreview');
+        // Render config into available elements
         const phonePreview = getEl('phonePreview');
-        const messageInput = getEl('whatsappMessageInput');
-        const phoneSelect = getEl('whatsappPhoneSelect');
+        const phoneInput = getEl('whatsappPhoneInput');
+        const statusValue = getEl('whatsappStatusValue');
 
-        if (messagePreview) {
-          messagePreview.textContent = whatsappState.message || 'Mensaje no configurado';
-        }
-
-        if (phonePreview) {
-          phonePreview.textContent = formatPhoneForDisplay(whatsappState.phone);
-        }
-
-        if (messageInput && messageInput instanceof HTMLTextAreaElement) {
-          messageInput.value = whatsappState.message;
-          updateCharCount();
-        }
-
-        // Populate phone select
-        if (phoneSelect && phoneSelect instanceof HTMLSelectElement) {
-          whatsappState.allVendors.forEach((vendor) => {
-            const option = document.createElement('option');
-            option.value = vendor.phone || '';
-            option.textContent = `${vendor.name} (${vendor.phone || 'Sin teléfono'})`;
-            option.selected = vendor.phone === whatsappState.phone;
-            phoneSelect.appendChild(option);
-          });
-        }
+        if (phonePreview) phonePreview.textContent = formatPhoneForDisplay(whatsappState.phone);
+        if (statusValue) statusValue.textContent = whatsappState.phone ? formatPhoneForDisplay(whatsappState.phone) : 'Sin configurar';
+        if (phoneInput && phoneInput instanceof HTMLInputElement) phoneInput.value = whatsappState.phone;
 
         updatePreview();
 
-        loading.hidden = true;
-        content.hidden = false;
-      } catch (err) {
-        loading.hidden = true;
-        error.hidden = false;
-        error.innerHTML = `<strong>Error:</strong> ${err instanceof Error ? err.message : 'No fue posible cargar la configuración'}`;
-      }
-    }
-
-    async function saveMessage(ev) {
-      ev.preventDefault();
-      const textarea = getEl('whatsappMessageInput');
-      const value = textarea && textarea instanceof HTMLTextAreaElement ? textarea.value.trim() : '';
-
-      if (!value) {
-        alert('El mensaje no puede estar vacío.');
-        return;
-      }
-
-      try {
-        const response = await fetch('/api/admin/whatsapp-config', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ message: value }),
-        });
-
-        const payload = await response.json();
-
-        if (!response.ok || !payload?.ok) {
-          throw new Error(payload?.error || 'Error al guardar el mensaje');
+        // Mark hero as configured when phone exists
+        const heroPanel = document.querySelector('.whatsapp-hero-panel');
+        const editWhatsappBtn = getEl('editWhatsappBtn');
+        const statusLabelEl = document.querySelector('.whatsapp-hero .whatsapp-status-label');
+        if (whatsappState.phone) {
+          if (heroPanel instanceof HTMLElement) heroPanel.classList.add('configured');
+          if (editWhatsappBtn instanceof HTMLElement) editWhatsappBtn.classList.add('configured');
+          if (statusLabelEl instanceof HTMLElement) statusLabelEl.textContent = 'Configurado';
+        } else {
+          if (heroPanel instanceof HTMLElement) heroPanel.classList.remove('configured');
+          if (editWhatsappBtn instanceof HTMLElement) editWhatsappBtn.classList.remove('configured');
+          if (statusLabelEl instanceof HTMLElement) statusLabelEl.textContent = 'Número configurado';
         }
 
-        whatsappState.message = value;
-        updatePreview();
-        setMessageEditMode(false);
-
-        const messagePreview = getEl('messagePreview');
-        if (messagePreview) {
-          messagePreview.textContent = value;
+        // Hide loading and show content using display:none (more reliable than hidden)
+        console.log('[WhatsApp Config] Hiding loading div, showing content...');
+        if (loading) {
+          loading.style.display = 'none';
+          loading.hidden = true;
         }
+        if (content) {
+          content.style.display = 'block';
+          content.hidden = false;
+        }
+        console.log('[WhatsApp Config] Carga completada');
       } catch (err) {
-        alert(`Error: ${err instanceof Error ? err.message : 'Ocurrió un error'}`);
+        console.error('[WhatsApp Config] Error:', err);
+        // Always hide loading even on error
+        if (loading) {
+          loading.style.display = 'none';
+          loading.hidden = true;
+        }
+        if (content) {
+          content.style.display = 'block';
+          content.hidden = false;
+        }
+        if (error) {
+          error.hidden = false;
+          error.innerHTML = `<strong>Error:</strong> ${err instanceof Error ? err.message : 'No fue posible cargar la configuración'}`;
+        }
       }
     }
 
     async function savePhone(ev) {
       ev.preventDefault();
-      const select = getEl('whatsappPhoneSelect');
-      const value = select && select instanceof HTMLSelectElement ? select.value.trim() : '';
+      const input = getEl('whatsappPhoneInput');
+      const value = input && input instanceof HTMLInputElement ? input.value.trim() : '';
 
       if (!value) {
-        alert('Debes seleccionar un número de teléfono.');
+        alert('El número de teléfono no puede estar vacío.');
+        return;
+      }
+
+      const cleaned = value.replace(/\D/g, '');
+      if (cleaned.length < 9) {
+        alert('El número debe tener al menos 9 dígitos.');
         return;
       }
 
       try {
-        const response = await fetch('/api/admin/whatsapp-config', {
+        const response = await fetch('/api/admin/app-config', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ phone: value }),
+          body: JSON.stringify({ phone: cleaned }),
         });
 
         const payload = await response.json();
@@ -390,13 +297,17 @@ const title = "Configuración de WhatsApp";
           throw new Error(payload?.error || 'Error al guardar el número');
         }
 
-        whatsappState.phone = value;
+        whatsappState.phone = cleaned;
         updatePreview();
         setPhoneEditMode(false);
 
         const phonePreview = getEl('phonePreview');
+        const statusValue = getEl('whatsappStatusValue');
         if (phonePreview) {
-          phonePreview.textContent = formatPhoneForDisplay(value);
+          phonePreview.textContent = formatPhoneForDisplay(cleaned);
+        }
+        if (statusValue) {
+          statusValue.textContent = formatPhoneForDisplay(cleaned);
         }
       } catch (err) {
         alert(`Error: ${err instanceof Error ? err.message : 'Ocurrió un error'}`);
@@ -410,32 +321,8 @@ const title = "Configuración de WhatsApp";
     const editWhatsappBtn = getEl('editWhatsappBtn');
     if (editWhatsappBtn) {
       editWhatsappBtn.addEventListener('click', () => {
-        setMessageEditMode(true);
+        setPhoneEditMode(true);
       });
-    }
-
-    const editMessageBtn = getEl('editMessageBtn');
-    if (editMessageBtn) {
-      editMessageBtn.addEventListener('click', () => {
-        setMessageEditMode(true);
-      });
-    }
-
-    const cancelMessageBtn = getEl('cancelMessageBtn');
-    if (cancelMessageBtn) {
-      cancelMessageBtn.addEventListener('click', () => {
-        setMessageEditMode(false);
-      });
-    }
-
-    const messageForm = getEl('messageEditForm');
-    if (messageForm && messageForm instanceof HTMLFormElement) {
-      messageForm.addEventListener('submit', saveMessage);
-    }
-
-    const messageInput = getEl('whatsappMessageInput');
-    if (messageInput) {
-      messageInput.addEventListener('input', updateCharCount);
     }
 
     const editPhoneBtn = getEl('editPhoneBtn');

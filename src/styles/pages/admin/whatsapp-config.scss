@@ -129,6 +129,15 @@ $whatsapp-dark: #075e54;
   }
 }
 
+/* When configured, make hero show subtle styling */
+.whatsapp-hero-panel.configured {
+  box-shadow: 0 6px 20px rgba(37, 211, 102, 0.12);
+
+  .whatsapp-status-value {
+    color: white;
+  }
+}
+
 .whatsapp-icon {
   font-size: 48px;
   display: flex;
@@ -227,10 +236,22 @@ $whatsapp-dark: #075e54;
   align-items: flex-start;
   gap: 16px;
   margin-bottom: 20px;
+  padding-right: 100px;
+
+  // Left section with h3 and p takes available space
+  > div:first-child {
+    flex: 1;
+    min-width: 0;
+  }
 
   @media (max-width: 768px) {
     flex-direction: column;
     gap: 12px;
+    padding-right: 0;
+
+    > div:first-child {
+      flex: 1;
+    }
   }
 
   h3 {
@@ -266,6 +287,7 @@ $whatsapp-dark: #075e54;
   font-weight: $fw-600;
   color: $primary;
   white-space: nowrap;
+  flex-shrink: 0;
 
   &.error {
     background: rgba(#ef4444, 0.1);
@@ -462,6 +484,12 @@ $whatsapp-dark: #075e54;
     &:active {
       transform: translateY(0);
     }
+  }
+
+  &.configured {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
+    box-shadow: 0 6px 18px rgba(16,185,129,0.18);
   }
 
   &.whatsapp-action-btn--secondary {

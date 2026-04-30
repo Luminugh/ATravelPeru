@@ -128,9 +128,22 @@ const { items: toursAtData, error: toursLoadError, source: toursSource } = await
         </div>
     </div>
 
-    <script define:vars={{ toursAtData, whatsappDigits }}>
+    <script define:vars={{ toursAtData }}>
         // Cargar tours dinámicamente desde la API para obtener datos actualizados
         let toursData = toursAtData || [];
+        let globalWhatsappPhone = null;
+
+        async function loadWhatsappConfig() {
+            try {
+                const response = await fetch('/api/whatsapp-config');
+                const result = await response.json();
+                if (result.ok && result.phone) {
+                    globalWhatsappPhone = result.phone;
+                }
+            } catch (error) {
+                console.error('Error loading WhatsApp config:', error);
+            }
+        }
         
         async function loadToursFromAPI() {
             try {
@@ -292,18 +305,25 @@ const { items: toursAtData, error: toursLoadError, source: toursSource } = await
                 return;
             }
 
-            // Usar el número configurado del vendedor, o el fallback si no está configurado
-            const whatsappNumber = selectedTour.whatsapp_phone || whatsappDigits;
-            
+            // Verificar que haya número configurado
+            if (!globalWhatsappPhone) {
+                alert('El sistema aún no tiene un número de WhatsApp configurado. Por favor, intenta más tarde.');
+                return;
+            }
+
             const message = `Hola, quiero reservar ${selectedTour.titulo} (${selectedTour.duracion}) por ${selectedTour.precio}.`;
-            const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
+            const whatsappUrl = `https://wa.me/${globalWhatsappPhone}?text=${encodeURIComponent(message)}`;
             window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
         });
 
         // Cargar tours dinámicamente cuando la página se carga
         if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', loadToursFromAPI);
+            document.addEventListener('DOMContentLoaded', () => {
+                loadWhatsappConfig();
+                loadToursFromAPI();
+            });
         } else {
+            loadWhatsappConfig();
             loadToursFromAPI();
         }
     </script>
