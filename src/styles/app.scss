@@ -17,15 +17,12 @@
 @import 'layout/footer';
 
 // 4. Components
-@import 'components/hero';
 @import 'components/forms';
 @import 'components/buttons';
-@import 'components/features';
 @import 'components/tours';
 
 // 5. Pages
 @import 'pages/_shared';
-@import 'pages/pages';
 @import 'pages/tours';
 
 // 6. Responsive overrides

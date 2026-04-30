@@ -1,7 +1,6 @@
 ---
 import AppLayout from "../../layouts/AppLayout.astro";
 import { getToursCatalog } from "../../lib/catalog";
-import DiagnosticPanel from "../../components/DiagnosticPanel.astro";
 import { contactConfig, toursPageConfig } from "../../lib/site-config";
 import { faWhatsapp } from "@fortawesome/free-brands-svg-icons";
 
@@ -28,7 +27,6 @@ const { items: toursAtData, error: toursLoadError, source: toursSource } = await
                         {toursLoadError && <p>Error detectado: {toursLoadError}</p>}
                         <p>Confirma que existan filas activas en la base de datos para mostrar el catálogo.</p>
                     </div>
-                    <DiagnosticPanel />
                 </>
             )}
             <div class="tours-summary-grid">

@@ -1,3 +1,3 @@
-// Middleware deshabilitado para compilación estática
-// La autenticación se maneja en client-side para páginas admin
+// Middleware placeholder to satisfy Astro loader
+// Disabled intentionally; auth handled client-side in admin.
 export const onRequest = undefined;
