@@ -30,8 +30,19 @@ function normalizeWhatsappDigits(value: string | undefined, fallback: string): s
 export const siteIdentity = {
   brand: import.meta.env.PUBLIC_BRAND_NAME ?? defaultBrand,
   adminBrand: import.meta.env.PUBLIC_ADMIN_BRAND_NAME ?? `${import.meta.env.PUBLIC_BRAND_NAME ?? defaultBrand} Admin`,
-  appTitleDefault: import.meta.env.PUBLIC_APP_TITLE_DEFAULT ?? `${import.meta.env.PUBLIC_BRAND_NAME ?? defaultBrand} - Tu proximo viaje espera`,
+  appTitleDefault: import.meta.env.PUBLIC_APP_TITLE_DEFAULT ?? `${import.meta.env.PUBLIC_BRAND_NAME ?? defaultBrand} Perú - Tu próximo viaje espera`,
   adminTitleDefault: import.meta.env.PUBLIC_ADMIN_TITLE_DEFAULT ?? `Panel Administrativo - ${import.meta.env.PUBLIC_BRAND_NAME ?? defaultBrand}`,
+};
+
+export const siteMetadata = {
+  description:
+    import.meta.env.PUBLIC_APP_DESCRIPTION ??
+    "ATRAVEL Perú ofrece tours turísticos, experiencias y excursiones en Perú. Reserva viajes seguros, con soporte 24/7 y descubre más de 150 destinos en atravelperu.org.",
+  siteUrl: import.meta.env.PUBLIC_SITE_URL ?? "https://atravelperu.org",
+  image: import.meta.env.PUBLIC_APP_OG_IMAGE ?? "/assets/images/icon.png",
+  iconPath: import.meta.env.PUBLIC_ICON_PATH ?? "/assets/images/icon.png",
+  twitterCard: import.meta.env.PUBLIC_TWITTER_CARD ?? "summary_large_image",
+  twitterSite: import.meta.env.PUBLIC_TWITTER_SITE ?? "@atravelperu",
 };
 
 export const adminSessionConfig = {

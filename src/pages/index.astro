@@ -1,10 +1,11 @@
 ---
 import AppLayout from "../layouts/AppLayout.astro";
+import { siteIdentity } from "../lib/site-config";
 
 export const prerender = true;
 ---
 
-<AppLayout title={"ATRAVEL - Tu próximo viaje espera"}>
+<AppLayout title={siteIdentity.appTitleDefault}>
   <section class="hero-section hero-secondary hero-home-align">
     <div class="hero-background">
       <video autoplay muted loop class="hero-video">
