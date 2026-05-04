@@ -27,7 +27,7 @@ const next = "/admin";
       }
       body {
         font-family: "Outfit", sans-serif;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, #0f766e 0%, #16a34a 100%);
         min-height: 100vh;
         display: flex;
         align-items: center;
@@ -42,10 +42,10 @@ const next = "/admin";
         gap: 0;
         border-radius: 16px;
         overflow: hidden;
-        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        box-shadow: 0 24px 80px rgba(15, 23, 42, 0.3);
       }
       .login-visual {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, #16a34a 0%, #22c55e 100%);
         padding: 60px 40px;
         display: flex;
         flex-direction: column;
@@ -55,9 +55,23 @@ const next = "/admin";
         text-align: center;
       }
       .login-visual-icon {
-        font-size: 80px;
-        margin-bottom: 30px;
+        width: 72px;
+        height: 72px;
+        margin-bottom: 24px;
         opacity: 0.95;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+      .login-visual-icon img {
+        width: auto;
+        height: 100%;
+        max-width: 72px;
+        object-fit: contain;
+      }
+      .login-brand img {
+        width: 24px;
+        height: 24px;
       }
       .login-visual h2 {
         font-size: 32px;
@@ -68,6 +82,33 @@ const next = "/admin";
         font-size: 16px;
         opacity: 0.9;
         line-height: 1.6;
+        margin-bottom: 40px;
+      }
+      .visual-secondary-text {
+        font-size: 14px;
+        color: rgba(255, 255, 255, 0.9);
+        margin-bottom: 12px;
+        font-weight: 600;
+      }
+      .visual-secondary-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        padding: 14px 22px;
+        border-radius: 999px;
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        background: rgba(255, 255, 255, 0.12);
+        color: #ffffff;
+        font-weight: 700;
+        text-decoration: none;
+        box-shadow: 0 14px 30px rgba(0, 0, 0, 0.18);
+        transition: transform 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+      }
+      .visual-secondary-btn:hover {
+        transform: translateY(-2px);
+        background: rgba(255, 255, 255, 0.18);
+        box-shadow: 0 18px 34px rgba(0, 0, 0, 0.22);
       }
       .login-form-container {
         background: #ffffff;
@@ -81,12 +122,14 @@ const next = "/admin";
         align-items: center;
         gap: 10px;
         font-weight: 800;
-        color: #667eea;
+        color: #16a34a;
         margin-bottom: 30px;
         font-size: 18px;
       }
-      .login-brand i {
-        font-size: 24px;
+      .login-brand img {
+        width: 32px;
+        height: 32px;
+        object-fit: contain;
       }
       h1 {
         margin: 0 0 10px;
@@ -122,15 +165,15 @@ const next = "/admin";
       }
       input:focus {
         outline: none;
-        border-color: #667eea;
-        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        border-color: #16a34a;
+        box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.18);
       }
       .btn {
         width: 100%;
         border: 0;
         border-radius: 8px;
         padding: 12px 14px;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, #22c55e 0%, #15803d 100%);
         color: #fff;
         font-size: 15px;
         font-weight: 700;
@@ -140,11 +183,36 @@ const next = "/admin";
       }
       .btn:hover {
         transform: translateY(-2px);
-        box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        box-shadow: 0 10px 24px rgba(16, 185, 129, 0.28);
       }
       .btn:disabled {
         opacity: 0.6;
         cursor: wait;
+      }
+      .login-secondary-action {
+        margin: 18px 0 0;
+        text-align: center;
+      }
+      .secondary-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        width: 100%;
+        padding: 14px 18px;
+        border-radius: 12px;
+        border: 0;
+        background: linear-gradient(135deg, #34d399 0%, #059669 100%);
+        color: #ffffff;
+        font-weight: 800;
+        text-decoration: none;
+        box-shadow: 0 16px 28px rgba(5, 150, 105, 0.2);
+        transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+      }
+      .secondary-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 20px 32px rgba(5, 150, 105, 0.24);
+        opacity: 0.98;
       }
       .error {
         margin-top: 15px;
@@ -176,15 +244,17 @@ const next = "/admin";
     <div class="login-container">
       <div class="login-visual">
         <div class="login-visual-icon">
-          <i class="fas fa-map"></i>
+          <img src="/assets/images/icon.png" alt={siteIdentity.adminBrand} />
         </div>
         <h2>Bienvenido</h2>
         <p>Accede a tu panel de administración para gestionar tours, destinos y más.</p>
+        <div class="visual-secondary-text">¿No eres administrador?</div>
+        <a href="/" class="visual-secondary-btn">Volver a la pantalla principal</a>
       </div>
       
       <div class="login-form-container">
         <div class="login-brand">
-          <i class="fas fa-compass"></i> {siteIdentity.adminBrand}
+          <img src="/assets/images/icon.png" alt={siteIdentity.adminBrand} /> {siteIdentity.adminBrand}
         </div>
         <h1>Iniciar sesión</h1>
         <p class="subtitle">Ingresa tus credenciales para continuar.</p>

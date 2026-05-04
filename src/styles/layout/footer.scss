@@ -26,8 +26,9 @@
 }
 
 .footer-icon {
-    font-size: 32px;
-    color: $text-white;
+    width: 32px;
+    height: 32px;
+    object-fit: contain;
     display: inline-block;
 }
 

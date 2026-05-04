@@ -35,8 +35,9 @@
 }
 
 .logo-icon {
-    font-size: 32px;
-    color: $text-white;
+    width: 40px;
+    height: 40px;
+    object-fit: contain;
     display: inline-block;
 }
 
