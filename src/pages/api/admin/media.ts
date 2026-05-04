@@ -32,16 +32,39 @@ async function getAuthenticatedClient(cookies: Parameters<APIRoute>[0]["cookies"
   return { client, userId: data.user.id } as const;
 }
 
-async function isAdmin(userId: string): Promise<boolean> {
+async function isAdmin(userId: string, authClient?: any): Promise<boolean> {
+  // Prefer service client (no RLS) when available. If service key is missing
+  // (e.g., in some local setups) fall back to the authenticated client.
   try {
-    const serviceClient = createSupabaseServiceClient();
-    const { data, error } = await serviceClient
-      .from('users')
-      .select('role')
-      .eq('id', userId)
-      .single();
-    
-    if (error || !data) return false;
+    let data: any = null;
+    let error: any = null;
+
+    try {
+      const serviceClient = createSupabaseServiceClient();
+      const res = await serviceClient
+        .from('users')
+        .select('role')
+        .eq('id', userId)
+        .single();
+      data = res.data;
+      error = res.error;
+    } catch (svcErr) {
+      // Service client unavailable (missing env) — we'll try authClient below.
+      data = null;
+      error = svcErr;
+    }
+
+    if (error || !data) {
+      if (!authClient) return false;
+      const res2 = await authClient
+        .from('users')
+        .select('role')
+        .eq('id', userId)
+        .single();
+      if (res2.error || !res2.data) return false;
+      return res2.data.role === 'admin';
+    }
+
     return data.role === 'admin';
   } catch (err) {
     return false;
@@ -53,8 +76,8 @@ export const GET: APIRoute = async ({ cookies, request }) => {
     const auth = await getAuthenticatedClient(cookies);
     if ("error" in auth) return auth.error;
 
-    // Check admin status
-    const admin = await isAdmin(auth.userId);
+    // Check admin status (pass auth client as fallback for local/dev)
+    const admin = await isAdmin(auth.userId, auth.client);
     if (!admin) {
       return jsonResponse({ ok: false, error: "No autorizado: permisos de administrador requeridos" }, 403);
     }
@@ -81,8 +104,8 @@ export const POST: APIRoute = async ({ cookies, request }) => {
     const auth = await getAuthenticatedClient(cookies);
     if ("error" in auth) return auth.error;
 
-    // Check admin status
-    const admin = await isAdmin(auth.userId);
+    // Check admin status (pass auth client as fallback for local/dev)
+    const admin = await isAdmin(auth.userId, auth.client);
     if (!admin) {
       return jsonResponse({ ok: false, error: "No autorizado: permisos de administrador requeridos" }, 403);
     }
@@ -152,8 +175,8 @@ export const DELETE: APIRoute = async ({ cookies, request }) => {
     const auth = await getAuthenticatedClient(cookies);
     if ("error" in auth) return auth.error;
 
-    // Check admin status
-    const admin = await isAdmin(auth.userId);
+    // Check admin status (pass auth client as fallback for local/dev)
+    const admin = await isAdmin(auth.userId, auth.client);
     if (!admin) {
       return jsonResponse({ ok: false, error: "No autorizado: permisos de administrador requeridos" }, 403);
     }
