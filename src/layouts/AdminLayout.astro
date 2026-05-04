@@ -10,6 +10,18 @@ const { title = siteIdentity.adminTitleDefault } = Astro.props;
 const currentPath = Astro.url.pathname;
 
 const navClass = (...paths: string[]) => (paths.includes(currentPath) ? "nav-item active" : "nav-item");
+
+// Función para obtener el título de la página basado en la ruta
+function getPageTitle(path: string): string {
+  if (path === "/admin" || path === "/admin/") return "Dashboard";
+  if (path === "/admin/tours") return "Tours AT";
+  if (path === "/admin/media") return "Multimedia";
+  if (path === "/admin/whatsapp-config") return "WhatsApp";
+  if (path === "/admin/account") return "Mi Cuenta";
+  return "Dashboard"; // fallback
+}
+
+const currentPageTitle = getPageTitle(currentPath);
 const defaultProfileName = adminSessionConfig.defaultDisplayName;
 const defaultAvatarSrc = `https://ui-avatars.com/api/?name=${encodeURIComponent(defaultProfileName)}&background=${adminSessionConfig.avatarBackground}&color=${adminSessionConfig.avatarColor}`;
 ---
@@ -62,7 +74,7 @@ const defaultAvatarSrc = `https://ui-avatars.com/api/?name=${encodeURIComponent(
             </a>
             <a href="/admin/media" class={navClass("/admin/media")}>
               <i class="fas fa-photo-video"></i>
-              <span>Media</span>
+              <span>Multimedia</span>
             </a>
             <a href="/admin/whatsapp-config" class={navClass("/admin/whatsapp-config")}>
               <i class="fab fa-whatsapp"></i>
@@ -91,7 +103,7 @@ const defaultAvatarSrc = `https://ui-avatars.com/api/?name=${encodeURIComponent(
             <button class="sidebar-toggle" id="sidebarToggle">
               <i class="fas fa-bars"></i>
             </button>
-            <h2 class="page-title" id="pageTitle">Dashboard</h2>
+            <h2 class="page-title" id="pageTitle">{currentPageTitle}</h2>
           </div>
           <div class="topbar-right">
             <button class="admin-profile" id="adminAccountButton" type="button" title="Ver cuenta">
