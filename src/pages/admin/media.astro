@@ -1,0 +1,409 @@
+---
+import AdminLayout from "../../layouts/AdminLayout.astro";
+import { siteIdentity } from "../../lib/site-config";
+
+export const prerender = true;
+
+const title = `Media Manager - ${siteIdentity.adminTitleDefault}`;
+---
+
+<AdminLayout title={title}>
+  <section class="content-section">
+    <!-- Header Section -->
+    <div class="section-header">
+      <div class="header-content">
+        <h3><i class="fas fa-photo-video"></i> Gestor de Medios</h3>
+        <p>Sube, organiza y reutiliza imágenes para tus tours y contenido.</p>
+      </div>
+      <div class="header-actions">
+        <button id="refreshBtn" class="btn btn-secondary">
+          <i class="fas fa-sync-alt"></i> Actualizar
+        </button>
+      </div>
+    </div>
+
+    <!-- Upload Section -->
+    <div class="upload-section">
+      <div class="upload-card">
+        <div class="upload-header">
+          <h4><i class="fas fa-cloud-upload-alt"></i> Subir Nueva Imagen</h4>
+        </div>
+        <form id="uploadForm" class="upload-form">
+          <div class="form-row">
+            <div class="file-input-wrapper">
+              <input id="fileInput" type="file" name="file" accept="image/*" hidden />
+              <label for="fileInput" class="file-input-label">
+                <i class="fas fa-image"></i>
+                <span id="fileLabel">Seleccionar imagen...</span>
+              </label>
+            </div>
+          </div>
+          <div class="form-row">
+            <input id="altInput" name="alt_text" type="text" placeholder="Texto alternativo (opcional)" class="form-input" />
+          </div>
+          <div class="form-row">
+            <input id="tagsInput" name="tags" type="text" placeholder="Etiquetas (separadas por comas)" class="form-input" />
+          </div>
+          <div class="form-row">
+            <button class="btn btn-primary btn-upload" type="submit">
+              <i class="fas fa-upload"></i> Subir Imagen
+            </button>
+          </div>
+        </form>
+        <div id="uploadStatus" class="upload-status"></div>
+      </div>
+    </div>
+
+    <!-- Media Grid -->
+    <div class="media-section">
+      <div class="media-header">
+        <h4><i class="fas fa-images"></i> Biblioteca de Medios</h4>
+        <div class="media-stats">
+          <span id="mediaCount">0 imágenes</span>
+        </div>
+      </div>
+
+      <div id="mediaGrid" class="media-grid"></div>
+
+      <div id="emptyState" class="empty-state">
+        <div class="empty-icon">
+          <i class="fas fa-images"></i>
+        </div>
+        <h4>No hay imágenes aún</h4>
+        <p>Sube tu primera imagen para comenzar a construir tu biblioteca de medios.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Image Preview Modal -->
+  <div id="imageModal" class="image-modal">
+    <div class="modal-backdrop" id="modalBackdrop"></div>
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 id="modalTitle">Vista previa</h4>
+        <button id="modalClose" class="modal-close">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <img id="modalImage" src="" alt="" />
+        <div class="image-info">
+          <div class="info-row">
+            <span class="info-label">Nombre:</span>
+            <span id="infoFilename"></span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Tamaño:</span>
+            <span id="infoSize"></span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Tipo:</span>
+            <span id="infoType"></span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">URL:</span>
+            <input id="infoUrl" type="text" readonly class="url-input" />
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="copyUrlBtn" class="btn btn-secondary">
+          <i class="fas fa-copy"></i> Copiar URL
+        </button>
+        <button id="deleteBtn" class="btn btn-danger">
+          <i class="fas fa-trash"></i> Eliminar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    const api = {
+      list: () => fetch('/api/admin/media').then(r=>r.json()),
+      upload: (form) => fetch('/api/admin/media', { method: 'POST', body: form }).then(r=>r.json()),
+      del: (id) => fetch('/api/admin/media', { method: 'DELETE', headers:{'content-type':'application/json'}, body: JSON.stringify({id})}).then(r=>r.json()),
+    };
+
+    // DOM Elements
+    const grid = document.getElementById('mediaGrid');
+    const empty = document.getElementById('emptyState');
+    const refreshBtn = document.getElementById('refreshBtn');
+    const uploadForm = document.getElementById('uploadForm');
+    const uploadStatus = document.getElementById('uploadStatus');
+    const fileInput = document.getElementById('fileInput');
+    const fileLabel = document.getElementById('fileLabel');
+    const mediaCount = document.getElementById('mediaCount');
+
+    // Modal elements
+    const imageModal = document.getElementById('imageModal');
+    const modalBackdrop = document.getElementById('modalBackdrop');
+    const modalClose = document.getElementById('modalClose');
+    const modalImage = document.getElementById('modalImage');
+    const modalTitle = document.getElementById('modalTitle');
+    const infoFilename = document.getElementById('infoFilename');
+    const infoSize = document.getElementById('infoSize');
+    const infoType = document.getElementById('infoType');
+    const infoUrl = document.getElementById('infoUrl');
+    const copyUrlBtn = document.getElementById('copyUrlBtn');
+    const deleteBtn = document.getElementById('deleteBtn');
+
+    let currentMediaItem = null;
+
+    // File input handling
+    fileInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        fileLabel.textContent = file.name;
+      } else {
+        fileLabel.textContent = 'Seleccionar imagen...';
+      }
+    });
+
+    // Modal functions
+    function openModal(item) {
+      currentMediaItem = item;
+      modalImage.src = item.url || item.storage_path;
+      modalImage.alt = item.alt_text || '';
+      modalTitle.textContent = item.filename || 'Vista previa';
+      infoFilename.textContent = item.filename || 'Sin nombre';
+      infoSize.textContent = formatFileSize(item.size);
+      infoType.textContent = item.mime_type || 'Desconocido';
+      infoUrl.value = item.url || item.storage_path;
+      imageModal.style.display = 'block';
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeModal() {
+      imageModal.style.display = 'none';
+      document.body.style.overflow = '';
+      currentMediaItem = null;
+    }
+
+    function formatFileSize(bytes) {
+      if (!bytes) return 'Desconocido';
+      const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+      const i = Math.floor(Math.log(bytes) / Math.log(1024));
+      return Math.round(bytes / Math.pow(1024, i) * 100) / 100 + ' ' + sizes[i];
+    }
+
+    // Load media
+    async function load() {
+      uploadStatus.textContent = '';
+      uploadStatus.className = 'upload-status';
+
+      try {
+        const res = await api.list();
+        if (!res.ok) {
+          uploadStatus.textContent = 'Error al cargar: ' + (res.error || '');
+          uploadStatus.classList.add('error');
+          return;
+        }
+
+        const items = res.data || [];
+        render(items);
+      } catch (error) {
+        uploadStatus.textContent = 'Error de conexión';
+        uploadStatus.classList.add('error');
+      }
+    }
+
+    // Render media grid
+    function render(items) {
+      mediaCount.textContent = `${items.length} ${items.length === 1 ? 'imagen' : 'imágenes'}`;
+
+      if (!items || items.length === 0) {
+        grid.style.display = 'none';
+        empty.style.display = 'block';
+        return;
+      }
+
+      grid.style.display = 'grid';
+      empty.style.display = 'none';
+
+      grid.innerHTML = items.map(i => {
+        const aspectRatio = getImageAspectRatio(i);
+        const orientation = aspectRatio > 1 ? 'landscape' : 'portrait';
+
+        return `
+          <div class="media-card ${orientation}" data-id="${i.id}">
+            <div class="media-thumb">
+              <img src="${i.url || i.storage_path}" alt="${i.alt_text || ''}" loading="lazy" />
+              <div class="media-overlay">
+                <button class="preview-btn" data-id="${i.id}">
+                  <i class="fas fa-eye"></i>
+                </button>
+                <button class="copy-btn" data-id="${i.id}">
+                  <i class="fas fa-copy"></i>
+                </button>
+                <button class="delete-btn" data-id="${i.id}">
+                  <i class="fas fa-trash"></i>
+                </button>
+              </div>
+            </div>
+            <div class="media-meta">
+              <div class="media-filename" title="${i.filename || ''}">${i.filename || 'Sin nombre'}</div>
+              <div class="media-size">${formatFileSize(i.size)}</div>
+              ${i.tags && i.tags.length > 0 ? `<div class="media-tags">${i.tags.slice(0, 2).join(', ')}${i.tags.length > 2 ? '...' : ''}</div>` : ''}
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      // Event listeners for cards
+      grid.querySelectorAll('.preview-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const id = btn.dataset.id;
+          const item = items.find(i => i.id === id);
+          if (item) openModal(item);
+        });
+      });
+
+      grid.querySelectorAll('.copy-btn').forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+          e.stopPropagation();
+          const id = btn.dataset.id;
+          const item = items.find(i => i.id === id);
+          if (item) {
+            const url = item.url || item.storage_path;
+            try {
+              await navigator.clipboard.writeText(url);
+              showToast('URL copiada al portapapeles', 'success');
+            } catch {
+              showToast('No se pudo copiar automáticamente', 'warning');
+            }
+          }
+        });
+      });
+
+      grid.querySelectorAll('.delete-btn').forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+          e.stopPropagation();
+          const id = btn.dataset.id;
+          const item = items.find(i => i.id === id);
+          if (item && confirm(`¿Eliminar "${item.filename}"?`)) {
+            try {
+              const res = await api.del(id);
+              if (res.ok) {
+                showToast('Imagen eliminada', 'success');
+                load();
+              } else {
+                showToast('Error al eliminar: ' + (res.error || ''), 'error');
+              }
+            } catch (error) {
+              showToast('Error de conexión', 'error');
+            }
+          }
+        });
+      });
+
+      // Click on card to preview
+      grid.querySelectorAll('.media-card').forEach(card => {
+        card.addEventListener('click', () => {
+          const id = card.dataset.id;
+          const item = items.find(i => i.id === id);
+          if (item) openModal(item);
+        });
+      });
+    }
+
+    // Get image aspect ratio (placeholder - in real implementation you'd need image dimensions)
+    function getImageAspectRatio(item) {
+      // This is a simplified version. In a real implementation, you'd store dimensions
+      // or calculate them from the image. For now, we'll use a default.
+      return 1.5; // Assume landscape by default
+    }
+
+    // Toast notification
+    function showToast(message, type = 'info') {
+      // Simple toast implementation
+      const toast = document.createElement('div');
+      toast.className = `toast toast-${type}`;
+      toast.textContent = message;
+      document.body.appendChild(toast);
+
+      setTimeout(() => {
+        toast.remove();
+      }, 3000);
+    }
+
+    // Upload form handler
+    uploadForm.addEventListener('submit', async (ev) => {
+      ev.preventDefault();
+
+      if (!fileInput.files || fileInput.files.length === 0) {
+        showToast('Selecciona un archivo primero', 'warning');
+        return;
+      }
+
+      const file = fileInput.files[0];
+      const form = new FormData();
+      form.append('file', file);
+      form.append('alt_text', document.getElementById('altInput').value || '');
+      form.append('tags', document.getElementById('tagsInput').value || '');
+
+      uploadStatus.textContent = 'Subiendo imagen...';
+      uploadStatus.className = 'upload-status loading';
+
+      try {
+        const res = await api.upload(form);
+        if (res.ok) {
+          uploadStatus.textContent = '¡Imagen subida correctamente!';
+          uploadStatus.className = 'upload-status success';
+          fileInput.value = '';
+          document.getElementById('altInput').value = '';
+          document.getElementById('tagsInput').value = '';
+          fileLabel.textContent = 'Seleccionar imagen...';
+          load();
+        } else {
+          uploadStatus.textContent = 'Error: ' + (res.error || '');
+          uploadStatus.className = 'upload-status error';
+        }
+      } catch (error) {
+        uploadStatus.textContent = 'Error de conexión';
+        uploadStatus.className = 'upload-status error';
+      }
+    });
+
+    // Modal event listeners
+    modalBackdrop.addEventListener('click', closeModal);
+    modalClose.addEventListener('click', closeModal);
+
+    copyUrlBtn.addEventListener('click', async () => {
+      if (currentMediaItem) {
+        const url = currentMediaItem.url || currentMediaItem.storage_path;
+        try {
+          await navigator.clipboard.writeText(url);
+          showToast('URL copiada al portapapeles', 'success');
+        } catch {
+          infoUrl.select();
+          showToast('Selecciona y copia la URL manualmente', 'warning');
+        }
+      }
+    });
+
+    deleteBtn.addEventListener('click', async () => {
+      if (currentMediaItem && confirm(`¿Eliminar "${currentMediaItem.filename}"?`)) {
+        try {
+          const res = await api.del(currentMediaItem.id);
+          if (res.ok) {
+            showToast('Imagen eliminada', 'success');
+            closeModal();
+            load();
+          } else {
+            showToast('Error al eliminar: ' + (res.error || ''), 'error');
+          }
+        } catch (error) {
+          showToast('Error de conexión', 'error');
+        }
+      }
+    });
+
+    // Refresh button
+    refreshBtn.addEventListener('click', load);
+
+    // Initial load
+    load();
+  </script>
+
+</AdminLayout>

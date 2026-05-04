@@ -1,5 +1,6 @@
 import type { APIRoute } from "astro";
-import { getSupabaseServerClient } from "../../lib/supabase";
+import { GetWhatsAppConfigUseCase } from "../../application/use-cases/GetWhatsAppConfigUseCase";
+import { SupabaseAppConfigRepository } from "../../infrastructure/repositories/SupabaseAppConfigRepository";
 
 export const prerender = false;
 
@@ -13,27 +14,16 @@ function jsonResponse(payload: unknown, status = 200) {
 // GET: Obtener número de WhatsApp global (públicamente accesible)
 export const GET: APIRoute = async () => {
   try {
-    const supabase = getSupabaseServerClient();
+    // Instantiate dependencies
+    const appConfigRepository = new SupabaseAppConfigRepository();
+    const getWhatsAppConfigUseCase = new GetWhatsAppConfigUseCase(appConfigRepository);
 
-    if (!supabase) {
-      return jsonResponse({ ok: false, error: "Supabase not configured", phone: null }, 500);
-    }
-
-    const { data, error } = await supabase
-      .from("app_config")
-      .select("config_value")
-      .eq("config_key", "whatsapp_phone")
-      .maybeSingle();
-
-    if (error && error.code !== "PGRST116") {
-      throw error;
-    }
-
-    const phone = data?.config_value || null;
+    // Execute use case
+    const result = await getWhatsAppConfigUseCase.execute();
 
     return jsonResponse({
       ok: true,
-      phone: phone,
+      phone: result.phone,
     });
   } catch (error) {
     console.error("Error fetching WhatsApp config:", error);

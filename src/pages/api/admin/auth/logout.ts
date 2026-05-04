@@ -1,9 +1,13 @@
 import type { APIRoute } from "astro";
-import { ADMIN_ACCESS_COOKIE, ADMIN_ACTIVITY_COOKIE } from "../../../../lib/admin-auth";
+import { LogoutUseCase } from "../../../../application/use-cases/LogoutUseCase";
+import { ADMIN_ACCESS_COOKIE, ADMIN_ACTIVITY_COOKIE } from "../../../../domain/services/SessionService";
 
 export const prerender = false;
 
 export const POST: APIRoute = async ({ cookies }) => {
+  const logoutUseCase = new LogoutUseCase();
+  logoutUseCase.execute();
+
   cookies.delete(ADMIN_ACCESS_COOKIE, { path: "/" });
   cookies.delete(ADMIN_ACTIVITY_COOKIE, { path: "/" });
 

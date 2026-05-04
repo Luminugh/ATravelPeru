@@ -1,5 +1,7 @@
 import type { APIRoute } from "astro";
-import { ADMIN_ACCESS_COOKIE, createSupabaseAuthedClient } from "../../../lib/admin-auth";
+import { GetUbicacionesUseCase } from "../../../application/use-cases/GetUbicacionesUseCase";
+import { createSupabaseAuthedClient } from "../../../infrastructure/supabase/AdminAuthClientFactory";
+import { ADMIN_ACCESS_COOKIE } from "../../../domain/services/SessionService";
 
 export const prerender = false;
 
@@ -18,16 +20,10 @@ export const GET: APIRoute = async ({ cookies }) => {
 
   try {
     const client = createSupabaseAuthedClient(accessToken);
-    const { data, error } = await client.from("ubicaciones").select("id,nombre").order("nombre", { ascending: true });
+    const getUbicacionesUseCase = new GetUbicacionesUseCase(client);
+    const data = await getUbicacionesUseCase.execute();
 
-    if (error) {
-      return new Response(JSON.stringify({ ok: false, error: error.message }), {
-        status: 400,
-        headers: { "Content-Type": "application/json" },
-      });
-    }
-
-    return new Response(JSON.stringify({ ok: true, data: data ?? [] }), {
+    return new Response(JSON.stringify({ ok: true, data }), {
       status: 200,
       headers: { "Content-Type": "application/json" },
     });

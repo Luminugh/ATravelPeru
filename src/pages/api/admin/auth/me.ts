@@ -1,11 +1,8 @@
 import type { APIRoute } from "astro";
-import {
-  ADMIN_ACCESS_COOKIE,
-  ADMIN_ACTIVITY_COOKIE,
-  createSupabaseAuthedClient,
-  getCookieSecurityOptions,
-  isIdleExpired,
-} from "../../../../lib/admin-auth";
+import { GetCurrentUserUseCase } from "../../../../application/use-cases/GetCurrentUserUseCase";
+import { createSupabaseAuthedClient } from "../../../../infrastructure/supabase/AdminAuthClientFactory";
+import { ADMIN_ACCESS_COOKIE, ADMIN_ACTIVITY_COOKIE, getCookieSecurityOptions } from "../../../../domain/services/SessionService";
+import { UnauthorizedError } from "../../../../domain/errors/DomainError";
 
 export const prerender = false;
 
@@ -23,20 +20,9 @@ export const GET: APIRoute = async ({ cookies }) => {
     const accessToken = cookies.get(ADMIN_ACCESS_COOKIE)?.value;
     const lastActivity = cookies.get(ADMIN_ACTIVITY_COOKIE)?.value;
 
-    if (!accessToken) {
-      return unauthorized(cookies);
-    }
-
-    if (isIdleExpired(lastActivity)) {
-      return unauthorized(cookies, "Sesion expirada por inactividad");
-    }
-
-    const client = createSupabaseAuthedClient(accessToken);
-    const { data, error } = await client.auth.getUser(accessToken);
-
-    if (error || !data?.user) {
-      return unauthorized(cookies);
-    }
+    const client = createSupabaseAuthedClient(accessToken || "");
+    const getCurrentUserUseCase = new GetCurrentUserUseCase(client);
+    const user = await getCurrentUserUseCase.execute(accessToken, lastActivity);
 
     const options = getCookieSecurityOptions();
     cookies.set(ADMIN_ACTIVITY_COOKIE, Date.now().toString(), {
@@ -44,21 +30,14 @@ export const GET: APIRoute = async ({ cookies }) => {
       httpOnly: false,
     });
 
-    const sellerRes = await client.from("vendedores").select("id,nombre,telefono,created_at").eq("id", data.user.id).maybeSingle();
-
-    const sellerName = sellerRes.data?.nombre?.trim() || (data.user.user_metadata?.nombre as string | undefined) || null;
-
     return new Response(
       JSON.stringify({
         ok: true,
         user: {
-          id: data.user.id,
-          email: data.user.email ?? null,
-          nombre: sellerName,
+          email: user.email,
+          nombre: user.nombre,
+          telefono: user.telefono,
         },
-        vendedor: sellerRes.data
-          ? { ...sellerRes.data, nombre: sellerName }
-          : null,
       }),
       {
         status: 200,
@@ -66,6 +45,9 @@ export const GET: APIRoute = async ({ cookies }) => {
       },
     );
   } catch (error) {
+    if (error instanceof UnauthorizedError) {
+      return unauthorized(cookies, error.message);
+    }
     return new Response(
       JSON.stringify({
         ok: false,

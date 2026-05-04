@@ -2,19 +2,15 @@
   {
     "id": 1,
     "titulo": "Machu Picchu Express",
-    "descripcion": "Explora la maravilla del mundo en una experiencia inolvidable con transporte, guia y alojamiento.",
+    "descripcion": "Explora la maravilla del mundo en una experiencia inolvidable con transporte, guía y alojamiento.",
     "precio": "S/ 1,200",
-    "duracion": "3 dias",
+    "duracion": "3 días",
     "ubicacion": "Cusco",
-    "incluye": "Transporte en tren, entradas, guia bilingue, hotel y comidas principales.",
+    "incluye": "Transporte en tren, entradas, guía bilingüe, hotel y comidas principales.",
     "no_incluye": "Vuelos nacionales, seguro de viaje y gastos personales.",
-    "itinerario": "Dia 1: llegada y city tour. Dia 2: Valle Sagrado y tren. Dia 3: visita guiada a Machu Picchu y retorno.",
+    "itinerario": "Día 1: Llegada y city tour. Día 2: Valle Sagrado y tren. Día 3: Visita guiada a Machu Picchu y retorno.",
     "imagen_principal": "https://images.unsplash.com/photo-1587595431973-160d0d94add1?auto=format&fit=crop&w=1100&q=80",
-    "galeria": [
-      "https://images.unsplash.com/photo-1526392060635-9d6019884377?auto=format&fit=crop&w=1200&q=80",
-      "https://images.unsplash.com/photo-1577717903315-1691ae25ab3f?auto=format&fit=crop&w=900&q=80",
-      "https://images.unsplash.com/photo-1601597111158-2fceff292cdc?auto=format&fit=crop&w=900&q=80"
-    ],
+    "galeria": [],
     "destacado": true,
     "estado": "activo",
     "vendedor_id": "38a05e7a-8ca1-4047-a6a5-237b51b02e7b"
@@ -22,39 +18,33 @@
   {
     "id": 2,
     "titulo": "Valle Sagrado Full Day",
-    "descripcion": "Ruta cultural por Ollantaytambo, Pisac y mercados tradicionales con guia local.",
+    "descripcion": "Ruta cultural por Ollantaytambo, Pisac y mercados tradicionales con guía local.",
     "precio": "S/ 450",
-    "duracion": "1 dia",
+    "duracion": "1 día",
     "ubicacion": "Cusco",
-    "incluye": "Movilidad turistica, guia profesional y almuerzo buffet tipico.",
-    "no_incluye": "Snacks, bebidas alcoholicas y compras de artesania.",
+    "incluye": "Movilidad turística, guía profesional y almuerzo buffet típico.",
+    "no_incluye": "Snacks, bebidas alcohólicas y compras de artesanía.",
     "itinerario": "Salida 7:00 AM. Pisac, mercado artesanal, almuerzo y Ollantaytambo. Retorno 6:30 PM.",
     "imagen_principal": "https://images.unsplash.com/photo-1580618672591-eb180b1a973f?auto=format&fit=crop&w=1100&q=80",
-    "galeria": [
-      "https://www.ollantaytambo.org/img/cusco-sacred-valley-machu-picchu-007-01.jpg",
-      "https://www.ollantaytambo.org/img/cusco-sacred-valley-machu-picchu-007-01.jpg"
-    ],
+    "galeria": [],
     "destacado": false,
     "estado": "activo",
     "vendedor_id": "38a05e7a-8ca1-4047-a6a5-237b51b02e7b"
   },
   {
     "id": 3,
-    "titulo": "Lima Historica y Gastronomica",
-    "descripcion": "Una experiencia urbana entre centro historico, costa y sabores peruanos de autor.",
+    "titulo": "Lima Histórica y Gastronómica",
+    "descripcion": "Una experiencia urbana entre centro histórico, costa y sabores peruanos de autor.",
     "precio": "S/ 680",
-    "duracion": "2 dias",
+    "duracion": "2 días",
     "ubicacion": "Lima",
-    "incluye": "Traslados internos, entradas, guia en espanol y degustacion gastronomica.",
+    "incluye": "Traslados internos, entradas, guía en español y degustación gastronómica.",
     "no_incluye": "Vuelos a Lima, alojamiento adicional y propinas.",
-    "itinerario": "Dia 1: centro historico y museo. Dia 2: circuito gastronomico y miradores costeros.",
+    "itinerario": "Día 1: Centro histórico y museo. Día 2: Circuito gastronómico y miradores costeros.",
     "imagen_principal": "https://images.unsplash.com/photo-1531968455001-5c5272a41129?auto=format&fit=crop&w=1100&q=80",
-    "galeria": [
-      "https://images.unsplash.com/photo-1594007654729-407eedc4be65?auto=format&fit=crop&w=1200&q=80",
-      "https://images.unsplash.com/photo-1518509562904-e7ef99cdcc86?auto=format&fit=crop&w=900&q=80"
-    ],
+    "galeria": [],
     "destacado": false,
-    "estado": "inactivo",
+    "estado": "activo",
     "vendedor_id": "38a05e7a-8ca1-4047-a6a5-237b51b02e7b"
   }
 ]

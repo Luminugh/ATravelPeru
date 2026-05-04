@@ -1,5 +1,6 @@
 ---
 import AdminLayout from "../../layouts/AdminLayout.astro";
+import MediaPicker from "../../components/MediaPicker.astro";
 import { siteIdentity } from "../../lib/site-config";
 
 export const prerender = true;
@@ -95,7 +96,10 @@ const title = `Gestion de Tours AT - ${siteIdentity.adminTitleDefault}`;
           <h3 class="section-title"><i class="fas fa-image"></i> Imagen Principal</h3>
           <div class="form-row">
             <label>URL de la Imagen *</label>
-            <input name="imagen_principal" placeholder="https://images.unsplash.com/..." onchange="updateImagePreview(this.value)" />
+            <div style="display:flex; gap:0.5rem; align-items:center;">
+              <input id="imagenPrincipalInput" name="imagen_principal" placeholder="https://images.unsplash.com/..." onchange="updateImagePreview(this.value)" />
+              <button type="button" id="selectPrimaryBtn" class="btn">Seleccionar</button>
+            </div>
           </div>
           <div id="imagePreview" class="image-preview-box" style="display: none;">
             <img id="previewImg" alt="Vista previa" />
@@ -134,8 +138,12 @@ const title = `Gestion de Tours AT - ${siteIdentity.adminTitleDefault}`;
           
           <div class="form-row gallery-row">
             <label>Array JSON con imágenes</label>
-            <small>{"Copiar array JSON. Ej. [{\"imagen\":\"https://...\",\"orden\":1}]"}</small>
-            <textarea name="galeria" rows="3" placeholder='[{"imagen":"https://...","orden":1}]'></textarea>
+            <small>{"Usa el selector para insertar imágenes o pega un array JSON. Ej. [{\"imagen\":\"https://...\",\"orden\":1}]"}</small>
+            <div style="display:flex; gap:0.5rem; align-items:center; margin-bottom:0.5rem;">
+              <button id="openGalleryPicker" type="button" class="btn btn-secondary">Abrir selector</button>
+              <button id="insertGalleryFromUrls" type="button" class="btn">Insertar URLs (copiar/pegar)</button>
+            </div>
+            <textarea id="galeriaTextarea" name="galeria" rows="3" placeholder='[{"imagen":"https://...","orden":1}]'></textarea>
           </div>
         </div>
 
@@ -172,6 +180,8 @@ const title = `Gestion de Tours AT - ${siteIdentity.adminTitleDefault}`;
         </div>
       </form>
     </div>
+    <!-- Media Picker Modal -->
+    <MediaPicker />
   </section>
 
     <script type="module">
@@ -245,7 +255,7 @@ const title = `Gestion de Tours AT - ${siteIdentity.adminTitleDefault}`;
               <div class="tour-card-body">
                 <h4 class="tour-card-title">${t.titulo}</h4>
                 <div class="tour-card-meta"><i class="fas fa-map-marker-alt"></i> ${t.ubicacion} <span>•</span> <i class="fas fa-clock"></i> ${t.duracion}</div>
-                <div class="tour-card-price">$${t.precio?.toFixed(2)}</div>
+                <div class="tour-card-price">$${Number(t.precio ?? 0).toFixed(2)}</div>
                 <p class="tour-card-desc">${t.descripcion?.slice(0,100) ?? ''}...</p>
                 <div class="tour-card-actions">
                   <button data-id="${t.id}" class="editBtn btn-edit"><i class="fas fa-edit"></i> Editar</button>
@@ -372,6 +382,75 @@ const title = `Gestion de Tours AT - ${siteIdentity.adminTitleDefault}`;
           preview.style.display = 'none';
         }
       };
+
+      // Media picker integration
+      const mediaPicker = document.getElementById('mediaPicker');
+      const mediaPickerContent = document.getElementById('mediaPickerContent');
+      const mediaPickerClose = document.getElementById('mediaPickerClose');
+      const mediaPickerSelect = document.getElementById('mediaPickerSelect');
+      const mediaPickerCancel = document.getElementById('mediaPickerCancel');
+      let mediaSelectionMode = 'single'; // 'single' or 'multiple'
+      let selectedMedia = new Set();
+
+      async function openMediaPicker(mode = 'single') {
+        mediaSelectionMode = mode;
+        selectedMedia = new Set();
+        mediaPickerContent.innerHTML = 'Cargando...';
+        mediaPicker.style.display = 'block';
+        const res = await fetch('/api/admin/media');
+        const payload = await res.json().catch(()=>({ok:false}));
+        if (!payload?.ok) { mediaPickerContent.innerHTML = 'Error cargando medios'; return; }
+        const items = payload.data || [];
+        mediaPickerContent.innerHTML = items.map(i => `
+          <div class="picker-item" data-id="${i.id}" data-url="${i.url}">
+            <img src="${i.url}" alt="${i.alt_text || ''}" />
+            <div class="picker-meta">${i.filename || ''}</div>
+          </div>
+        `).join('');
+
+        mediaPickerContent.querySelectorAll('.picker-item').forEach(el=>{
+          el.addEventListener('click', ()=>{
+            const id = el.dataset.id; const url = el.dataset.url;
+            if (mediaSelectionMode === 'single') {
+              selectedMedia = new Set([JSON.stringify({id, url})]);
+              // highlight
+              mediaPickerContent.querySelectorAll('.picker-item').forEach(x=>x.classList.remove('selected'));
+              el.classList.add('selected');
+            } else {
+              const key = JSON.stringify({id, url});
+              if (selectedMedia.has(key)) { selectedMedia.delete(key); el.classList.remove('selected'); }
+              else { selectedMedia.add(key); el.classList.add('selected'); }
+            }
+          });
+        });
+      }
+
+      mediaPickerClose?.addEventListener('click', ()=>{ mediaPicker.style.display='none'; });
+      mediaPickerCancel?.addEventListener('click', ()=>{ mediaPicker.style.display='none'; });
+      mediaPickerSelect?.addEventListener('click', ()=>{
+        const arr = Array.from(selectedMedia).map(s=>JSON.parse(s));
+        if (mediaSelectionMode === 'single' && arr[0]) {
+          // set as imagen_principal
+          document.getElementById('imagenPrincipalInput').value = arr[0].url;
+          updateImagePreview(arr[0].url);
+        } else if (mediaSelectionMode === 'multiple') {
+          // append to gallery textarea as JSON array
+          const curr = document.getElementById('galeriaTextarea').value || '[]';
+          let gallery = [];
+          try { gallery = JSON.parse(curr); if (!Array.isArray(gallery)) gallery = []; } catch { gallery = []; }
+          const maxOrden = gallery.reduce((m, it)=>Math.max(m, Number(it.orden || 0)), 0);
+          let next = maxOrden + 1;
+          arr.forEach(it=>{ gallery.push({ imagen: it.url, orden: next++ }); });
+          document.getElementById('galeriaTextarea').value = JSON.stringify(gallery, null, 2);
+        }
+        mediaPicker.style.display='none';
+      });
+
+      // Hook up buttons
+      const selectPrimaryBtn = document.getElementById('selectPrimaryBtn');
+      const openGalleryPickerBtn = document.getElementById('openGalleryPicker');
+      selectPrimaryBtn?.addEventListener('click', ()=>openMediaPicker('single'));
+      openGalleryPickerBtn?.addEventListener('click', ()=>openMediaPicker('multiple'));
 
       load();
     </script>
