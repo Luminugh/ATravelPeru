@@ -32,17 +32,17 @@ async function getAuthenticatedClient(cookies: Parameters<APIRoute>[0]["cookies"
   return { client, userId: data.user.id } as const;
 }
 
-async function isAdmin(client: any, userId: string): Promise<boolean> {
+async function isAdmin(userId: string): Promise<boolean> {
   try {
-    const { data, error } = await client
+    const serviceClient = createSupabaseServiceClient();
+    const { data, error } = await serviceClient
       .from('users')
       .select('role')
       .eq('id', userId)
-      .eq('role', 'admin')
       .single();
     
     if (error || !data) return false;
-    return true;
+    return data.role === 'admin';
   } catch (err) {
     return false;
   }
@@ -54,7 +54,7 @@ export const GET: APIRoute = async ({ cookies, request }) => {
     if ("error" in auth) return auth.error;
 
     // Check admin status
-    const admin = await isAdmin(auth.client, auth.userId);
+    const admin = await isAdmin(auth.userId);
     if (!admin) {
       return jsonResponse({ ok: false, error: "No autorizado: permisos de administrador requeridos" }, 403);
     }
@@ -82,7 +82,7 @@ export const POST: APIRoute = async ({ cookies, request }) => {
     if ("error" in auth) return auth.error;
 
     // Check admin status
-    const admin = await isAdmin(auth.client, auth.userId);
+    const admin = await isAdmin(auth.userId);
     if (!admin) {
       return jsonResponse({ ok: false, error: "No autorizado: permisos de administrador requeridos" }, 403);
     }
@@ -153,7 +153,7 @@ export const DELETE: APIRoute = async ({ cookies, request }) => {
     if ("error" in auth) return auth.error;
 
     // Check admin status
-    const admin = await isAdmin(auth.client, auth.userId);
+    const admin = await isAdmin(auth.userId);
     if (!admin) {
       return jsonResponse({ ok: false, error: "No autorizado: permisos de administrador requeridos" }, 403);
     }
