@@ -78,3 +78,44 @@
 - El backend ya esta bastante organizado por capas.
 - La mayoria de los endpoints ya usa Use Cases.
 - El principal pendiente de limpieza es el catalogo publico legado en `src/lib/` y su consumo desde `src/pages/tours/index.astro`.
+
+## Cambios importantes recientes (21-05-2026)
+
+Se implementaron varias mejoras y correcciones enfocadas en la persistencia de la galería, la experiencia de usuario en móviles y ajustes visuales:
+
+- Persistencia y normalización de galería
+	- La base de datos ahora mantiene `tour_media` y `tours.galeria` (JSONB) sincronizada vía triggers.
+	- Normalización en la capa de lectura para aceptar objetos con `imagen`, `url` o `publicUrl`.
+	- Archivos modificados: `src/infrastructure/repositories/SupabaseTourRepository.ts`, `src/application/use-cases/CreateTourUseCase.ts`, `src/application/use-cases/UpdateTourUseCase.ts`.
+
+- Interfaz pública: listado y detalle de tours
+	- Página de listado `src/pages/tours/index.astro`: se añadió un `tours-page-shell` y un `tours-top-spacer` para corregir solapamiento con el header fijo y márgenes laterales.
+	- Página de detalle `src/pages/tours/[id].astro`: nueva ficha de producto con hero, miniaturas y panel de reserva refactorizados.
+	- Archivos modificados: `src/pages/tours/index.astro`, `src/pages/tours/[id].astro`.
+
+- Comportamiento responsive y carrusel móvil
+	- La imagen principal del tour fue convertida a un carrusel horizontal con `scroll-snap` y auto-scroll en móviles (reanudación tras interacción).
+	- Miniaturas se convierten a fila horizontal en móvil y sincronizan con el carrusel.
+	- Reglas CSS en `src/styles/pages/tours.scss` ajustadas para grid, paneles y botones en pantallas pequeñas.
+
+- Botón WhatsApp
+	- El CTA de WhatsApp se redujo (padding, icono y tipografía) para evitar que ocupase demasiado espacio en la ficha.
+	- Selector principal: `.btn-cta` y `.btn-icon` en `src/styles/pages/tours.scss`.
+
+- Build y validación
+	- `npm run build` se ejecutó y pasó correctamente tras los cambios.
+
+## Cómo hacer commit y push del README (desde tu entorno local)
+
+Ejecuta los siguientes comandos en la raíz del repositorio:
+
+```bash
+git add README.md
+git commit -m "docs: document recent gallery, responsive and UI changes"
+git push
+```
+
+Si tu entorno requiere autenticación (token/SSH), asegúrate de tener las credenciales configuradas antes de hacer `git push`.
+
+Si quieres que yo intente el `git commit` y `git push` desde aquí, dímelo y lo ejecuto ahora (puede pedir autenticación en tu máquina).
+
