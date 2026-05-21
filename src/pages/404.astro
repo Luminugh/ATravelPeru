@@ -1,0 +1,121 @@
+---
+import AppLayout from "../layouts/AppLayout.astro";
+import { siteIdentity } from "../lib/site-config";
+
+const title = `404 - No encontrado | ${siteIdentity.brand}`;
+---
+
+<AppLayout title={title}>
+  <main class="not-found-page" aria-labelledby="not-found-title">
+    <section class="not-found-card">
+      <div class="not-found-code">404</div>
+      <p class="not-found-kicker">Página no encontrada</p>
+      <h1 id="not-found-title">No encontramos lo que buscas</h1>
+      <p class="not-found-text">
+        El enlace que abriste no existe, fue movido o ya no está disponible. Puedes volver al catálogo de tours para seguir navegando.
+      </p>
+
+      <div class="not-found-actions">
+        <a class="not-found-button" href="/tours">Ir a Tours</a>
+      </div>
+    </section>
+  </main>
+
+  <style>
+    .not-found-page {
+      min-height: calc(100vh - 160px);
+      display: grid;
+      place-items: center;
+      padding: 120px 20px 64px;
+      background:
+        radial-gradient(circle at top, rgba(34, 197, 94, 0.18), transparent 38%),
+        linear-gradient(180deg, #f8fffb 0%, #f1f8f4 100%);
+    }
+
+    .not-found-card {
+      width: min(720px, 100%);
+      padding: clamp(28px, 5vw, 48px);
+      border-radius: 28px;
+      background: rgba(255, 255, 255, 0.92);
+      border: 1px solid rgba(22, 163, 74, 0.12);
+      box-shadow: 0 30px 80px rgba(15, 23, 42, 0.12);
+      text-align: center;
+      backdrop-filter: blur(14px);
+    }
+
+    .not-found-code {
+      font-size: clamp(72px, 14vw, 140px);
+      line-height: 0.9;
+      font-weight: 900;
+      letter-spacing: -0.08em;
+      color: #16a34a;
+      text-shadow: 0 12px 24px rgba(22, 163, 74, 0.18);
+      margin-bottom: 10px;
+    }
+
+    .not-found-kicker {
+      margin: 0 0 10px;
+      font-size: 0.82rem;
+      font-weight: 800;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: #0f766e;
+    }
+
+    .not-found-card h1 {
+      margin: 0;
+      font-size: clamp(2rem, 4vw, 3.4rem);
+      line-height: 1.05;
+      color: #0f172a;
+    }
+
+    .not-found-text {
+      max-width: 56ch;
+      margin: 18px auto 0;
+      font-size: 1.05rem;
+      line-height: 1.75;
+      color: #475569;
+    }
+
+    .not-found-actions {
+      margin-top: 28px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .not-found-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 180px;
+      padding: 14px 22px;
+      border-radius: 14px;
+      text-decoration: none;
+      color: #fff;
+      font-weight: 800;
+      background: linear-gradient(135deg, #22c55e 0%, #15803d 100%);
+      box-shadow: 0 16px 28px rgba(21, 128, 61, 0.24);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .not-found-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 20px 34px rgba(21, 128, 61, 0.3);
+    }
+
+    @media (max-width: 640px) {
+      .not-found-page {
+        min-height: calc(100vh - 120px);
+        padding-top: 92px;
+      }
+
+      .not-found-card {
+        border-radius: 22px;
+      }
+
+      .not-found-button {
+        width: 100%;
+      }
+    }
+  </style>
+</AppLayout>
