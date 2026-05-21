@@ -20,7 +20,7 @@ if (!tour) {
 
 const gallery = Array.from(new Set([tour.imagen_principal, ...(tour.galeria ?? [])].filter(Boolean)));
 
-const appConfigRepository = new SupabaseAppConfigRepository();
+import { contactConfig, siteIdentity } from "../../lib/site-config";
 const getWhatsAppConfigUseCase = new GetWhatsAppConfigUseCase(appConfigRepository);
 const { phone } = await getWhatsAppConfigUseCase.execute();
 const messageService = new MessageService();
@@ -32,10 +32,11 @@ const whatsappLink = whatsappReady
   : "#";
 
 ---
-
+  Astro.response.status = 404;
 <AppLayout title={tour.titulo}>
   <main class="tour-detail-page">
     <div class="tour-top-spacer" aria-hidden="true"></div>
+const pageTitle = tour ? tour.titulo : `Tour no encontrado | ${siteIdentity.brand}`;
     <section class="tour-product">
       <header class="product-header">
         <nav class="product-breadcrumb">Home / Tours / {tour.ubicacion} / {tour.titulo}</nav>
@@ -53,7 +54,7 @@ const whatsappLink = whatsappReady
       </header>
 
       <div class="product-grid">
-        <aside class="product-thumbs" aria-label="Miniaturas del tour">
+<AppLayout title={pageTitle}>
           <p class="thumbs-label">Fotos del tour</p>
           {gallery.map((src, i) => (
             <button class={`gallery-thumb ${i === 0 ? 'active' : ''}`} type="button" data-src={src} aria-label={`Ver imagen ${i + 1}`}>
