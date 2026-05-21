@@ -117,3 +117,43 @@ export async function getToursCatalog(): Promise<{ items: CatalogItem[]; error: 
   console.log("[Tours] No data available from Supabase or cache");
   return { items: [], error: "No data available - check Supabase connection and credentials", source: "none" };
 }
+
+export async function getTourById(id: number): Promise<CatalogItem | null> {
+  const supabase = getSupabaseServerClient();
+  if (!supabase) return null;
+
+  try {
+    const { data, error } = await supabase
+      .from("v_tours_catalogo")
+      .select("id,titulo,descripcion,precio,duracion,ubicacion,incluye,no_incluye,itinerario,imagen_principal,galeria,destacado,estado,vendedor_id")
+      .eq("id", id)
+      .maybeSingle();
+
+    if (error) {
+      console.warn("[Tours] getTourById error:", error.message);
+      return null;
+    }
+
+    if (!data) return null;
+
+    return {
+      id: data.id,
+      titulo: data.titulo,
+      descripcion: data.descripcion,
+      precio: formatPrice(data.precio),
+      duracion: data.duracion,
+      ubicacion: data.ubicacion,
+      incluye: data.incluye,
+      no_incluye: data.no_incluye,
+      itinerario: data.itinerario,
+      imagen_principal: data.imagen_principal,
+      galeria: normalizeGallery(data.galeria),
+      destacado: Boolean(data.destacado),
+      estado: data.estado,
+      vendedor_id: data.vendedor_id,
+    };
+  } catch (err) {
+    console.warn("[Tours] getTourById failed:", err instanceof Error ? err.message : String(err));
+    return null;
+  }
+}

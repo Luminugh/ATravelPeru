@@ -17,6 +17,7 @@ export interface UpdateTourInput {
   imagen_principal?: string | null;
   destacado?: boolean;
   estado?: string;
+  galeria?: Array<{ imagen: string; orden?: number }>;
 }
 
 export class UpdateTourUseCase {
@@ -49,6 +50,68 @@ export class UpdateTourUseCase {
 
     if (error) {
       throw new Error(error.message);
+    }
+
+    // If gallery provided, rebuild media_references for this tour
+    try {
+      const gal = Array.isArray(input.galeria) ? input.galeria : null;
+      if (gal && gal.length >= 0) {
+        // remove existing gallery references for this tour
+        const { error: delErr } = await this.supabaseClient
+          .from("tour_media")
+          .delete()
+          .eq("tour_id", id)
+          .eq("role", "gallery");
+        if (delErr) {
+          throw new Error(delErr.message);
+        }
+
+        const refs: Array<Record<string, unknown>> = [];
+        for (let i = 0; i < gal.length; i++) {
+          const item = gal[i];
+          const url = String(item?.imagen ?? "").trim();
+          if (!url) continue;
+
+          const { data: mf } = await this.supabaseClient
+            .from("media_files")
+            .select("id")
+            .eq("url", url)
+            .maybeSingle();
+
+          let mediaId: string | undefined;
+          if (mf && (mf as any).id) {
+            mediaId = (mf as any).id;
+          } else {
+            const filename = url.split("/").pop() || null;
+            const { data: newMf, error: newMfErr } = await this.supabaseClient
+              .from("media_files")
+              .insert({ url, filename })
+              .select("id")
+              .single();
+            if (newMf && (newMf as any).id) mediaId = (newMf as any).id;
+            if (newMfErr) continue;
+          }
+
+          if (mediaId) {
+            refs.push({
+              tour_id: id,
+              media_id: mediaId,
+              role: "gallery",
+              orden: Number(item?.orden ?? refs.length + 1),
+              meta: null,
+            });
+          }
+        }
+
+        if (refs.length > 0) {
+          const { error: refErr } = await this.supabaseClient.from("tour_media").insert(refs);
+          if (refErr) {
+            throw new Error(refErr.message);
+          }
+        }
+      }
+    } catch (e) {
+      console.warn("Warning: no fue posible actualizar referencias de galería:", e instanceof Error ? e.message : e);
     }
   }
 }

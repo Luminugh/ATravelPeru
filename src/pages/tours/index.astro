@@ -34,6 +34,13 @@ const { items: toursAtData, error: toursLoadError, source: toursSource } = await
                     <article class="tour-summary-card" data-tour-id={tour.id}>
                         <div class="summary-image-wrap">
                             <img src={tour.imagen_principal} alt={tour.titulo} class="summary-image" loading="lazy" />
+                            {Array.isArray(tour.galeria) && tour.galeria.length > 0 && (
+                                <div class="summary-thumbs">
+                                    {tour.galeria.slice(0,3).map((src) => (
+                                        <img src={typeof src === 'string' ? src : (src.url || src.imagen || '')} alt={tour.titulo} loading="lazy" class="summary-thumb" />
+                                    ))}
+                                </div>
+                            )}
                             <div class="summary-badges">
                                 {tour.destacado && <span class="summary-badge destacado">Destacado</span>}
                                 <span class={`summary-badge estado ${tour.estado}`}>{tour.estado}</span>
@@ -45,9 +52,9 @@ const { items: toursAtData, error: toursLoadError, source: toursSource } = await
                             <p class="summary-description">{tour.descripcion}</p>
                             <div class="summary-footer">
                                 <span class="summary-price">{tour.precio}</span>
-                                <button class="btn-summary-open" type="button" data-open-tour={tour.id} disabled={tour.estado !== "activo"}>
+                                <a class="btn-summary-open" href={`/tours/${tour.id}`} aria-disabled={tour.estado !== "activo"}>
                                     {tour.estado === "activo" ? "Ver detalles" : "No disponible"}
-                                </button>
+                                </a>
                             </div>
                         </div>
                     </article>
@@ -128,7 +135,13 @@ const { items: toursAtData, error: toursLoadError, source: toursSource } = await
 
     <script define:vars={{ toursAtData }}>
         // Cargar tours dinámicamente desde la API para obtener datos actualizados
-        let toursData = toursAtData || [];
+        // Normalizar galeria: la vista puede devolver objetos con 'url', convertir a array de URLs
+        let toursAtData = (toursAtData || []).map(t => ({
+            ...t,
+            galeria: Array.isArray(t.galeria)
+                ? t.galeria.map(g => (typeof g === 'string' ? g : (g.url || g.imagen || ''))).filter(Boolean)
+                : []
+        }));
         let globalWhatsappPhone = null;
 
         async function loadWhatsappConfig() {
@@ -148,9 +161,14 @@ const { items: toursAtData, error: toursLoadError, source: toursSource } = await
                 const response = await fetch('/api/tours');
                 const result = await response.json();
                 if (result.ok && Array.isArray(result.items)) {
-                    toursData = result.items;
+                    toursAtData = result.items.map(t => ({
+                        ...t,
+                        galeria: Array.isArray(t.galeria)
+                            ? t.galeria.map(g => (typeof g === 'string' ? g : (g.url || g.imagen || ''))).filter(Boolean)
+                            : []
+                    }));
                     // Actualizar la grilla de tours
-                    updateToursGrid(toursData);
+                    updateToursGrid(toursAtData);
                 }
             } catch (error) {
                 console.error('Error loading tours from API:', error);
@@ -175,9 +193,14 @@ const { items: toursAtData, error: toursLoadError, source: toursSource } = await
                 const article = document.createElement('article');
                 article.className = 'tour-summary-card';
                 article.setAttribute('data-tour-id', tour.id);
+                const thumbsHtml = Array.isArray(tour.galeria) && tour.galeria.length > 0
+                    ? `<div class="summary-thumbs">${tour.galeria.slice(0,3).map(s => `<img src="${s}" loading="lazy" class="summary-thumb"/>`).join('')}</div>`
+                    : '';
+
                 article.innerHTML = `
                     <div class="summary-image-wrap">
                         <img src="${tour.imagen_principal}" alt="${tour.titulo}" class="summary-image" loading="lazy" />
+                        ${thumbsHtml}
                         <div class="summary-badges">
                             ${tour.destacado ? '<span class="summary-badge destacado">Destacado</span>' : ''}
                             <span class="summary-badge estado ${tour.estado}">${tour.estado}</span>
@@ -189,17 +212,16 @@ const { items: toursAtData, error: toursLoadError, source: toursSource } = await
                         <p class="summary-description">${tour.descripcion}</p>
                         <div class="summary-footer">
                             <span class="summary-price">${tour.precio}</span>
-                            <button class="btn-summary-open" type="button" data-open-tour="${tour.id}" ${tour.estado !== 'activo' ? 'disabled' : ''}>
+                            <a class="btn-summary-open" href="/tours/${tour.id}" ${tour.estado !== 'activo' ? 'aria-disabled="true"' : ''}>
                                 ${tour.estado === 'activo' ? 'Ver detalles' : 'No disponible'}
-                            </button>
+                            </a>
                         </div>
                     </div>
                 `;
                 grid.appendChild(article);
             });
 
-            // Re-asignar event listeners a los botones actualizados
-            attachEventListeners();
+            // Event listeners handled via delegation on the grid container
         }
 
         const modal = document.getElementById('tourDetailModal');
@@ -221,7 +243,7 @@ const { items: toursAtData, error: toursLoadError, source: toursSource } = await
         let selectedTour = null;
 
         function openTourDetail(tourId) {
-            const found = toursData.find((tour) => String(tour.id) === String(tourId));
+            const found = toursAtData.find((tour) => String(tour.id) === String(tourId));
             if (!found || found.estado !== 'activo') {
                 return;
             }
@@ -243,20 +265,29 @@ const { items: toursAtData, error: toursLoadError, source: toursSource } = await
             itinerarioWrapEl.hidden = !found.itinerario;
             itinerarioEl.textContent = found.itinerario || '';
 
-            const internalImage = Array.isArray(found.galeria) && found.galeria.length > 0
-                ? found.galeria[0]
-                : found.imagen_principal;
-            internalImageEl.src = internalImage;
+            // Build gallery viewer: main image + thumbnails
+            const galleryUrls = Array.isArray(found.galeria) ? found.galeria : [];
+            const mainSrc = galleryUrls.length > 0 ? galleryUrls[0] : found.imagen_principal;
+            internalImageEl.src = mainSrc;
             internalImageEl.alt = `${found.titulo} imagen interna`;
 
             galleryEl.innerHTML = '';
-            (found.galeria || []).forEach((src, index) => {
-                const img = document.createElement('img');
-                img.src = src;
-                img.alt = `${found.titulo} galería ${index + 1}`;
-                img.loading = 'lazy';
-                galleryEl.appendChild(img);
+            const thumbsWrap = document.createElement('div');
+            thumbsWrap.className = 'tour-detail-thumbs';
+
+            galleryUrls.forEach((src, idx) => {
+                const t = document.createElement('img');
+                t.src = src;
+                t.alt = `${found.titulo} galería ${idx + 1}`;
+                t.loading = 'lazy';
+                t.className = 'tour-detail-thumb';
+                t.addEventListener('click', () => {
+                    internalImageEl.src = src;
+                });
+                thumbsWrap.appendChild(t);
             });
+
+            if (thumbsWrap.childElementCount > 0) galleryEl.appendChild(thumbsWrap);
 
             priceEl.textContent = found.precio;
 
@@ -270,21 +301,26 @@ const { items: toursAtData, error: toursLoadError, source: toursSource } = await
             selectedTour = null;
         }
 
-        document.querySelectorAll('[data-open-tour]').forEach((button) => {
-            button.addEventListener('click', () => {
-                openTourDetail(button.getAttribute('data-open-tour'));
-            });
-        });
+        // Use event delegation on the grid to handle 'Ver detalles' clicks
+        const gridEl = document.querySelector('.tours-summary-grid');
+        if (gridEl) {
+            gridEl.addEventListener('click', (ev) => {
+                const target = ev.target;
+                const btn = (target instanceof Element) ? target.closest('[data-open-tour]') : null;
+                if (btn) {
+                    const id = btn.getAttribute('data-open-tour');
+                    if (id) {
+                        // redirect to detail page
+                        window.location.href = `/tours/${id}`;
+                        return;
+                    }
+                }
 
-        function attachEventListeners() {
-            document.querySelectorAll('[data-open-tour]').forEach((button) => {
-                button.addEventListener('click', () => {
-                    openTourDetail(button.getAttribute('data-open-tour'));
-                });
-            });
-
-            document.querySelectorAll('[data-close-modal]').forEach((button) => {
-                button.addEventListener('click', closeTourDetail);
+                // if click was on the card (not the button), navigate when clicking the article
+                const article = (target instanceof Element) ? target.closest('.tour-summary-card') : null;
+                if (article && article.dataset && article.dataset.tourId) {
+                    window.location.href = `/tours/${article.dataset.tourId}`;
+                }
             });
         }
 

@@ -1,0 +1,130 @@
+export const prerender = false;
+---
+import AppLayout from "../../layouts/AppLayout.astro";
+import { getTourById } from "../../lib/catalog";
+import { contactConfig } from "../../lib/site-config";
+import { GetWhatsAppConfigUseCase } from "../../application/use-cases/GetWhatsAppConfigUseCase";
+import { SupabaseAppConfigRepository } from "../../infrastructure/repositories/SupabaseAppConfigRepository";
+import { MessageService } from "../../domain/services/MessageService";
+import { faWhatsapp } from "@fortawesome/free-brands-svg-icons";
+
+const whatsappPath = Array.isArray(faWhatsapp.icon[4]) ? faWhatsapp.icon[4].join(" ") : faWhatsapp.icon[4];
+const whatsappViewBox = `0 0 ${faWhatsapp.icon[0]} ${faWhatsapp.icon[1]}`;
+
+const id = Number(Astro.params.id);
+const tour = await getTourById(id);
+
+if (!tour) {
+  throw new Error("Tour no encontrado");
+}
+
+const gallery = tour.galeria && tour.galeria.length > 0 ? tour.galeria : [tour.imagen_principal];
+
+const appConfigRepository = new SupabaseAppConfigRepository();
+const getWhatsAppConfigUseCase = new GetWhatsAppConfigUseCase(appConfigRepository);
+const { phone } = await getWhatsAppConfigUseCase.execute();
+const messageService = new MessageService();
+const phoneDigits = (phone ?? contactConfig.whatsappDigits ?? "").replace(/\D/g, "");
+const reservationMessage = `Hola, quiero reservar ${tour.titulo} en ${tour.ubicacion} (${tour.duracion}) por ${tour.precio}.`;
+const whatsappReady = messageService.isValidPhoneNumber(phoneDigits);
+const whatsappLink = whatsappReady
+  ? messageService.generateWhatsAppLink(phoneDigits, reservationMessage)
+  : "#";
+
+---
+
+<AppLayout title={tour.titulo}>
+  <main class="tour-detail-page">
+    <section class="tour-product">
+      <nav class="product-breadcrumb">Home / Tours / {tour.ubicacion} / {tour.titulo}</nav>
+
+      <div class="product-grid">
+        <aside class="product-thumbs" aria-label="Miniaturas">
+          {gallery.map((src, i) => (
+            <button class={`gallery-thumb ${i === 0 ? 'active' : ''}`} type="button" data-src={src} aria-label={`Ver imagen ${i + 1}`}>
+              <img src={src} alt={`Thumb ${i + 1}`} loading="lazy" />
+            </button>
+          ))}
+        </aside>
+
+        <section class="product-main">
+          <div class="main-image-frame">
+            <img class="gallery-main" src={gallery[0]} alt={tour.titulo} loading="eager" />
+            <div class="main-badges">
+              {tour.destacado && <span class="badge badge-destacado">Destacado</span>}
+              <span class="badge badge-estado" data-estado={tour.estado}>{tour.estado}</span>
+            </div>
+          </div>
+          <div class="main-meta">
+            <span class="meta-chip">Duracion: {tour.duracion}</span>
+            <span class="meta-chip">Ubicacion: {tour.ubicacion}</span>
+          </div>
+        </section>
+
+        <aside class="product-info">
+          <p class="product-brand">ATravel Peru</p>
+          <h1 class="product-title">{tour.titulo}</h1>
+          <p class="product-sub">{tour.ubicacion} · {tour.duracion}</p>
+          <div class="product-price">{tour.precio}</div>
+          <p class="product-note">Reserva inmediata por WhatsApp.</p>
+          <a class={`btn-cta ${whatsappReady ? "" : "disabled"}`} href={whatsappLink} target="_blank" rel="noopener noreferrer" aria-disabled={!whatsappReady}>
+            <svg viewBox={whatsappViewBox} class="btn-icon"><path d={whatsappPath}></path></svg>
+            Reservar ahora
+          </a>
+          {!whatsappReady && (
+            <p class="product-warning">WhatsApp no configurado. Por favor intenta mas tarde.</p>
+          )}
+          <div class="product-actions">
+            <a class="btn-secondary" href="#galeria">Ver galeria</a>
+            {tour.itinerario && <a class="btn-secondary" href="#itinerario">Ver itinerario</a>}
+          </div>
+          <div class="product-quick">
+            <div><span>Estado</span><strong>{tour.estado}</strong></div>
+            <div><span>Duracion</span><strong>{tour.duracion}</strong></div>
+            <div><span>Ubicacion</span><strong>{tour.ubicacion}</strong></div>
+          </div>
+        </aside>
+      </div>
+
+      <div class="product-sections">
+        <section class="section-card">
+          <h2>Descripcion</h2>
+          <p>{tour.descripcion || 'Descripcion no disponible.'}</p>
+        </section>
+        <section class="section-card">
+          <h3>Incluye</h3>
+          <p>{tour.incluye || 'No especificado.'}</p>
+        </section>
+        <section class="section-card">
+          <h3>No incluye</h3>
+          <p>{tour.no_incluye || 'Consulta antes de reservar.'}</p>
+        </section>
+        {tour.itinerario && (
+          <section id="itinerario" class="section-card">
+            <h3>Itinerario</h3>
+            <p>{tour.itinerario}</p>
+          </section>
+        )}
+      </div>
+    </section>
+
+    <script type="text/javascript">
+      // Galería: cambiar imagen principal al clicar en miniatura
+      (function(){
+        if (typeof document === 'undefined') return;
+        document.addEventListener('click', function (e) {
+          const thumb = e.target.closest('.gallery-thumb');
+          if (!thumb) return;
+          const src = thumb.getAttribute('data-src');
+          const main = document.querySelector('.gallery-main');
+          if (main && src) {
+            main.src = src;
+            document.querySelectorAll('.gallery-thumb').forEach(t => t.classList.remove('active'));
+            thumb.classList.add('active');
+          }
+        });
+      })();
+    </script>
+  </main>
+</AppLayout>
+

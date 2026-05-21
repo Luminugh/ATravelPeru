@@ -2,16 +2,22 @@
 // Simple Media Picker modal (client-side behavior implemented where used)
 ---
 <div id="mediaPicker" class="media-picker" style="display:none;">
-  <div class="picker-backdrop"></div>
-  <div class="picker-panel">
-    <div class="picker-header">
-      <h4>Seleccionar Imagen</h4>
-      <button id="mediaPickerClose">×</button>
+  <div class="media-picker-backdrop" id="mediaPickerBackdrop"></div>
+  <div class="media-picker-shell" role="dialog" aria-modal="true" aria-labelledby="mediaPickerTitle">
+    <div class="media-picker-header">
+      <div>
+        <span class="media-picker-eyebrow">Biblioteca</span>
+        <h4 id="mediaPickerTitle">Seleccionar imagen</h4>
+        <p class="media-picker-subtitle">Elige una imagen para el tour o agrega varias a la galería.</p>
+      </div>
+      <button id="mediaPickerClose" type="button" class="media-picker-close">×</button>
     </div>
-    <div id="mediaPickerContent">Cargando...</div>
-    <div class="picker-actions">
-      <button id="mediaPickerSelect" class="btn btn-primary">Seleccionar</button>
-      <button id="mediaPickerCancel" class="btn">Cancelar</button>
+    <div class="media-picker-body">
+      <div id="mediaPickerContent" class="media-picker-content">Cargando...</div>
+    </div>
+    <div class="media-picker-footer">
+      <button id="mediaPickerSelect" type="button" class="btn btn-primary">Seleccionar</button>
+      <button id="mediaPickerCancel" type="button" class="btn btn-secondary">Cancelar</button>
     </div>
   </div>
 </div>
