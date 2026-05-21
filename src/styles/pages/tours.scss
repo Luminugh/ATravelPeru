@@ -774,8 +774,9 @@
 
 .tours-summary-grid {
 	display: grid;
-	grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+	grid-template-columns: repeat(auto-fit, minmax(280px, 280px));
 	gap: 22px;
+	justify-content: center;
 }
 
 .tour-empty-state {
@@ -789,6 +790,8 @@
 .tour-summary-card {
 	display: flex;
 	flex-direction: column;
+	width: 100%;
+	max-width: 280px;
 	background: $bg-white;
 	border-radius: $radius-lg;
 	overflow: hidden;
