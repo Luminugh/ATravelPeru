@@ -40,8 +40,9 @@ function normalizeGallery(galeria: unknown): string[] {
       if (typeof item === "string") {
         return item;
       }
-      if (item && typeof item === "object" && "imagen" in item) {
-        return (item as { imagen?: string }).imagen ?? null;
+      if (item && typeof item === "object") {
+        const galleryItem = item as { imagen?: string; url?: string; publicUrl?: string };
+        return galleryItem.imagen ?? galleryItem.url ?? galleryItem.publicUrl ?? null;
       }
       return null;
     })

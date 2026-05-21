@@ -18,7 +18,7 @@ if (!tour) {
   throw new Error("Tour no encontrado");
 }
 
-const gallery = tour.galeria && tour.galeria.length > 0 ? tour.galeria : [tour.imagen_principal];
+const gallery = Array.from(new Set([tour.imagen_principal, ...(tour.galeria ?? [])].filter(Boolean)));
 
 const appConfigRepository = new SupabaseAppConfigRepository();
 const getWhatsAppConfigUseCase = new GetWhatsAppConfigUseCase(appConfigRepository);
@@ -35,11 +35,26 @@ const whatsappLink = whatsappReady
 
 <AppLayout title={tour.titulo}>
   <main class="tour-detail-page">
+    <div class="tour-top-spacer" aria-hidden="true"></div>
     <section class="tour-product">
-      <nav class="product-breadcrumb">Home / Tours / {tour.ubicacion} / {tour.titulo}</nav>
+      <header class="product-header">
+        <nav class="product-breadcrumb">Home / Tours / {tour.ubicacion} / {tour.titulo}</nav>
+        <div class="product-header-row">
+          <div>
+            <p class="product-kicker">Experiencia destacada</p>
+            <h1 class="product-title">{tour.titulo}</h1>
+            <p class="product-sub">{tour.ubicacion} · {tour.duracion}</p>
+          </div>
+          <div class="product-header-badges">
+            {tour.destacado && <span class="badge badge-destacado">Destacado</span>}
+            <span class={`badge badge-estado ${tour.estado === 'activo' ? '' : 'inactive'}`}>{tour.estado}</span>
+          </div>
+        </div>
+      </header>
 
       <div class="product-grid">
-        <aside class="product-thumbs" aria-label="Miniaturas">
+        <aside class="product-thumbs" aria-label="Miniaturas del tour">
+          <p class="thumbs-label">Fotos del tour</p>
           {gallery.map((src, i) => (
             <button class={`gallery-thumb ${i === 0 ? 'active' : ''}`} type="button" data-src={src} aria-label={`Ver imagen ${i + 1}`}>
               <img src={src} alt={`Thumb ${i + 1}`} loading="lazy" />
@@ -49,9 +64,16 @@ const whatsappLink = whatsappReady
 
         <section class="product-main">
           <div class="main-image-frame">
-            <img class="gallery-main" src={gallery[0]} alt={tour.titulo} loading="eager" />
+            <div class="gallery-carousel" id="tourGalleryCarousel" tabindex="0" aria-label="Galería principal del tour">
+              <div class="gallery-carousel-track">
+                {gallery.map((src, index) => (
+                  <figure class="gallery-slide" data-slide-index={index}>
+                    <img class="gallery-main" src={src} alt={`${tour.titulo} - imagen ${index + 1}`} loading={index === 0 ? 'eager' : 'lazy'} />
+                  </figure>
+                ))}
+              </div>
+            </div>
             <div class="main-badges">
-              {tour.destacado && <span class="badge badge-destacado">Destacado</span>}
               <span class="badge badge-estado" data-estado={tour.estado}>{tour.estado}</span>
             </div>
           </div>
@@ -63,8 +85,7 @@ const whatsappLink = whatsappReady
 
         <aside class="product-info">
           <p class="product-brand">ATravel Peru</p>
-          <h1 class="product-title">{tour.titulo}</h1>
-          <p class="product-sub">{tour.ubicacion} · {tour.duracion}</p>
+          <p class="product-summary-label">Resumen del tour</p>
           <div class="product-price">{tour.precio}</div>
           <p class="product-note">Reserva inmediata por WhatsApp.</p>
           <a class={`btn-cta ${whatsappReady ? "" : "disabled"}`} href={whatsappLink} target="_blank" rel="noopener noreferrer" aria-disabled={!whatsappReady}>
@@ -75,52 +96,176 @@ const whatsappLink = whatsappReady
             <p class="product-warning">WhatsApp no configurado. Por favor intenta mas tarde.</p>
           )}
           <div class="product-actions">
-            <a class="btn-secondary" href="#galeria">Ver galeria</a>
+            <a class="btn-secondary" href="#detalles">Ver detalles</a>
             {tour.itinerario && <a class="btn-secondary" href="#itinerario">Ver itinerario</a>}
           </div>
-          <div class="product-quick">
-            <div><span>Estado</span><strong>{tour.estado}</strong></div>
-            <div><span>Duracion</span><strong>{tour.duracion}</strong></div>
-            <div><span>Ubicacion</span><strong>{tour.ubicacion}</strong></div>
-          </div>
+          <ul class="product-summary-list">
+            <li><span>Duración</span><strong>{tour.duracion}</strong></li>
+            <li><span>Ubicación</span><strong>{tour.ubicacion}</strong></li>
+            <li><span>Estado</span><strong>{tour.estado}</strong></li>
+            <li><span>Tipo</span><strong>{tour.destacado ? 'Destacado' : 'Regular'}</strong></li>
+          </ul>
         </aside>
       </div>
 
-      <div class="product-sections">
-        <section class="section-card">
-          <h2>Descripcion</h2>
-          <p>{tour.descripcion || 'Descripcion no disponible.'}</p>
+        <section id="detalles" class="details-board">
+          <div class="section-heading">
+            <h2>Información del tour</h2>
+            <p>Todo está organizado para leerlo rápido y entender la experiencia sin esfuerzo.</p>
+          </div>
+
+          <div class="details-grid">
+            <article class="detail-panel detail-panel-primary">
+              <div class="detail-panel-head">
+                <span class="detail-panel-kicker">Descripción</span>
+                <h3>La experiencia</h3>
+              </div>
+              <p>{tour.descripcion || 'Descripcion no disponible.'}</p>
+            </article>
+
+            <article class="detail-panel detail-panel-contrast detail-panel-includes">
+              <div class="detail-panel-head">
+                <span class="detail-panel-kicker">Incluye</span>
+                <h3>Servicios incluidos</h3>
+              </div>
+              <p>{tour.incluye || 'No especificado.'}</p>
+            </article>
+
+            <article class="detail-panel detail-panel-contrast detail-panel-excludes">
+              <div class="detail-panel-head">
+                <span class="detail-panel-kicker">No incluye</span>
+                <h3>Lo que debes considerar</h3>
+              </div>
+              <p>{tour.no_incluye || 'Consulta antes de reservar.'}</p>
+            </article>
+
+            {tour.itinerario && (
+              <article id="itinerario" class="detail-panel detail-panel-wide detail-panel-timeline">
+                <div class="detail-panel-head">
+                  <span class="detail-panel-kicker">Itinerario</span>
+                  <h3>Recorrido paso a paso</h3>
+                </div>
+                <p>{tour.itinerario}</p>
+              </article>
+            )}
+          </div>
         </section>
-        <section class="section-card">
-          <h3>Incluye</h3>
-          <p>{tour.incluye || 'No especificado.'}</p>
-        </section>
-        <section class="section-card">
-          <h3>No incluye</h3>
-          <p>{tour.no_incluye || 'Consulta antes de reservar.'}</p>
-        </section>
-        {tour.itinerario && (
-          <section id="itinerario" class="section-card">
-            <h3>Itinerario</h3>
-            <p>{tour.itinerario}</p>
-          </section>
-        )}
-      </div>
     </section>
 
     <script type="text/javascript">
       // Galería: cambiar imagen principal al clicar en miniatura
       (function(){
         if (typeof document === 'undefined') return;
+        const carousel = document.getElementById('tourGalleryCarousel');
+        const slides = carousel ? Array.from(carousel.querySelectorAll('.gallery-slide')) : [];
+        const thumbs = Array.from(document.querySelectorAll('.gallery-thumb'));
+        let autoScrollTimer = null;
+        let autoScrollResumeTimer = null;
+        let autoScrollEnabled = window.matchMedia('(max-width: 768px)').matches;
+
+        const getSlideWidth = () => {
+          if (!carousel || slides.length === 0) return 0;
+          return slides[0].getBoundingClientRect().width || carousel.getBoundingClientRect().width || 0;
+        };
+
+        const setActiveThumb = (src) => {
+          thumbs.forEach((t) => t.classList.toggle('active', t.getAttribute('data-src') === src));
+        };
+
+        const scrollToSlide = (index, behavior = 'smooth') => {
+          if (!carousel || !slides[index]) return;
+          carousel.scrollTo({ left: slides[index].offsetLeft, behavior });
+          const img = slides[index].querySelector('img');
+          if (img) setActiveThumb(img.getAttribute('src') || '');
+        };
+
+        const getCurrentIndex = () => {
+          if (!carousel || slides.length === 0) return 0;
+          const center = carousel.scrollLeft + carousel.clientWidth / 2;
+          let bestIndex = 0;
+          let bestDistance = Infinity;
+          slides.forEach((slide, index) => {
+            const slideCenter = slide.offsetLeft + slide.clientWidth / 2;
+            const distance = Math.abs(center - slideCenter);
+            if (distance < bestDistance) {
+              bestDistance = distance;
+              bestIndex = index;
+            }
+          });
+          return bestIndex;
+        };
+
+        const stopAutoScroll = () => {
+          if (autoScrollTimer) {
+            window.clearInterval(autoScrollTimer);
+            autoScrollTimer = null;
+          }
+          if (autoScrollResumeTimer) {
+            window.clearTimeout(autoScrollResumeTimer);
+            autoScrollResumeTimer = null;
+          }
+        };
+
+        const queueAutoScrollRestart = () => {
+          if (!autoScrollEnabled) return;
+          if (autoScrollResumeTimer) window.clearTimeout(autoScrollResumeTimer);
+          autoScrollResumeTimer = window.setTimeout(() => {
+            autoScrollResumeTimer = null;
+            startAutoScroll();
+          }, 1800);
+        };
+
+        const startAutoScroll = () => {
+          stopAutoScroll();
+          if (!autoScrollEnabled || !carousel || slides.length < 2) return;
+          autoScrollTimer = window.setInterval(() => {
+            if (!carousel) return;
+            const currentIndex = getCurrentIndex();
+            const nextIndex = currentIndex + 1 < slides.length ? currentIndex + 1 : 0;
+            scrollToSlide(nextIndex);
+          }, 3200);
+        };
+
+        const refreshAutoScrollState = () => {
+          autoScrollEnabled = window.matchMedia('(max-width: 768px)').matches;
+          if (autoScrollEnabled) startAutoScroll();
+          else stopAutoScroll();
+        };
+
+        if (carousel && slides.length > 0) {
+          const firstImg = slides[0].querySelector('img');
+          if (firstImg) setActiveThumb(firstImg.getAttribute('src') || '');
+
+          carousel.addEventListener('scroll', () => {
+            if (!carousel) return;
+            const index = getCurrentIndex();
+            const slide = slides[index];
+            if (!slide) return;
+            const img = slide.querySelector('img');
+            if (img) setActiveThumb(img.getAttribute('src') || '');
+            if (autoScrollEnabled) queueAutoScrollRestart();
+          }, { passive: true });
+
+          carousel.addEventListener('touchstart', stopAutoScroll, { passive: true });
+          carousel.addEventListener('touchend', queueAutoScrollRestart, { passive: true });
+          carousel.addEventListener('mouseenter', stopAutoScroll);
+          carousel.addEventListener('mouseleave', startAutoScroll);
+          window.addEventListener('resize', refreshAutoScrollState);
+          refreshAutoScrollState();
+        }
+
         document.addEventListener('click', function (e) {
           const thumb = e.target.closest('.gallery-thumb');
           if (!thumb) return;
           const src = thumb.getAttribute('data-src');
-          const main = document.querySelector('.gallery-main');
-          if (main && src) {
-            main.src = src;
-            document.querySelectorAll('.gallery-thumb').forEach(t => t.classList.remove('active'));
-            thumb.classList.add('active');
+          if (!src) return;
+          const index = slides.findIndex((slide) => {
+            const img = slide.querySelector('img');
+            return img && img.getAttribute('src') === src;
+          });
+          if (index >= 0) {
+            scrollToSlide(index);
+            setActiveThumb(src);
           }
         });
       })();

@@ -14,7 +14,8 @@ const { items: toursAtData, error: toursLoadError, source: toursSource } = await
 
 <AppLayout title={title}>
     <!-- Main Content -->
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+    <main class="tours-page-shell max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" style="padding-top: 50px; padding-inline: 28px;">
+        <div class="tours-top-spacer" aria-hidden="true"></div>
         
         <!-- Tours Grid Section -->
         <section id="tours-content" class="tours-section">
