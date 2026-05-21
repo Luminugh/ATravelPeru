@@ -118,10 +118,42 @@ const title = `Gestión de Multimedia - ${siteIdentity.adminTitleDefault}`;
   </div>
 
   <script type="module">
+    async function fetchJson(url, options) {
+      const response = await fetch(url, options);
+      const contentType = response.headers.get('content-type') || '';
+      const rawBody = await response.text();
+
+      let body = null;
+      if (rawBody && contentType.includes('application/json')) {
+        try {
+          body = JSON.parse(rawBody);
+        } catch {
+          body = null;
+        }
+      } else if (rawBody) {
+        try {
+          body = JSON.parse(rawBody);
+        } catch {
+          body = { raw: rawBody };
+        }
+      }
+
+      if (!response.ok) {
+        return {
+          ok: false,
+          status: response.status,
+          error: body?.error || body?.message || response.statusText || 'Error HTTP',
+          raw: typeof body?.raw === 'string' ? body.raw : rawBody,
+        };
+      }
+
+      return body ?? { ok: true };
+    }
+
     const api = {
-      list: () => fetch('/api/admin/media').then(r=>r.json()),
-      upload: (form) => fetch('/api/admin/media', { method: 'POST', body: form }).then(r=>r.json()),
-      del: (id) => fetch('/api/admin/media', { method: 'DELETE', headers:{'content-type':'application/json'}, body: JSON.stringify({id})}).then(r=>r.json()),
+      list: () => fetchJson('/api/admin/media'),
+      upload: (form) => fetchJson('/api/admin/media', { method: 'POST', body: form }),
+      del: (id) => fetchJson('/api/admin/media', { method: 'DELETE', headers:{'content-type':'application/json'}, body: JSON.stringify({id})}),
     };
 
     // DOM Elements
@@ -194,7 +226,7 @@ const title = `Gestión de Multimedia - ${siteIdentity.adminTitleDefault}`;
       try {
         const res = await api.list();
         if (!res.ok) {
-          uploadStatus.textContent = 'Error al cargar: ' + (res.error || '');
+          uploadStatus.textContent = `Error al cargar (${res.status || 'sin status'}): ${res.error || ''}`;
           uploadStatus.classList.add('error');
           return;
         }
@@ -202,7 +234,8 @@ const title = `Gestión de Multimedia - ${siteIdentity.adminTitleDefault}`;
         const items = res.data || [];
         render(items);
       } catch (error) {
-        uploadStatus.textContent = 'Error de conexión';
+        console.error('[admin/media] load failed:', error);
+        uploadStatus.textContent = 'Error de conexión al cargar medios';
         uploadStatus.classList.add('error');
       }
     }
@@ -356,11 +389,15 @@ const title = `Gestión de Multimedia - ${siteIdentity.adminTitleDefault}`;
           fileLabel.textContent = 'Seleccionar imagen...';
           load();
         } else {
-          uploadStatus.textContent = 'Error: ' + (res.error || '');
+          uploadStatus.textContent = `Error al subir (${res.status || 'sin status'}): ${res.error || ''}`;
+          if (res.raw) {
+            console.error('[admin/media] upload response body:', res.raw);
+          }
           uploadStatus.className = 'upload-status error';
         }
       } catch (error) {
-        uploadStatus.textContent = 'Error de conexión';
+        console.error('[admin/media] upload failed:', error);
+        uploadStatus.textContent = 'Error de conexión al subir la imagen';
         uploadStatus.className = 'upload-status error';
       }
     });
@@ -391,10 +428,14 @@ const title = `Gestión de Multimedia - ${siteIdentity.adminTitleDefault}`;
             closeModal();
             load();
           } else {
-            showToast('Error al eliminar: ' + (res.error || ''), 'error');
+            showToast(`Error al eliminar (${res.status || 'sin status'}): ${res.error || ''}`, 'error');
+            if (res.raw) {
+              console.error('[admin/media] delete response body:', res.raw);
+            }
           }
         } catch (error) {
-          showToast('Error de conexión', 'error');
+          console.error('[admin/media] delete failed:', error);
+          showToast('Error de conexión al eliminar', 'error');
         }
       }
     });
