@@ -69,132 +69,153 @@ const title = `Gestion de Tours AT - ${siteIdentity.adminTitleDefault}`;
           <input type="hidden" name="id" />
 
           <div class="tour-modal-scroll">
-            <p class="guide-note">Completa todos los campos de forma ordenada. Desplaza hacia abajo para ver más secciones.</p>
+            <div class="guide-note tour-flow-note">
+              Organiza el tour en este orden: primero la información base, luego el contenido, y al final las imágenes y opciones de publicación.
+            </div>
 
             <div class="tour-modal-grid">
-              <section class="tour-card-section" id="tour-basic">
-                <h3 class="section-title"><i class="fas fa-info-circle"></i> Información Básica</h3>
-
-                <div class="form-row">
-                  <label><i class="fas fa-heading"></i> Título del Tour *</label>
-                  <input name="titulo" required placeholder="Ej. Machu Picchu Express" />
-                </div>
-
-                <div class="form-row">
-                  <label><i class="fas fa-file-alt"></i> Descripción Corta *</label>
-                  <textarea name="descripcion" rows="2" required placeholder="Describe brevemente el tour..."></textarea>
-                </div>
-
-                <div class="form-row grid-3">
-                  <div>
-                    <label><i class="fas fa-dollar-sign"></i> Precio (USD) *</label>
-                    <input type="number" step="0.01" name="precio" required placeholder="1200" />
+              <div class="tour-column tour-column-main">
+                <section class="tour-card-section" id="tour-basic">
+                  <div class="section-heading">
+                    <h3 class="section-title"><i class="fas fa-info-circle"></i> Información Básica</h3>
+                    <p class="section-subtitle">Define lo esencial del tour para que el registro quede claro desde el inicio.</p>
                   </div>
-                  <div>
-                    <label><i class="fas fa-hourglass-end"></i> Duración *</label>
-                    <small class="field-note">Ejemplo: 3 días, 2 noches.</small>
-                    <input name="duracion" required placeholder="Ej. 3 dias" />
-                  </div>
-                  <div>
-                    <label><i class="fas fa-location-dot"></i> Destino *</label>
-                    <select name="ubicacion_id" required></select>
-                  </div>
-                </div>
-              </section>
 
-              <section class="tour-card-section" id="tour-content">
-                <h3 class="section-title"><i class="fas fa-list"></i> Contenido del Tour</h3>
-
-                <div class="form-row grid-2">
-                  <div>
-                    <label class="label-success"><i class="fas fa-check-circle"></i> Incluye *</label>
-                    <textarea name="incluye" rows="3" placeholder="- Transporte\n- Entradas\n- Guía profesional"></textarea>
+                  <div class="tour-field">
+                    <label><i class="fas fa-heading"></i> Título del Tour *</label>
+                    <input name="titulo" required placeholder="Ej. Machu Picchu Express" />
                   </div>
-                  <div>
-                    <label class="label-danger"><i class="fas fa-times-circle"></i> No Incluye</label>
-                    <textarea name="no_incluye" rows="3" placeholder="- Seguro\n- Gastos personales\n- Propinas"></textarea>
+
+                  <div class="tour-field">
+                    <label><i class="fas fa-file-alt"></i> Descripción Corta *</label>
+                    <textarea name="descripcion" rows="3" required placeholder="Describe brevemente el tour..."></textarea>
                   </div>
-                </div>
 
-                <div class="form-row">
-                  <label>Descripcion dia a dia</label>
-                  <small class="field-note">Divide el texto por días para que el usuario entienda el flujo del tour.</small>
-                  <textarea name="itinerario" rows="4" placeholder="Día 1: llegada y traslado\nDía 2: actividad principal\nDía 3: retorno"></textarea>
-                </div>
-              </section>
+                  <div class="tour-grid-3">
+                    <div class="tour-field tour-field-compact">
+                      <label><i class="fas fa-coins"></i> Precio (S/) *</label>
+                      <input type="number" step="0.01" name="precio" required placeholder="1200" />
+                    </div>
+                    <div class="tour-field tour-field-compact">
+                      <label><i class="fas fa-hourglass-end"></i> Duración *</label>
+                      <small class="field-note">Ejemplo: 3 días, 2 noches.</small>
+                      <input name="duracion" required placeholder="Ej. 3 dias" />
+                    </div>
+                    <div class="tour-field tour-field-compact">
+                      <label><i class="fas fa-location-dot"></i> Destino *</label>
+                      <select name="ubicacion_id" required></select>
+                    </div>
+                  </div>
+                </section>
 
-              <section class="tour-card-section" id="tour-image">
-                <h3 class="section-title"><i class="fas fa-image"></i> Imagen Principal</h3>
-                
-                <div class="image-selector-container">
-                  <div id="imagenPrincipalPreview" class="image-preview-large" style="display: none;">
-                    <img id="previewImg" alt="Imagen principal del tour" />
-                    <div class="image-preview-overlay">
-                      <button type="button" id="changePrimaryBtn" class="btn btn-secondary btn-sm">Cambiar</button>
-                      <button type="button" id="removePrimaryBtn" class="btn btn-danger btn-sm">Eliminar</button>
+                <section class="tour-card-section" id="tour-content">
+                  <div class="section-heading">
+                    <h3 class="section-title"><i class="fas fa-list"></i> Contenido del Tour</h3>
+                    <p class="section-subtitle">Describe lo que el cliente recibe y cómo se desarrolla la experiencia día a día.</p>
+                  </div>
+
+                  <div class="tour-grid-2">
+                    <div class="tour-field">
+                      <label class="label-success"><i class="fas fa-check-circle"></i> Incluye *</label>
+                        <textarea name="incluye" rows="4" placeholder="- Transporte\n- Entradas\n- Guía profesional"></textarea>
+                    </div>
+                    <div class="tour-field">
+                      <label class="label-danger"><i class="fas fa-times-circle"></i> No Incluye</label>
+                      <textarea name="no_incluye" rows="4" placeholder="- Seguro\n- Gastos personales\n- Propinas"></textarea>
                     </div>
                   </div>
 
-                  <div id="imagenPrincipalEmpty" class="image-placeholder">
-                    <i class="fas fa-cloud-upload-alt"></i>
-                    <p>Sin imagen seleccionada</p>
-                    <p class="text-muted">Selecciona una imagen de tu biblioteca</p>
+                  <div class="tour-field">
+                    <label><i class="fas fa-route"></i> Descripción día a día</label>
+                    <small class="field-note">Divide el texto por días para que el usuario entienda el flujo del tour.</small>
+                    <textarea name="itinerario" rows="5" placeholder="Día 1: llegada y traslado\nDía 2: actividad principal\nDía 3: retorno"></textarea>
+                  </div>
+                </section>
+              </div>
+
+              <div class="tour-column tour-column-side">
+                <section class="tour-card-section tour-card-section-media" id="tour-image">
+                  <div class="section-heading">
+                    <h3 class="section-title"><i class="fas fa-image"></i> Imagen Principal</h3>
+                    <p class="section-subtitle">Escoge la portada primero para que el tour tenga una referencia visual clara.</p>
                   </div>
 
-                  <input type="hidden" id="imagenPrincipalInput" name="imagen_principal" />
-                  <button type="button" id="selectPrimaryBtn" class="btn btn-primary btn-block">
-                    <i class="fas fa-plus"></i> Seleccionar Imagen Principal
-                  </button>
-                </div>
-              </section>
+                  <div class="image-selector-container">
+                    <div id="imagenPrincipalPreview" class="image-preview-large" style="display: none;">
+                      <img id="previewImg" alt="Imagen principal del tour" />
+                      <div class="image-preview-overlay">
+                        <button type="button" id="changePrimaryBtn" class="btn btn-secondary btn-sm">Cambiar</button>
+                        <button type="button" id="removePrimaryBtn" class="btn btn-danger btn-sm">Eliminar</button>
+                      </div>
+                    </div>
 
-              <section class="tour-card-section" id="tour-gallery">
-                <h3 class="section-title"><i class="fas fa-images"></i> Galería de Fotos</h3>
-                
-                <div class="gallery-manager-container">
-                  <div id="galeriaGrid" class="gallery-grid">
-                    <!-- Las imágenes se renderizarán aquí dinámicamente -->
+                    <div id="imagenPrincipalEmpty" class="image-placeholder">
+                      <i class="fas fa-cloud-upload-alt"></i>
+                      <p>Sin imagen seleccionada</p>
+                      <p class="text-muted">Selecciona una imagen de tu biblioteca</p>
+                    </div>
+
+                    <input type="hidden" id="imagenPrincipalInput" name="imagen_principal" />
+                    <button type="button" id="selectPrimaryBtn" class="btn btn-primary btn-block">
+                      <i class="fas fa-plus"></i> Seleccionar Imagen Principal
+                    </button>
+                  </div>
+                </section>
+
+                <section class="tour-card-section tour-card-section-gallery" id="tour-gallery">
+                  <div class="section-heading">
+                    <h3 class="section-title"><i class="fas fa-images"></i> Galería de Fotos</h3>
+                    <p class="section-subtitle">Agrega varias imágenes para vender mejor el tour sin saturar la pantalla principal.</p>
                   </div>
 
-                  <div id="galeriaEmpty" class="gallery-empty" style="display: none;">
-                    <i class="fas fa-image"></i>
-                    <p>Sin fotos agregadas</p>
-                    <p class="text-muted">Comienza agregando fotos a la galería</p>
+                  <div class="gallery-manager-container">
+                    <div id="galeriaGrid" class="gallery-grid">
+                      <!-- Las imágenes se renderizarán aquí dinámicamente -->
+                    </div>
+
+                    <div id="galeriaEmpty" class="gallery-empty" style="display: none;">
+                      <i class="fas fa-image"></i>
+                      <p>Sin fotos agregadas</p>
+                      <p class="text-muted">Comienza agregando fotos a la galería</p>
+                    </div>
+
+                    <button type="button" id="addGalleryBtn" class="btn btn-primary btn-block">
+                      <i class="fas fa-plus"></i> Agregar Foto a la Galería
+                    </button>
+
+                    <!-- Hidden textarea para guardar JSON -->
+                    <textarea id="galeriaTextarea" name="galeria" style="display: none;"></textarea>
+                  </div>
+                </section>
+
+                <section class="tour-card-section tour-card-section-tight" id="tour-options">
+                  <div class="section-heading">
+                    <h3 class="section-title"><i class="fas fa-cog"></i> Publicación</h3>
+                    <p class="section-subtitle">Define si el tour se destacará en portada y si estará visible para el público.</p>
                   </div>
 
-                  <button type="button" id="addGalleryBtn" class="btn btn-primary btn-block">
-                    <i class="fas fa-plus"></i> Agregar Foto a la Galería
-                  </button>
-
-                  <!-- Hidden textarea para guardar JSON -->
-                  <textarea id="galeriaTextarea" name="galeria" style="display: none;"></textarea>
-                </div>
-              </section>
-
-              <section class="tour-card-section tour-card-section-tight" id="tour-options">
-                <h3 class="section-title"><i class="fas fa-cog"></i> Opciones</h3>
-
-                <div class="form-row options-row">
-                  <label class="checkbox-inline">
-                    <input type="checkbox" name="destacado" />
-                    <span><i class="fas fa-star label-warning"></i> Destacado en portada</span>
-                  </label>
-                </div>
-
-                <div class="form-row">
-                  <label>Estado de Publicación</label>
-                  <div class="radio-group">
-                    <label class="radio-inline">
-                      <input type="radio" name="estado" value="activo" checked />
-                      <span><i class="fas fa-eye"></i> Activo</span>
+                  <div class="tour-options-row">
+                    <label class="checkbox-inline">
+                      <input type="checkbox" name="destacado" />
+                      <span><i class="fas fa-star label-warning"></i> Destacado en portada</span>
                     </label>
-                    <label class="radio-inline">
-                      <input type="radio" name="estado" value="inactivo" />
-                      <span><i class="fas fa-eye-slash"></i> Inactivo</span>
-                    </label>
                   </div>
-                </div>
-              </section>
+
+                  <div class="tour-field">
+                    <label>Estado de Publicación</label>
+                    <div class="radio-group">
+                      <label class="radio-inline">
+                        <input type="radio" name="estado" value="activo" checked />
+                        <span><i class="fas fa-eye"></i> Activo</span>
+                      </label>
+                      <label class="radio-inline">
+                        <input type="radio" name="estado" value="inactivo" />
+                        <span><i class="fas fa-eye-slash"></i> Inactivo</span>
+                      </label>
+                    </div>
+                  </div>
+                </section>
+              </div>
             </div>
           </div>
 
@@ -254,6 +275,18 @@ const title = `Gestion de Tours AT - ${siteIdentity.adminTitleDefault}`;
       let tours = [];
       let ubicaciones = [];
 
+      function formatSoles(value) {
+        const numericValue = Number(value ?? 0);
+        if (!Number.isFinite(numericValue)) {
+          return 'S/ 0.00';
+        }
+
+        return `S/ ${numericValue.toLocaleString('es-PE', {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        })}`;
+      }
+
       async function load() {
         const [tRes, uRes] = await Promise.all([api.list(), api.ubicaciones()]);
         if (uRes.ok) ubicaciones = uRes.data;
@@ -300,7 +333,7 @@ const title = `Gestion de Tours AT - ${siteIdentity.adminTitleDefault}`;
               <div class="tour-card-body">
                 <h4 class="tour-card-title">${t.titulo}</h4>
                 <div class="tour-card-meta"><i class="fas fa-map-marker-alt"></i> ${t.ubicacion} <span>•</span> <i class="fas fa-clock"></i> ${t.duracion}</div>
-                <div class="tour-card-price">$${Number(t.precio ?? 0).toFixed(2)}</div>
+                <div class="tour-card-price">${formatSoles(t.precio)}</div>
                 <p class="tour-card-desc">${t.descripcion?.slice(0,100) ?? ''}...</p>
                 <div class="tour-card-actions">
                   <button data-id="${t.id}" class="editBtn btn-edit"><i class="fas fa-edit"></i> Editar</button>
