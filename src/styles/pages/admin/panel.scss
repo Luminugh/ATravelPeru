@@ -18,6 +18,16 @@
   color: #1a202c;
 }
 
+/* Page-specific utility: allow a content-section to be fluid within the admin content area
+   (keeps inner gutters but stretches to the available content width) */
+.content-section--fluid {
+  max-width: none;
+  width: 100%;
+  margin: 0 0 30px 0;
+  box-sizing: border-box;
+  padding-inline: 20px; /* keep small inner gutters */
+}
+
 .admin-container {
   display: block;
   min-height: 100vh;

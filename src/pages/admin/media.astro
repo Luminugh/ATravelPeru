@@ -16,7 +16,7 @@ const title = `Gestión de Multimedia - ${siteIdentity.adminTitleDefault}`;
         <p>Sube, organiza y reutiliza imágenes para tus tours y contenido.</p>
       </div>
       <div class="header-actions">
-        <button id="refreshBtn" class="btn btn-secondary">
+        <button id="refreshBtn" class="btn btn-secondary refresh-btn">
           <i class="fas fa-sync-alt"></i> Actualizar
         </button>
       </div>
@@ -25,32 +25,51 @@ const title = `Gestión de Multimedia - ${siteIdentity.adminTitleDefault}`;
     <!-- Upload Section -->
     <div class="upload-section">
       <div class="upload-card">
-        <div class="upload-header">
+        <button id="uploadToggle" class="upload-header" type="button" aria-expanded="false" aria-controls="uploadBody">
           <h4><i class="fas fa-cloud-upload-alt"></i> Subir Nueva Imagen</h4>
-        </div>
-        <form id="uploadForm" class="upload-form">
-          <div class="form-row">
-            <div class="file-input-wrapper">
-              <input id="fileInput" type="file" name="file" accept="image/*" hidden />
-              <label for="fileInput" class="file-input-label">
-                <i class="fas fa-image"></i>
-                <span id="fileLabel">Seleccionar imagen...</span>
-              </label>
+          <i id="uploadToggleIcon" class="fas fa-chevron-down upload-toggle-icon" aria-hidden="true"></i>
+        </button>
+        <div id="uploadBody" class="upload-body is-collapsed">
+          <form id="uploadForm" class="upload-form upload-form-local">
+            <div class="form-row">
+              <div id="fileDropzone" class="file-input-wrapper">
+                <input id="fileInput" type="file" name="file" accept="image/*" hidden />
+                <label for="fileInput" class="file-input-label" aria-label="Seleccionar o arrastrar imagen para subir">
+                  <i class="fas fa-image"></i>
+                  <span class="file-input-text">
+                    <strong id="fileLabel">Seleccionar imagen...</strong>
+                    <small>o arrastra y suelta el archivo aquí</small>
+                  </span>
+                </label>
+              </div>
             </div>
-          </div>
-          <div class="form-row">
-            <input id="altInput" name="alt_text" type="text" placeholder="Texto alternativo (opcional)" class="form-input" />
-          </div>
-          <div class="form-row">
-            <input id="tagsInput" name="tags" type="text" placeholder="Etiquetas (separadas por comas)" class="form-input" />
-          </div>
-          <div class="form-row">
-            <button class="btn btn-primary btn-upload" type="submit">
-              <i class="fas fa-upload"></i> Subir Imagen
-            </button>
-          </div>
-        </form>
-        <div id="uploadStatus" class="upload-status"></div>
+            <div class="form-row">
+              <input id="altInput" name="alt_text" type="text" placeholder="Texto alternativo (opcional)" class="form-input" />
+            </div>
+            <div class="form-row">
+              <input id="tagsInput" name="tags" type="text" placeholder="Etiquetas (separadas por comas)" class="form-input" />
+            </div>
+            <div class="form-row">
+              <button class="btn btn-primary btn-upload" type="submit">
+                <i class="fas fa-upload"></i> Subir Imagen
+              </button>
+            </div>
+          </form>
+          <div class="upload-divider"></div>
+          <form id="linkUploadForm" class="upload-form upload-form-link">
+            <div class="link-upload-row">
+              <label for="imageUrlInput" class="form-label">Agregar desde enlace directo</label>
+              <input id="imageUrlInput" name="image_url" type="url" placeholder="https://ejemplo.com/imagen.jpg" class="form-input" />
+              <p class="form-hint">Pega un enlace directo a una imagen para descargarla y guardarla en la biblioteca.</p>
+            </div>
+            <div class="form-row link-action-row">
+              <button id="linkUploadBtn" class="btn btn-primary btn-upload btn-upload-link" type="submit" hidden>
+                <i class="fas fa-link"></i> Agregar desde enlace
+              </button>
+            </div>
+          </form>
+          <div id="uploadStatus" class="upload-status"></div>
+        </div>
       </div>
     </div>
 
@@ -153,6 +172,7 @@ const title = `Gestión de Multimedia - ${siteIdentity.adminTitleDefault}`;
     const api = {
       list: () => fetchJson('/api/admin/media'),
       upload: (form) => fetchJson('/api/admin/media', { method: 'POST', body: form }),
+      sync: () => fetchJson('/api/admin/media?sync=1', { method: 'POST' }),
       del: (id) => fetchJson('/api/admin/media', { method: 'DELETE', headers:{'content-type':'application/json'}, body: JSON.stringify({id})}),
     };
 
@@ -160,10 +180,17 @@ const title = `Gestión de Multimedia - ${siteIdentity.adminTitleDefault}`;
     const grid = document.getElementById('mediaGrid');
     const empty = document.getElementById('emptyState');
     const refreshBtn = document.getElementById('refreshBtn');
+    const uploadToggle = document.getElementById('uploadToggle');
+    const uploadToggleIcon = document.getElementById('uploadToggleIcon');
+    const uploadBody = document.getElementById('uploadBody');
     const uploadForm = document.getElementById('uploadForm');
+    const linkUploadForm = document.getElementById('linkUploadForm');
     const uploadStatus = document.getElementById('uploadStatus');
+    const fileDropzone = document.getElementById('fileDropzone');
     const fileInput = document.getElementById('fileInput');
     const fileLabel = document.getElementById('fileLabel');
+    const imageUrlInput = document.getElementById('imageUrlInput');
+    const linkUploadBtn = document.getElementById('linkUploadBtn');
     const mediaCount = document.getElementById('mediaCount');
 
     // Modal elements
@@ -181,15 +208,79 @@ const title = `Gestión de Multimedia - ${siteIdentity.adminTitleDefault}`;
 
     let currentMediaItem = null;
 
+    function setUploadCollapsed(collapsed) {
+      uploadBody.classList.toggle('is-collapsed', collapsed);
+      uploadBody.classList.toggle('is-open', !collapsed);
+      uploadToggle.setAttribute('aria-expanded', String(!collapsed));
+      uploadToggleIcon.classList.toggle('fa-chevron-up', !collapsed);
+      uploadToggleIcon.classList.toggle('fa-chevron-down', collapsed);
+      uploadToggle.closest('.upload-card')?.classList.toggle('is-collapsed', collapsed);
+    }
+
+    uploadToggle.addEventListener('click', () => {
+      const collapsed = uploadBody.classList.contains('is-collapsed');
+      setUploadCollapsed(!collapsed);
+    });
+
+    function setSelectedFile(file) {
+      if (!file) {
+        fileLabel.textContent = 'Seleccionar imagen...';
+        fileDropzone.classList.remove('has-file');
+        return;
+      }
+
+      fileLabel.textContent = file.name;
+      fileDropzone.classList.add('has-file');
+    }
+
+    setUploadCollapsed(true);
+
     // File input handling
     fileInput.addEventListener('change', (e) => {
       const file = e.target.files[0];
-      if (file) {
-        fileLabel.textContent = file.name;
-      } else {
-        fileLabel.textContent = 'Seleccionar imagen...';
-      }
+      setSelectedFile(file);
     });
+
+    // Drag and drop handling
+    ['dragenter', 'dragover'].forEach((eventName) => {
+      fileDropzone.addEventListener(eventName, (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        fileDropzone.classList.add('drag-active');
+      });
+    });
+
+    ['dragleave', 'dragend', 'drop'].forEach((eventName) => {
+      fileDropzone.addEventListener(eventName, (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        fileDropzone.classList.remove('drag-active');
+      });
+    });
+
+    fileDropzone.addEventListener('drop', (event) => {
+      const file = event.dataTransfer?.files?.[0];
+      if (!file) return;
+
+      if (!file.type.startsWith('image/')) {
+        showToast('Solo se permiten imágenes', 'warning');
+        return;
+      }
+
+      const dataTransfer = new DataTransfer();
+      dataTransfer.items.add(file);
+      fileInput.files = dataTransfer.files;
+      setSelectedFile(file);
+    });
+
+    function updateLinkButtonState() {
+      const hasUrl = imageUrlInput.value.trim().length > 0;
+      linkUploadBtn.hidden = !hasUrl;
+      linkUploadBtn.disabled = !hasUrl;
+    }
+
+    imageUrlInput.addEventListener('input', updateLinkButtonState);
+    updateLinkButtonState();
 
     // Modal functions
     function openModal(item) {
@@ -363,13 +454,13 @@ const title = `Gestión de Multimedia - ${siteIdentity.adminTitleDefault}`;
     // Upload form handler
     uploadForm.addEventListener('submit', async (ev) => {
       ev.preventDefault();
+      const file = fileInput.files && fileInput.files.length > 0 ? fileInput.files[0] : null;
 
-      if (!fileInput.files || fileInput.files.length === 0) {
+      if (!file) {
         showToast('Selecciona un archivo primero', 'warning');
         return;
       }
 
-      const file = fileInput.files[0];
       const form = new FormData();
       form.append('file', file);
       form.append('alt_text', document.getElementById('altInput').value || '');
@@ -384,9 +475,9 @@ const title = `Gestión de Multimedia - ${siteIdentity.adminTitleDefault}`;
           uploadStatus.textContent = '¡Imagen subida correctamente!';
           uploadStatus.className = 'upload-status success';
           fileInput.value = '';
+          setSelectedFile(null);
           document.getElementById('altInput').value = '';
           document.getElementById('tagsInput').value = '';
-          fileLabel.textContent = 'Seleccionar imagen...';
           load();
         } else {
           uploadStatus.textContent = `Error al subir (${res.status || 'sin status'}): ${res.error || ''}`;
@@ -398,6 +489,45 @@ const title = `Gestión de Multimedia - ${siteIdentity.adminTitleDefault}`;
       } catch (error) {
         console.error('[admin/media] upload failed:', error);
         uploadStatus.textContent = 'Error de conexión al subir la imagen';
+        uploadStatus.className = 'upload-status error';
+      }
+    });
+
+    linkUploadForm.addEventListener('submit', async (ev) => {
+      ev.preventDefault();
+
+      const imageUrl = imageUrlInput.value.trim();
+      if (!imageUrl) {
+        showToast('Pega un enlace primero', 'warning');
+        return;
+      }
+
+      const form = new FormData();
+      form.append('image_url', imageUrl);
+      form.append('alt_text', '');
+      form.append('tags', '');
+
+      uploadStatus.textContent = 'Descargando imagen desde enlace...';
+      uploadStatus.className = 'upload-status loading';
+
+      try {
+        const res = await api.upload(form);
+        if (res.ok) {
+          uploadStatus.textContent = '¡Imagen agregada desde enlace correctamente!';
+          uploadStatus.className = 'upload-status success';
+          imageUrlInput.value = '';
+          updateLinkButtonState();
+          load();
+        } else {
+          uploadStatus.textContent = `Error al agregar (${res.status || 'sin status'}): ${res.error || ''}`;
+          if (res.raw) {
+            console.error('[admin/media] link upload response body:', res.raw);
+          }
+          uploadStatus.className = 'upload-status error';
+        }
+      } catch (error) {
+        console.error('[admin/media] link upload failed:', error);
+        uploadStatus.textContent = 'Error de conexión al agregar la imagen desde enlace';
         uploadStatus.className = 'upload-status error';
       }
     });
@@ -441,7 +571,34 @@ const title = `Gestión de Multimedia - ${siteIdentity.adminTitleDefault}`;
     });
 
     // Refresh button
-    refreshBtn.addEventListener('click', load);
+    refreshBtn.addEventListener('click', async () => {
+      refreshBtn.disabled = true;
+      refreshBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sincronizando...';
+      uploadStatus.textContent = 'Buscando imágenes en tours para recuperar medios faltantes...';
+      uploadStatus.className = 'upload-status loading';
+
+      try {
+        const res = await api.sync();
+        if (res.ok) {
+          const created = res.data?.created ?? 0;
+          const skippedExisting = res.data?.skippedExisting ?? 0;
+          const skippedInvalid = res.data?.skippedInvalid ?? 0;
+          uploadStatus.textContent = `Sincronización lista: ${created} recuperadas, ${skippedExisting} ya existían, ${skippedInvalid} omitidas.`;
+          uploadStatus.className = 'upload-status success';
+          await load();
+        } else {
+          uploadStatus.textContent = `Error al sincronizar (${res.status || 'sin status'}): ${res.error || ''}`;
+          uploadStatus.className = 'upload-status error';
+        }
+      } catch (error) {
+        console.error('[admin/media] sync failed:', error);
+        uploadStatus.textContent = 'Error de conexión al sincronizar imágenes de tours';
+        uploadStatus.className = 'upload-status error';
+      } finally {
+        refreshBtn.disabled = false;
+        refreshBtn.innerHTML = '<i class="fas fa-sync-alt"></i> Actualizar';
+      }
+    });
 
     // Initial load
     load();

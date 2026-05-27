@@ -31,6 +31,58 @@
   font-size: 0.875rem;
 }
 
+.header-actions {
+  .refresh-btn {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    padding: 0.8rem 1.15rem;
+    border: 1px solid rgba(16, 185, 129, 0.18);
+    border-radius: 999px;
+    background: linear-gradient(180deg, #ffffff 0%, #f0fdf4 100%);
+    color: #047857;
+    box-shadow: 0 10px 24px rgba(16, 185, 129, 0.12);
+    font-weight: 700;
+    letter-spacing: 0.01em;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, background 0.2s ease, color 0.2s ease;
+
+    i {
+      font-size: 0.95rem;
+      transition: transform 0.2s ease;
+    }
+
+    &:hover {
+      transform: translateY(-1px);
+      background: linear-gradient(180deg, #ecfdf5 0%, #d1fae5 100%);
+      border-color: rgba(5, 150, 105, 0.3);
+      box-shadow: 0 14px 30px rgba(16, 185, 129, 0.18);
+      color: #065f46;
+
+      i {
+        transform: rotate(18deg);
+      }
+    }
+
+    &:active {
+      transform: translateY(0);
+      box-shadow: 0 8px 18px rgba(16, 185, 129, 0.12);
+    }
+
+    &:focus-visible {
+      outline: none;
+      box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.18), 0 10px 24px rgba(16, 185, 129, 0.12);
+    }
+
+    &:disabled {
+      cursor: progress;
+      opacity: 0.85;
+      transform: none;
+      box-shadow: 0 8px 18px rgba(16, 185, 129, 0.08);
+    }
+  }
+}
+
 // Upload Section
 .upload-section {
   margin-bottom: 2rem;
@@ -45,9 +97,18 @@
 }
 
 .upload-header {
+  width: 100%;
+  appearance: none;
+  border: 0;
   background: linear-gradient(135deg, #10b981, #059669);
   color: white;
   padding: 1.25rem 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.2s ease;
 
   h4 {
     margin: 0;
@@ -58,10 +119,69 @@
       margin-right: 0.5rem;
     }
   }
+
+  &:hover {
+    background: linear-gradient(135deg, #059669, #047857);
+  }
+}
+
+.upload-toggle-icon {
+  width: 2rem;
+  height: 2rem;
+  margin-left: 1rem;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.16);
+  font-size: 0.9rem;
+  transition: transform 0.2s ease, background 0.2s ease, color 0.2s ease;
+}
+
+.upload-card.is-collapsed .upload-toggle-icon {
+  background: rgba(255, 255, 255, 0.22);
+  color: #fff;
+}
+
+.upload-card:not(.is-collapsed) .upload-toggle-icon {
+  background: rgba(255, 255, 255, 0.1);
+  transform: rotate(0deg);
+}
+
+.upload-body {
+  max-height: 1200px;
+  overflow: hidden;
+  transition: max-height 0.3s ease, opacity 0.25s ease, padding 0.25s ease;
+  opacity: 1;
+}
+
+.upload-body.is-collapsed {
+  max-height: 0;
+  opacity: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+.upload-body.is-collapsed .upload-status {
+  display: none;
 }
 
 .upload-form {
   padding: 1.5rem;
+}
+
+.upload-form-local {
+  padding-bottom: 1rem;
+}
+
+.upload-divider {
+  height: 1px;
+  margin: 0 1.5rem;
+  background: linear-gradient(90deg, rgba(16, 185, 129, 0), rgba(16, 185, 129, 0.25), rgba(16, 185, 129, 0));
+}
+
+.upload-form-link {
+  padding-top: 1rem;
 }
 
 .form-row {
@@ -72,14 +192,47 @@
   }
 }
 
+.form-label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #4a5568;
+}
+
+.form-hint {
+  margin: 0.5rem 0 0;
+  font-size: 0.8125rem;
+  line-height: 1.4;
+  color: #718096;
+}
+
+.link-upload-row {
+  padding: 1rem;
+  border: 1px solid #e8ecf8;
+  border-radius: 10px;
+  background: #f8fafc;
+}
+
+.link-action-row {
+  margin-top: 0.85rem;
+}
+
+.btn-upload-link[hidden] {
+  display: none;
+}
+
 .file-input-wrapper {
   position: relative;
 }
 
 .file-input-label {
+  position: relative;
+  min-height: 8rem;
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: 1rem;
   padding: 2rem;
   border: 2px dashed #cbd5e0;
   border-radius: 8px;
@@ -94,8 +247,20 @@
     color: #a0aec0;
   }
 
-  span {
+  .file-input-text {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    text-align: left;
+  }
+
+  strong {
     font-weight: 500;
+  }
+
+  small {
+    font-size: 0.8125rem;
+    color: #94a3b8;
   }
 
   &:hover {
@@ -107,6 +272,19 @@
       color: #10b981;
     }
   }
+}
+
+.file-input-wrapper.drag-active .file-input-label {
+  border-color: #10b981;
+  background: #ecfdf5;
+  color: #047857;
+  box-shadow: inset 0 0 0 1px rgba(16, 185, 129, 0.15);
+  transform: translateY(-1px);
+}
+
+.file-input-wrapper.has-file .file-input-label {
+  border-color: #34d399;
+  background: #f0fdf4;
 }
 
 .form-input {
@@ -539,6 +717,7 @@
 
   .file-input-label {
     padding: 1.5rem;
+    min-height: 7rem;
 
     i {
       font-size: 1.5rem;
