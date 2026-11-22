@@ -1,17 +1,11 @@
 import type { APIRoute } from "astro";
-import { GetToursCatalogUseCase } from "../../application/use-cases/GetToursCatalogUseCase";
-import { SupabaseTourRepository } from "../../infrastructure/repositories/SupabaseTourRepository";
+import { tourUseCases } from "../../infrastructure/composition";
 
 export const prerender = false;
 
 export const GET: APIRoute = async () => {
   try {
-    // Instantiate dependencies
-    const tourRepository = new SupabaseTourRepository();
-    const getToursCatalogUseCase = new GetToursCatalogUseCase(tourRepository);
-
-    // Execute use case
-    const items = await getToursCatalogUseCase.execute();
+    const items = await tourUseCases.getCatalog.execute();
 
     return new Response(JSON.stringify({ ok: true, items }), {
       status: 200,

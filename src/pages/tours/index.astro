@@ -1,366 +1,164 @@
 ---
 import AppLayout from "../../layouts/AppLayout.astro";
-import { getToursCatalog } from "../../lib/catalog";
-import { contactConfig, toursPageConfig } from "../../lib/site-config";
-import { faWhatsapp } from "@fortawesome/free-brands-svg-icons";
+import { tourUseCases } from "../../infrastructure/composition";
+import type { Tour } from "../../domain/models";
+import { toursPageConfig } from "../../lib/site-config";
+import { optimizedImageUrl, responsiveImageSrcSet } from "../../lib/images";
 
-const title = toursPageConfig.title;
-const whatsappPath = Array.isArray(faWhatsapp.icon[4]) ? faWhatsapp.icon[4].join(" ") : faWhatsapp.icon[4];
-const whatsappViewBox = `0 0 ${faWhatsapp.icon[0]} ${faWhatsapp.icon[1]}`;
-const whatsappDigits = contactConfig.whatsappDigits;
+let tours: Tour[] = [];
+let hasLoadError = false;
 
-const { items: toursAtData, error: toursLoadError, source: toursSource } = await getToursCatalog();
+try {
+  tours = await tourUseCases.getCatalog.execute();
+} catch {
+  hasLoadError = true;
+}
+
+const experienceCount = String(tours.length).padStart(2, "0");
 ---
 
-<AppLayout title={title}>
-    <!-- Main Content -->
-    <main class="tours-page-shell max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" style="padding-top: 50px; padding-inline: 28px;">
-        <div class="tours-top-spacer" aria-hidden="true"></div>
-        
-        <!-- Tours Grid Section -->
-        <section id="tours-content" class="tours-section">
-            <h2 class="section-title mb-12">{toursPageConfig.sectionTitle}</h2>
-            {toursAtData.length === 0 && (
-                <>
-                    <div class="tour-empty-state">
-                        <h3>No se encontraron tours para mostrar</h3>
-                        <p>Fuente consultada: {toursSource}</p>
-                        {toursLoadError && <p>Error detectado: {toursLoadError}</p>}
-                        <p>Confirma que existan filas activas en la base de datos para mostrar el catálogo.</p>
-                    </div>
-                </>
-            )}
-            <div class="tours-summary-grid">
-                {toursAtData.map((tour) => (
-                    <article class="tour-summary-card" data-tour-id={tour.id}>
-                        <div class="summary-image-wrap">
-                            <img src={tour.imagen_principal} alt={tour.titulo} class="summary-image" loading="lazy" />
-                            {Array.isArray(tour.galeria) && tour.galeria.length > 0 && (
-                                <div class="summary-thumbs">
-                                    {tour.galeria.slice(0,3).map((src) => (
-                                        <img src={typeof src === 'string' ? src : (src.url || src.imagen || '')} alt={tour.titulo} loading="lazy" class="summary-thumb" />
-                                    ))}
-                                </div>
-                            )}
-                            <div class="summary-badges">
-                                {tour.destacado && <span class="summary-badge destacado">Destacado</span>}
-                                <span class={`summary-badge estado ${tour.estado}`}>{tour.estado}</span>
-                            </div>
-                        </div>
-                        <div class="summary-content">
-                            <h3 class="summary-title">{tour.titulo}</h3>
-                            <p class="summary-meta"><i class="fas fa-location-dot"></i> {tour.ubicacion} · <i class="fas fa-clock"></i> {tour.duracion}</p>
-                            <p class="summary-description">{tour.descripcion}</p>
-                            <div class="summary-footer">
-                                <span class="summary-price">{tour.precio}</span>
-                                <a class="btn-summary-open" href={`/tours/${tour.id}`} aria-disabled={tour.estado !== "activo"}>
-                                    {tour.estado === "activo" ? "Ver detalles" : "No disponible"}
-                                </a>
-                            </div>
-                        </div>
-                    </article>
-                ))}
-            </div>
-        </section>
-
-        <!-- Why Choose Tours AT Section -->
-        <section class="why-choose-section mt-20">
-            <h2 class="section-title mb-12">{toursPageConfig.whyChooseTitle}</h2>
-            <div class="why-choose-grid">
-                {toursPageConfig.whyChooseCards.map((card) => (
-                    <div class="why-choose-card">
-                        <i class={`${card.icon} why-choose-icon`}></i>
-                        <h3 class="why-choose-title">{card.title}</h3>
-                        <p class="why-choose-text">{card.text}</p>
-                    </div>
-                ))}
-            </div>
-        </section>
-
-    </main>
-
-    <div id="tourDetailModal" class="tour-detail-modal" hidden>
-        <div class="tour-detail-backdrop" data-close-modal></div>
-        <div class="tour-detail-window" role="dialog" aria-modal="true" aria-labelledby="tourDetailTitle">
-            <button type="button" class="tour-detail-close" data-close-modal aria-label="Cerrar ventana">
-                <i class="fas fa-xmark"></i>
-            </button>
-
-            <div class="tour-detail-header">
-                <img id="tourDetailInternalImage" src="" alt="Imagen detalle" class="tour-detail-internal-image" />
-                <div class="tour-detail-title-wrap">
-                    <h3 id="tourDetailTitle" class="tour-detail-title"></h3>
-                    <p id="tourDetailMeta" class="tour-detail-meta"></p>
-                    <div class="tour-detail-badges">
-                        <span id="tourDetailEstado" class="summary-badge estado"></span>
-                        <span id="tourDetailDestacado" class="summary-badge destacado" hidden>Destacado</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="tour-detail-body">
-                <p id="tourDetailDescripcion" class="tour-detail-text"></p>
-
-                <div class="tour-detail-block">
-                    <h4>Incluye</h4>
-                    <p id="tourDetailIncluye"></p>
-                </div>
-
-                <div class="tour-detail-block" id="tourDetailNoIncluyeWrap">
-                    <h4>No incluye</h4>
-                    <p id="tourDetailNoIncluye"></p>
-                </div>
-
-                <div class="tour-detail-block" id="tourDetailItinerarioWrap">
-                    <h4>Itinerario</h4>
-                    <p id="tourDetailItinerario"></p>
-                </div>
-
-                <div class="tour-detail-block">
-                    <h4>Galería</h4>
-                    <div id="tourDetailGallery" class="tour-detail-gallery"></div>
-                </div>
-            </div>
-
-            <div class="tour-detail-footer">
-                <strong id="tourDetailPrice" class="tour-detail-price"></strong>
-                <button type="button" id="tourDetailReserve" class="btn-tour-reserve-modal">
-                    <svg class="btn-tour-reserve-icon" viewBox={whatsappViewBox} aria-hidden="true" focusable="false">
-                        <path d={whatsappPath}></path>
-                    </svg>
-                    Reservar este tour
-                </button>
-            </div>
+<AppLayout title={toursPageConfig.title}>
+  <main class="tours-catalog-page">
+    <div class="tours-catalog-shell">
+      <section class="tours-intro" aria-labelledby="tours-heading">
+        <div class="tours-intro-copy">
+          <p class="tours-kicker"><span aria-hidden="true"></span> Viajes que se sienten distintos</p>
+          <h1 id="tours-heading">El Perú empieza <span>por aquí.</span></h1>
+          <p class="tours-intro-text">
+            Rutas escogidas para mirar más lejos, descubrir nuevos sabores y llevarte historias que sí dan ganas de contar.
+          </p>
+          <a class="tours-explore-link" href="#tours-content">
+            Explorar experiencias <span aria-hidden="true">↓</span>
+          </a>
         </div>
+
+        <aside class="tours-intro-glass" aria-label="Resumen del catálogo">
+          <span class="tours-glass-orbit tours-glass-orbit-one" aria-hidden="true"></span>
+          <span class="tours-glass-orbit tours-glass-orbit-two" aria-hidden="true"></span>
+          <p class="tours-glass-label">Tu próxima historia</p>
+          <div class="tours-glass-count"><span>{experienceCount}</span><span>experiencias</span></div>
+          <p class="tours-glass-note">Naturaleza, cultura y aventura. A tu manera.</p>
+          <a href="#tours-content" aria-label="Ver todas las experiencias">Ver el catálogo <span aria-hidden="true">↘</span></a>
+        </aside>
+      </section>
+
+      <section id="tours-content" class="tours-catalog-section" aria-labelledby="catalog-heading">
+        <header class="tours-section-heading">
+          <div>
+            <p class="tours-section-label">Elige tu próxima escapada</p>
+            <h2 id="catalog-heading">Experiencias para recordar</h2>
+          </div>
+          <p class="tours-section-count"><span>{experienceCount}</span> rutas disponibles</p>
+        </header>
+
+        {tours.length === 0 ? (
+          <div class="tours-empty-state" role={hasLoadError ? "alert" : undefined}>
+            <span class="tours-empty-mark" aria-hidden="true">✳</span>
+            <h3>{hasLoadError ? "Estamos preparando la ruta" : "Pronto habrá nuevas rutas"}</h3>
+            <p>{hasLoadError ? "No pudimos cargar el catálogo en este momento. Vuelve a intentarlo en unos minutos." : "Estamos preparando experiencias nuevas para que encuentres tu próximo destino."}</p>
+            {hasLoadError && <a href="/tours">Intentar de nuevo</a>}
+          </div>
+        ) : (
+          <div class="tours-prism-grid">
+            {tours.map((tour, index) => (
+              <article class="tours-prism-card" data-prism-card>
+                <div class="tours-prism-image-wrap">
+                  {tour.imagen_principal && (
+                    <img
+                      class="tours-prism-image"
+                      src={optimizedImageUrl(tour.imagen_principal, 480, { quality: 58 })}
+                      srcset={responsiveImageSrcSet(tour.imagen_principal, { quality: 58 })}
+                      sizes="(max-width: 680px) calc(100vw - 40px), (max-width: 1100px) calc(50vw - 32px), 380px"
+                      alt={tour.titulo}
+                      width="800"
+                      height="560"
+                      decoding="async"
+                      loading={index === 0 ? "eager" : "lazy"}
+                      fetchpriority={index === 0 ? "high" : undefined}
+                    />
+                  )}
+                  <div class="tours-prism-image-shade" aria-hidden="true"></div>
+                  <div class="tours-prism-badges">
+                    {tour.destacado && <span class="tours-prism-badge tours-prism-featured">Recomendado</span>}
+                    <span class={`tours-prism-badge tours-prism-status ${tour.estado === "activo" ? "is-active" : "is-inactive"}`}>
+                      {tour.estado === "activo" ? "Disponible" : "No disponible"}
+                    </span>
+                  </div>
+                  <span class="tours-prism-image-index" aria-hidden="true">{String(index + 1).padStart(2, "0")}</span>
+                </div>
+
+                <div class="tours-prism-content">
+                  <p class="tours-prism-location">{tour.ubicacion} <span aria-hidden="true">/</span> {tour.duracion}</p>
+                  <h3>{tour.titulo}</h3>
+                  <p class="tours-prism-description">{tour.descripcion}</p>
+                  <footer class="tours-prism-footer">
+                    <div class="tours-prism-price">
+                      <span>Desde</span>
+                      <strong>{tour.precio}</strong>
+                    </div>
+                    {tour.estado === "activo" ? (
+                      <a class="tours-prism-link" href={`/tours/${tour.id}`} aria-label={`Ver detalles de ${tour.titulo}`}>
+                        Descubrir <span aria-hidden="true">↗</span>
+                      </a>
+                    ) : (
+                      <span class="tours-prism-unavailable">No disponible</span>
+                    )}
+                  </footer>
+                </div>
+              </article>
+            ))}
+          </div>
+        )}
+      </section>
+
+      <section class="tours-values" aria-label="Lo que hace especial cada viaje">
+        {toursPageConfig.whyChooseCards.slice(0, 3).map((item) => (
+          <article class="tours-value-card">
+            <span class="tours-value-icon" aria-hidden="true"><i class={item.title === "100% Asegurado" ? "fas fa-shield-halved" : item.icon}></i></span>
+            <div>
+              <h3>{item.title}</h3>
+              <p>{item.text}</p>
+            </div>
+          </article>
+        ))}
+      </section>
     </div>
+  </main>
 
-    <script define:vars={{ toursAtData }}>
-        // Cargar tours dinámicamente desde la API para obtener datos actualizados
-        // Normalizar galeria: la vista puede devolver objetos con 'url', convertir a array de URLs
-        let toursAtData = (toursAtData || []).map(t => ({
-            ...t,
-            galeria: Array.isArray(t.galeria)
-                ? t.galeria.map(g => (typeof g === 'string' ? g : (g.url || g.imagen || ''))).filter(Boolean)
-                : []
-        }));
-        let globalWhatsappPhone = null;
+  <script>
+    const supportsFinePointer = window.matchMedia("(hover: hover) and (pointer: fine)");
+    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 
-        async function loadWhatsappConfig() {
-            try {
-                const response = await fetch('/api/whatsapp-config');
-                const result = await response.json();
-                if (result.ok && result.phone) {
-                    globalWhatsappPhone = result.phone;
-                }
-            } catch (error) {
-                console.error('Error loading WhatsApp config:', error);
-            }
-        }
-        
-        async function loadToursFromAPI() {
-            try {
-                const response = await fetch('/api/tours');
-                const result = await response.json();
-                if (result.ok && Array.isArray(result.items)) {
-                    toursAtData = result.items.map(t => ({
-                        ...t,
-                        galeria: Array.isArray(t.galeria)
-                            ? t.galeria.map(g => (typeof g === 'string' ? g : (g.url || g.imagen || ''))).filter(Boolean)
-                            : []
-                    }));
-                    // Actualizar la grilla de tours
-                    updateToursGrid(toursAtData);
-                }
-            } catch (error) {
-                console.error('Error loading tours from API:', error);
-                // Si falla, usar los datos del build
-            }
-        }
+    if (supportsFinePointer.matches && !prefersReducedMotion.matches) {
+      document.querySelectorAll<HTMLElement>("[data-prism-card]").forEach((card) => {
+        let frame = 0;
+        let pointerX = 0;
+        let pointerY = 0;
 
-        function updateToursGrid(tours) {
-            const grid = document.querySelector('.tours-summary-grid');
-            if (!grid) return;
+        card.addEventListener("pointermove", (event) => {
+          pointerX = event.clientX;
+          pointerY = event.clientY;
+          if (frame) return;
 
-            // Limpiar la grilla actual
-            grid.innerHTML = '';
+          frame = requestAnimationFrame(() => {
+            const bounds = card.getBoundingClientRect();
+            const x = Math.max(0, Math.min(1, (pointerX - bounds.left) / bounds.width));
+            const y = Math.max(0, Math.min(1, (pointerY - bounds.top) / bounds.height));
+            card.style.setProperty("--prism-x", `${Math.round(pointerX - bounds.left)}px`);
+            card.style.setProperty("--prism-y", `${Math.round(pointerY - bounds.top)}px`);
+            card.style.setProperty("--prism-tilt-x", `${((x - 0.5) * 3).toFixed(2)}deg`);
+            card.style.setProperty("--prism-tilt-y", `${((0.5 - y) * 3).toFixed(2)}deg`);
+            frame = 0;
+          });
+        }, { passive: true });
 
-            if (tours.length === 0) {
-                grid.innerHTML = '<div class="tour-empty-state"><h3>No se encontraron tours para mostrar</h3></div>';
-                return;
-            }
-
-            // Renderizar cada tour
-            tours.forEach((tour) => {
-                const article = document.createElement('article');
-                article.className = 'tour-summary-card';
-                article.setAttribute('data-tour-id', tour.id);
-                const thumbsHtml = Array.isArray(tour.galeria) && tour.galeria.length > 0
-                    ? `<div class="summary-thumbs">${tour.galeria.slice(0,3).map(s => `<img src="${s}" loading="lazy" class="summary-thumb"/>`).join('')}</div>`
-                    : '';
-
-                article.innerHTML = `
-                    <div class="summary-image-wrap">
-                        <img src="${tour.imagen_principal}" alt="${tour.titulo}" class="summary-image" loading="lazy" />
-                        ${thumbsHtml}
-                        <div class="summary-badges">
-                            ${tour.destacado ? '<span class="summary-badge destacado">Destacado</span>' : ''}
-                            <span class="summary-badge estado ${tour.estado}">${tour.estado}</span>
-                        </div>
-                    </div>
-                    <div class="summary-content">
-                        <h3 class="summary-title">${tour.titulo}</h3>
-                        <p class="summary-meta"><i class="fas fa-location-dot"></i> ${tour.ubicacion} · <i class="fas fa-clock"></i> ${tour.duracion}</p>
-                        <p class="summary-description">${tour.descripcion}</p>
-                        <div class="summary-footer">
-                            <span class="summary-price">${tour.precio}</span>
-                            <a class="btn-summary-open" href="/tours/${tour.id}" ${tour.estado !== 'activo' ? 'aria-disabled="true"' : ''}>
-                                ${tour.estado === 'activo' ? 'Ver detalles' : 'No disponible'}
-                            </a>
-                        </div>
-                    </div>
-                `;
-                grid.appendChild(article);
-            });
-
-            // Event listeners handled via delegation on the grid container
-        }
-
-        const modal = document.getElementById('tourDetailModal');
-        const titleEl = document.getElementById('tourDetailTitle');
-        const metaEl = document.getElementById('tourDetailMeta');
-        const estadoEl = document.getElementById('tourDetailEstado');
-        const destacadoEl = document.getElementById('tourDetailDestacado');
-        const descripcionEl = document.getElementById('tourDetailDescripcion');
-        const incluyeEl = document.getElementById('tourDetailIncluye');
-        const noIncluyeWrapEl = document.getElementById('tourDetailNoIncluyeWrap');
-        const noIncluyeEl = document.getElementById('tourDetailNoIncluye');
-        const itinerarioWrapEl = document.getElementById('tourDetailItinerarioWrap');
-        const itinerarioEl = document.getElementById('tourDetailItinerario');
-        const galleryEl = document.getElementById('tourDetailGallery');
-        const priceEl = document.getElementById('tourDetailPrice');
-        const reserveBtn = document.getElementById('tourDetailReserve');
-        const internalImageEl = document.getElementById('tourDetailInternalImage');
-
-        let selectedTour = null;
-
-        function openTourDetail(tourId) {
-            const found = toursAtData.find((tour) => String(tour.id) === String(tourId));
-            if (!found || found.estado !== 'activo') {
-                return;
-            }
-
-            selectedTour = found;
-            titleEl.textContent = found.titulo;
-            metaEl.textContent = `${found.ubicacion} · ${found.duracion} · Vendedor #${found.vendedor_id}`;
-            estadoEl.textContent = found.estado;
-            estadoEl.classList.remove('activo', 'inactivo');
-            estadoEl.classList.add(found.estado);
-            destacadoEl.hidden = !found.destacado;
-
-            descripcionEl.textContent = found.descripcion;
-            incluyeEl.textContent = found.incluye;
-
-            noIncluyeWrapEl.hidden = !found.no_incluye;
-            noIncluyeEl.textContent = found.no_incluye || '';
-
-            itinerarioWrapEl.hidden = !found.itinerario;
-            itinerarioEl.textContent = found.itinerario || '';
-
-            // Build gallery viewer: main image + thumbnails
-            const galleryUrls = Array.isArray(found.galeria) ? found.galeria : [];
-            const mainSrc = galleryUrls.length > 0 ? galleryUrls[0] : found.imagen_principal;
-            internalImageEl.src = mainSrc;
-            internalImageEl.alt = `${found.titulo} imagen interna`;
-
-            galleryEl.innerHTML = '';
-            const thumbsWrap = document.createElement('div');
-            thumbsWrap.className = 'tour-detail-thumbs';
-
-            galleryUrls.forEach((src, idx) => {
-                const t = document.createElement('img');
-                t.src = src;
-                t.alt = `${found.titulo} galería ${idx + 1}`;
-                t.loading = 'lazy';
-                t.className = 'tour-detail-thumb';
-                t.addEventListener('click', () => {
-                    internalImageEl.src = src;
-                });
-                thumbsWrap.appendChild(t);
-            });
-
-            if (thumbsWrap.childElementCount > 0) galleryEl.appendChild(thumbsWrap);
-
-            priceEl.textContent = found.precio;
-
-            modal.hidden = false;
-            document.body.classList.add('tour-modal-open');
-        }
-
-        function closeTourDetail() {
-            modal.hidden = true;
-            document.body.classList.remove('tour-modal-open');
-            selectedTour = null;
-        }
-
-        // Use event delegation on the grid to handle 'Ver detalles' clicks
-        const gridEl = document.querySelector('.tours-summary-grid');
-        if (gridEl) {
-            gridEl.addEventListener('click', (ev) => {
-                const target = ev.target;
-                const btn = (target instanceof Element) ? target.closest('[data-open-tour]') : null;
-                if (btn) {
-                    const id = btn.getAttribute('data-open-tour');
-                    if (id) {
-                        // redirect to detail page
-                        window.location.href = `/tours/${id}`;
-                        return;
-                    }
-                }
-
-                // if click was on the card (not the button), navigate when clicking the article
-                const article = (target instanceof Element) ? target.closest('.tour-summary-card') : null;
-                if (article && article.dataset && article.dataset.tourId) {
-                    window.location.href = `/tours/${article.dataset.tourId}`;
-                }
-            });
-        }
-
-        document.querySelectorAll('[data-close-modal]').forEach((button) => {
-            button.addEventListener('click', closeTourDetail);
-        });
-
-        document.addEventListener('keydown', (event) => {
-            if (event.key === 'Escape' && !modal.hidden) {
-                closeTourDetail();
-            }
-        });
-
-        reserveBtn.addEventListener('click', () => {
-            if (!selectedTour) {
-                return;
-            }
-
-            // Verificar que haya número configurado
-            if (!globalWhatsappPhone) {
-                alert('El sistema aún no tiene un número de WhatsApp configurado. Por favor, intenta más tarde.');
-                return;
-            }
-
-            const message = `Hola, quiero reservar ${selectedTour.titulo} (${selectedTour.duracion}) por ${selectedTour.precio}.`;
-            const whatsappUrl = `https://wa.me/${globalWhatsappPhone}?text=${encodeURIComponent(message)}`;
-            window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
-        });
-
-        // Cargar tours dinámicamente cuando la página se carga
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', () => {
-                loadWhatsappConfig();
-                loadToursFromAPI();
-            });
-        } else {
-            loadWhatsappConfig();
-            loadToursFromAPI();
-        }
-    </script>
-
+        card.addEventListener("pointerleave", () => {
+          if (frame) cancelAnimationFrame(frame);
+          frame = 0;
+          card.style.setProperty("--prism-tilt-x", "0deg");
+          card.style.setProperty("--prism-tilt-y", "0deg");
+        }, { passive: true });
+      });
+    }
+  </script>
 </AppLayout>

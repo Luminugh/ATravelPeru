@@ -8,9 +8,6 @@ export default defineConfig({
     }
   }),
   output: "server",
-  security: {
-    checkOrigin: false,
-  },
   server: {
     port: 4321,
     host: true

@@ -1,0 +1,406 @@
+---
+---
+
+<section class="admin-dashboard-page">
+  <div class="dashboard-hero">
+    <div class="dashboard-hero-copy">
+      <span class="dashboard-eyebrow"><i class="fas fa-chart-line"></i> Panel general</span>
+      <h1>Resumen operativo de ATravel Peru</h1>
+      <p>
+        Vista central para revisar catalogo, contenido visual, configuracion de reservas y pendientes que pueden afectar la publicacion de tours.
+      </p>
+    </div>
+    <div class="dashboard-hero-actions">
+      <a href="/admin/tours" class="dashboard-action dashboard-action--primary"><i class="fas fa-plus"></i> Nuevo tour</a>
+      <a href="/admin/media" class="dashboard-action dashboard-action--secondary"><i class="fas fa-images"></i> Biblioteca</a>
+    </div>
+  </div>
+
+  <div id="dashboardAlert" class="dashboard-alert" hidden></div>
+
+  <div class="dashboard-metrics-grid" aria-label="Metricas principales">
+    <article class="dashboard-metric-card">
+      <span class="metric-icon metric-icon--green"><i class="fas fa-map"></i></span>
+      <span class="metric-label">Tours totales</span>
+      <strong id="metricTotalTours">-</strong>
+      <small id="metricTotalToursNote">Cargando catalogo...</small>
+    </article>
+    <article class="dashboard-metric-card">
+      <span class="metric-icon metric-icon--blue"><i class="fas fa-eye"></i></span>
+      <span class="metric-label">Publicados</span>
+      <strong id="metricActiveTours">-</strong>
+      <small id="metricActiveToursNote">Tours visibles al publico</small>
+    </article>
+    <article class="dashboard-metric-card">
+      <span class="metric-icon metric-icon--amber"><i class="fas fa-star"></i></span>
+      <span class="metric-label">Destacados</span>
+      <strong id="metricFeaturedTours">-</strong>
+      <small id="metricFeaturedToursNote">Prioridad comercial</small>
+    </article>
+    <article class="dashboard-metric-card">
+      <span class="metric-icon metric-icon--slate"><i class="fas fa-photo-video"></i></span>
+      <span class="metric-label">Medios</span>
+      <strong id="metricMediaFiles">-</strong>
+      <small id="metricMediaFilesNote">Imagenes en biblioteca</small>
+    </article>
+  </div>
+
+  <div class="dashboard-main-grid">
+    <section class="dashboard-panel dashboard-panel--wide">
+      <div class="dashboard-panel-header">
+        <div>
+          <h2><i class="fas fa-chart-pie"></i> Salud del sistema</h2>
+          <p>Analisis automatico segun datos reales del catalogo y configuracion.</p>
+        </div>
+        <span id="healthBadge" class="dashboard-status-badge">Calculando</span>
+      </div>
+
+      <div class="dashboard-health">
+        <div class="health-score-ring" aria-label="Puntaje de salud">
+          <strong id="healthScore">-</strong>
+          <span>de 100</span>
+        </div>
+        <div class="health-bars">
+          <div class="health-row">
+            <span>Catalogo activo</span>
+            <div class="health-bar"><span id="barCatalog" style="width: 0%"></span></div>
+            <strong id="barCatalogValue">0%</strong>
+          </div>
+          <div class="health-row">
+            <span>Contenido completo</span>
+            <div class="health-bar"><span id="barContent" style="width: 0%"></span></div>
+            <strong id="barContentValue">0%</strong>
+          </div>
+          <div class="health-row">
+            <span>Reservas listas</span>
+            <div class="health-bar"><span id="barBooking" style="width: 0%"></span></div>
+            <strong id="barBookingValue">0%</strong>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="dashboard-panel">
+      <div class="dashboard-panel-header">
+        <div>
+          <h2><i class="fab fa-whatsapp"></i> Reservas</h2>
+          <p>Estado del canal principal de conversion.</p>
+        </div>
+      </div>
+      <div class="booking-card">
+        <span id="whatsappStateIcon" class="booking-icon"><i class="fas fa-circle-notch fa-spin"></i></span>
+        <strong id="whatsappStateTitle">Revisando WhatsApp</strong>
+        <p id="whatsappStateText">Validando si existe un numero global para reservas.</p>
+        <a href="/admin/whatsapp-config" class="dashboard-link-button"><i class="fas fa-gear"></i> Configurar</a>
+      </div>
+    </section>
+
+    <section class="dashboard-panel">
+      <div class="dashboard-panel-header">
+        <div>
+          <h2><i class="fas fa-location-dot"></i> Destinos</h2>
+          <p>Distribucion de tours por ubicacion.</p>
+        </div>
+      </div>
+      <div id="destinationList" class="destination-list">
+        <div class="dashboard-skeleton"></div>
+        <div class="dashboard-skeleton"></div>
+        <div class="dashboard-skeleton"></div>
+      </div>
+    </section>
+
+    <section class="dashboard-panel">
+      <div class="dashboard-panel-header">
+        <div>
+          <h2><i class="fas fa-list-check"></i> Pendientes</h2>
+          <p>Prioridades detectadas para mejorar el sistema.</p>
+        </div>
+      </div>
+      <div id="recommendationList" class="recommendation-list">
+        <div class="dashboard-skeleton"></div>
+        <div class="dashboard-skeleton"></div>
+      </div>
+    </section>
+
+    <section class="dashboard-panel dashboard-panel--wide">
+      <div class="dashboard-panel-header">
+        <div>
+          <h2><i class="fas fa-clock-rotate-left"></i> Tours recientes</h2>
+          <p>Ultimos registros actualizados en el catalogo.</p>
+        </div>
+        <a href="/admin/tours" class="dashboard-text-link">Ver todos</a>
+      </div>
+      <div id="recentTours" class="recent-tours-list">
+        <div class="dashboard-skeleton dashboard-skeleton--row"></div>
+        <div class="dashboard-skeleton dashboard-skeleton--row"></div>
+        <div class="dashboard-skeleton dashboard-skeleton--row"></div>
+      </div>
+    </section>
+  </div>
+</section>
+
+<script type="module">
+  const state = {
+    tours: [],
+    media: [],
+    whatsappPhone: '',
+    errors: [],
+  };
+
+  const $ = (id) => document.getElementById(id);
+
+  function escapeHtml(value) {
+    return String(value ?? '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
+  }
+
+  function formatMoney(value) {
+    const amount = Number(value ?? 0);
+    if (!Number.isFinite(amount)) return 'S/ 0.00';
+    return `S/ ${amount.toLocaleString('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  }
+
+  function formatDate(value) {
+    if (!value) return 'Sin fecha';
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return 'Sin fecha';
+    return date.toLocaleDateString('es-PE', { day: '2-digit', month: 'short', year: 'numeric' });
+  }
+
+  function percent(value, total) {
+    if (!total) return 0;
+    return Math.max(0, Math.min(100, Math.round((value / total) * 100)));
+  }
+
+  function setText(id, value) {
+    const element = $(id);
+    if (element) element.textContent = value;
+  }
+
+  function setBar(id, value) {
+    const element = $(id);
+    if (element) element.style.width = `${value}%`;
+  }
+
+  async function fetchJson(url) {
+    const response = await fetch(url);
+    const payload = await response.json().catch(() => null);
+    if (!response.ok || !payload?.ok) {
+      throw new Error(payload?.error || `No se pudo cargar ${url}`);
+    }
+    return payload;
+  }
+
+  async function loadDashboard() {
+    const [toursResult, mediaResult, whatsappResult] = await Promise.allSettled([
+      fetchJson('/api/admin/tours'),
+      fetchJson('/api/admin/media'),
+      fetchJson('/api/admin/app-config'),
+    ]);
+
+    if (toursResult.status === 'fulfilled') {
+      state.tours = Array.isArray(toursResult.value.data) ? toursResult.value.data : [];
+    } else {
+      state.errors.push('No se pudieron cargar los tours.');
+    }
+
+    if (mediaResult.status === 'fulfilled') {
+      state.media = Array.isArray(mediaResult.value.data) ? mediaResult.value.data : [];
+    } else {
+      state.errors.push('No se pudo cargar la biblioteca multimedia.');
+    }
+
+    if (whatsappResult.status === 'fulfilled') {
+      state.whatsappPhone = whatsappResult.value.phone || '';
+    } else {
+      state.errors.push('No se pudo revisar la configuracion de WhatsApp.');
+    }
+
+    renderDashboard();
+  }
+
+  function getCompleteTours(tours) {
+    return tours.filter((tour) => {
+      const hasMainImage = Boolean(tour.imagen_principal);
+      const hasIncludes = Boolean(String(tour.incluye || '').trim());
+      const hasItinerary = Boolean(String(tour.itinerario || '').trim());
+      const hasPrice = Number(tour.precio) > 0;
+      return hasMainImage && hasIncludes && hasItinerary && hasPrice;
+    });
+  }
+
+  function renderDashboard() {
+    const tours = state.tours;
+    const total = tours.length;
+    const active = tours.filter((tour) => tour.estado === 'activo').length;
+    const inactive = tours.filter((tour) => tour.estado !== 'activo').length;
+    const featured = tours.filter((tour) => Boolean(tour.destacado)).length;
+    const complete = getCompleteTours(tours).length;
+    const withoutImage = tours.filter((tour) => !tour.imagen_principal).length;
+    const withoutItinerary = tours.filter((tour) => !String(tour.itinerario || '').trim()).length;
+    const avgPrice = total ? tours.reduce((sum, tour) => sum + (Number(tour.precio) || 0), 0) / total : 0;
+    const catalogScore = percent(active, total);
+    const contentScore = percent(complete, total);
+    const bookingScore = state.whatsappPhone ? 100 : 0;
+    const healthScore = Math.round((catalogScore * 0.4) + (contentScore * 0.4) + (bookingScore * 0.2));
+
+    setText('metricTotalTours', String(total));
+    setText('metricTotalToursNote', total ? `${inactive} inactivo${inactive === 1 ? '' : 's'} y precio promedio ${formatMoney(avgPrice)}` : 'Aun no hay tours registrados');
+    setText('metricActiveTours', String(active));
+    setText('metricActiveToursNote', `${catalogScore}% del catalogo esta publicado`);
+    setText('metricFeaturedTours', String(featured));
+    setText('metricFeaturedToursNote', featured ? `${percent(featured, total)}% con prioridad comercial` : 'Sin tours destacados');
+    setText('metricMediaFiles', String(state.media.length));
+    setText('metricMediaFilesNote', state.media.length ? 'Recursos disponibles para tours' : 'Biblioteca sin imagenes');
+
+    setText('healthScore', String(healthScore));
+    setText('barCatalogValue', `${catalogScore}%`);
+    setText('barContentValue', `${contentScore}%`);
+    setText('barBookingValue', `${bookingScore}%`);
+    setBar('barCatalog', catalogScore);
+    setBar('barContent', contentScore);
+    setBar('barBooking', bookingScore);
+
+    const healthBadge = $('healthBadge');
+    if (healthBadge) {
+      healthBadge.textContent = healthScore >= 80 ? 'Salud alta' : healthScore >= 55 ? 'Atencion media' : 'Requiere accion';
+      healthBadge.className = `dashboard-status-badge ${healthScore >= 80 ? 'is-good' : healthScore >= 55 ? 'is-warning' : 'is-danger'}`;
+    }
+
+    renderWhatsapp();
+    renderDestinations();
+    renderRecommendations({ total, inactive, withoutImage, withoutItinerary, complete, active });
+    renderRecentTours();
+    renderErrors();
+  }
+
+  function renderWhatsapp() {
+    const icon = $('whatsappStateIcon');
+    const title = $('whatsappStateTitle');
+    const text = $('whatsappStateText');
+    const configured = Boolean(state.whatsappPhone);
+
+    if (icon) {
+      icon.innerHTML = configured ? '<i class="fas fa-circle-check"></i>' : '<i class="fas fa-circle-exclamation"></i>';
+      icon.classList.toggle('is-ok', configured);
+      icon.classList.toggle('is-alert', !configured);
+    }
+    if (title) title.textContent = configured ? 'WhatsApp configurado' : 'WhatsApp pendiente';
+    if (text) text.textContent = configured
+      ? `Numero global activo: +51 ${state.whatsappPhone.replace(/\D/g, '').slice(-9)}`
+      : 'Configura el numero global para que los clientes puedan reservar desde el catalogo.';
+  }
+
+  function renderDestinations() {
+    const container = $('destinationList');
+    if (!container) return;
+
+    const counts = new Map();
+    state.tours.forEach((tour) => {
+      const key = tour.ubicacion || 'Sin destino';
+      counts.set(key, (counts.get(key) || 0) + 1);
+    });
+
+    const items = [...counts.entries()].sort((a, b) => b[1] - a[1]).slice(0, 6);
+
+    if (!items.length) {
+      container.innerHTML = '<p class="dashboard-empty">No hay destinos para mostrar.</p>';
+      return;
+    }
+
+    const max = Math.max(...items.map(([, count]) => count));
+    container.innerHTML = items.map(([name, count]) => `
+      <div class="destination-item">
+        <div>
+          <strong>${escapeHtml(name)}</strong>
+          <span>${count} tour${count === 1 ? '' : 's'}</span>
+        </div>
+        <div class="destination-meter"><span style="width: ${percent(count, max)}%"></span></div>
+      </div>
+    `).join('');
+  }
+
+  function renderRecommendations(metrics) {
+    const container = $('recommendationList');
+    if (!container) return;
+
+    const recommendations = [];
+    if (!metrics.total) {
+      recommendations.push({ icon: 'fa-plus', title: 'Crear el primer tour', text: 'El catalogo no tiene registros para vender desde la web.', href: '/admin/tours' });
+    }
+    if (metrics.inactive > 0) {
+      recommendations.push({ icon: 'fa-eye-slash', title: 'Revisar tours inactivos', text: `${metrics.inactive} tour${metrics.inactive === 1 ? '' : 's'} no aparece${metrics.inactive === 1 ? '' : 'n'} en el catalogo publico.`, href: '/admin/tours' });
+    }
+    if (metrics.withoutImage > 0) {
+      recommendations.push({ icon: 'fa-image', title: 'Completar imagenes principales', text: `${metrics.withoutImage} tour${metrics.withoutImage === 1 ? '' : 's'} necesita${metrics.withoutImage === 1 ? '' : 'n'} portada.`, href: '/admin/media' });
+    }
+    if (metrics.withoutItinerary > 0) {
+      recommendations.push({ icon: 'fa-route', title: 'Agregar descripcion dia a dia', text: `${metrics.withoutItinerary} tour${metrics.withoutItinerary === 1 ? '' : 's'} puede${metrics.withoutItinerary === 1 ? '' : 'n'} explicar mejor la experiencia.`, href: '/admin/tours' });
+    }
+    if (!state.whatsappPhone) {
+      recommendations.push({ icon: 'fa-phone', title: 'Configurar WhatsApp', text: 'El flujo de reservas necesita un numero global activo.', href: '/admin/whatsapp-config' });
+    }
+    if (!recommendations.length) {
+      recommendations.push({ icon: 'fa-circle-check', title: 'Sistema en buen estado', text: 'Catalogo, contenido y reservas tienen la base operativa lista.', href: '/admin/tours' });
+    }
+
+    container.innerHTML = recommendations.slice(0, 5).map((item) => `
+      <a class="recommendation-item" href="${item.href}">
+        <span><i class="fas ${item.icon}"></i></span>
+        <div>
+          <strong>${escapeHtml(item.title)}</strong>
+          <p>${escapeHtml(item.text)}</p>
+        </div>
+      </a>
+    `).join('');
+  }
+
+  function renderRecentTours() {
+    const container = $('recentTours');
+    if (!container) return;
+
+    const recent = [...state.tours]
+      .sort((a, b) => new Date(b.updated_at || b.created_at || 0).getTime() - new Date(a.updated_at || a.created_at || 0).getTime())
+      .slice(0, 5);
+
+    if (!recent.length) {
+      container.innerHTML = '<p class="dashboard-empty">No hay tours recientes.</p>';
+      return;
+    }
+
+    container.innerHTML = recent.map((tour) => `
+      <article class="recent-tour-item">
+        <div class="recent-tour-thumb">
+          ${tour.imagen_principal ? `<img src="${escapeHtml(tour.imagen_principal)}" alt="${escapeHtml(tour.titulo)}" loading="lazy" />` : '<i class="fas fa-image"></i>'}
+        </div>
+        <div class="recent-tour-copy">
+          <strong>${escapeHtml(tour.titulo || 'Tour sin titulo')}</strong>
+          <span>${escapeHtml(tour.ubicacion || 'Sin destino')} · ${escapeHtml(tour.duracion || 'Sin duracion')}</span>
+        </div>
+        <div class="recent-tour-meta">
+          <span class="tour-status ${tour.estado === 'activo' ? 'is-active' : 'is-inactive'}">${tour.estado === 'activo' ? 'Activo' : 'Inactivo'}</span>
+          <small>${formatDate(tour.updated_at || tour.created_at)}</small>
+        </div>
+      </article>
+    `).join('');
+  }
+
+  function renderErrors() {
+    const alert = $('dashboardAlert');
+    if (!alert) return;
+
+    if (!state.errors.length) {
+      alert.hidden = true;
+      return;
+    }
+
+    alert.hidden = false;
+    alert.innerHTML = `<i class="fas fa-triangle-exclamation"></i><span>${state.errors.map(escapeHtml).join(' ')}</span>`;
+  }
+
+  loadDashboard();
+</script>

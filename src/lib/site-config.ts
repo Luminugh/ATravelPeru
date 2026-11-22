@@ -127,11 +127,6 @@ export const footerConfig = {
   description: "Tu plataforma confiable de viajes. Conectando aventuras con sonadores desde 2020.",
 };
 
-export const cacheConfig = {
-  filePath: import.meta.env.TOURS_CACHE_FILE ?? "./src/data/tours-cache.json",
-  directoryPath: import.meta.env.TOURS_CACHE_DIR ?? "./src/data",
-};
-
 export const contactConfig = {
   whatsappDigits: normalizeWhatsappDigits(import.meta.env.PUBLIC_WHATSAPP_DIGITS as string | undefined, ""),
 };

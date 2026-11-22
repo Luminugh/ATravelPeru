@@ -2,7 +2,10 @@
 // Implements ITourRepository from domain
 
 import type { Tour, ITourRepository } from "../../domain/models/repositories";
+import toursCache from "../../data/tours-cache.json";
 import { getSupabaseServerClient } from "../supabase/SupabaseClientFactory";
+
+const cachedCatalog = toursCache as Tour[];
 
 function formatPrice(value: unknown): string {
   const numericValue = Number(value ?? 0);
@@ -39,16 +42,19 @@ export class SupabaseTourRepository implements ITourRepository {
   async findAll(): Promise<Tour[]> {
     const supabase = getSupabaseServerClient();
     if (!supabase) {
-      throw new Error("Supabase client not available");
+      return cachedCatalog;
     }
 
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 1500);
     try {
       const { data, error } = await supabase
         .from("v_tours_catalogo")
         .select(
           "id,titulo,descripcion,precio,duracion,ubicacion,incluye,no_incluye,itinerario,imagen_principal,galeria,destacado,estado,vendedor_id"
         )
-        .order("id", { ascending: true });
+        .order("id", { ascending: true })
+        .abortSignal(controller.signal);
 
       if (error) {
         throw error;
@@ -71,17 +77,21 @@ export class SupabaseTourRepository implements ITourRepository {
         vendedor_id: row.vendedor_id,
       }));
     } catch (error) {
-      console.error("[TourRepository] Error fetching all tours:", error);
-      throw error;
+      console.warn("[TourRepository] Serving cached catalog after the database request failed.", error);
+      return cachedCatalog;
+    } finally {
+      clearTimeout(timeout);
     }
   }
 
   async findById(id: number): Promise<Tour | null> {
     const supabase = getSupabaseServerClient();
     if (!supabase) {
-      throw new Error("Supabase client not available");
+      return cachedCatalog.find((tour) => tour.id === id) ?? null;
     }
 
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 1500);
     try {
       const { data, error } = await supabase
         .from("v_tours_catalogo")
@@ -89,7 +99,8 @@ export class SupabaseTourRepository implements ITourRepository {
           "id,titulo,descripcion,precio,duracion,ubicacion,incluye,no_incluye,itinerario,imagen_principal,galeria,destacado,estado,vendedor_id"
         )
         .eq("id", id)
-        .maybeSingle();
+        .maybeSingle()
+        .abortSignal(controller.signal);
 
       if (error && error.code !== "PGRST116") {
         throw error;
@@ -114,8 +125,10 @@ export class SupabaseTourRepository implements ITourRepository {
         vendedor_id: data.vendedor_id,
       };
     } catch (error) {
-      console.error(`[TourRepository] Error fetching tour ${id}:`, error);
-      throw error;
+      console.warn(`[TourRepository] Serving cached tour ${id} after the database request failed.`);
+      return cachedCatalog.find((tour) => tour.id === id) ?? null;
+    } finally {
+      clearTimeout(timeout);
     }
   }
 

@@ -1,0 +1,224 @@
+:root {
+  color-scheme: light dark;
+  --page-light: #f3f7fa;
+  --page-dark: #071321;
+  --surface-light: #ffffff;
+  --surface-dark: #102235;
+  --surface-raised-light: #ffffff;
+  --surface-raised-dark: #13283b;
+  --surface-soft-light: #eaf0f5;
+  --surface-soft-dark: #0d1b2c;
+  --text-primary-light: #152437;
+  --text-primary-dark: #eef7ff;
+  --text-secondary-light: #526579;
+  --text-secondary-dark: #b3c2d1;
+  --text-muted-light: #63788c;
+  --text-muted-dark: #91a4b8;
+  --border-light: rgba(28, 54, 77, .14);
+  --border-dark: rgba(192, 220, 245, .14);
+  --accent-light: #087d73;
+  --accent-dark: #83f0df;
+  --accent-strong-light: #07685f;
+  --accent-strong-dark: #4bd6c1;
+  --accent-contrast-light: #ffffff;
+  --accent-contrast-dark: #071321;
+  --accent-soft-light: #e0f5f1;
+  --accent-soft-dark: rgba(131, 240, 223, .11);
+  --success-light: #187447;
+  --success-dark: #42d392;
+  --warning-light: #875700;
+  --warning-dark: #f2c46c;
+  --danger-light: #b42337;
+  --danger-dark: #ff9aa4;
+  --danger-soft-light: #fff0f1;
+  --danger-soft-dark: rgba(248, 113, 128, .12);
+  --shadow-light: 0 18px 50px rgba(27, 49, 71, .09);
+  --shadow-dark: 0 24px 70px rgba(0, 0, 0, .25);
+  --page: light-dark(var(--page-light), var(--page-dark));
+  --surface: light-dark(var(--surface-light), var(--surface-dark));
+  --surface-raised: light-dark(var(--surface-raised-light), var(--surface-raised-dark));
+  --surface-soft: light-dark(var(--surface-soft-light), var(--surface-soft-dark));
+  --surface-glass: light-dark(rgba(255,255,255,.88), rgba(255,255,255,.055));
+  --text-primary: light-dark(var(--text-primary-light), var(--text-primary-dark));
+  --text-secondary: light-dark(var(--text-secondary-light), var(--text-secondary-dark));
+  --text-muted: light-dark(var(--text-muted-light), var(--text-muted-dark));
+  --border-color: light-dark(var(--border-light), var(--border-dark));
+  --accent: light-dark(var(--accent-light), var(--accent-dark));
+  --accent-strong: light-dark(var(--accent-strong-light), var(--accent-strong-dark));
+  --accent-contrast: light-dark(var(--accent-contrast-light), var(--accent-contrast-dark));
+  --accent-soft: light-dark(var(--accent-soft-light), var(--accent-soft-dark));
+  --success: light-dark(var(--success-light), var(--success-dark));
+  --warning: light-dark(var(--warning-light), var(--warning-dark));
+  --danger: light-dark(var(--danger-light), var(--danger-dark));
+  --danger-soft: light-dark(var(--danger-soft-light), var(--danger-soft-dark));
+  --shadow: light-dark(var(--shadow-light), var(--shadow-dark));
+  --muted: var(--text-secondary);
+  accent-color: var(--accent);
+}
+:root:has(> head > meta[name="color-scheme"][content="dark"]) { color-scheme: dark; }
+:root:has(> head > meta[name="color-scheme"][content="light"]) { color-scheme: light; }
+html { min-height: 100%; background: var(--page); scroll-behavior: smooth; scrollbar-color: light-dark(#8295a4, #526779) transparent; }
+body { min-height: 100vh; background: var(--page); color: var(--text-primary); }
+::selection { color: var(--accent-contrast); background: var(--accent); }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.visually-hidden { position: absolute !important; width: 1px !important; height: 1px !important; padding: 0 !important; margin: -1px !important; overflow: hidden !important; clip: rect(0,0,0,0) !important; white-space: nowrap !important; border: 0 !important; }
+
+.theme-toggle { display: inline-grid; place-items: center; flex: 0 0 auto; width: 42px; height: 42px; padding: 0; border: 1px solid var(--border-color); border-radius: 13px; background: var(--surface-glass); color: var(--text-primary); cursor: pointer; transition: background-color .18s, border-color .18s, transform .18s; }
+.theme-toggle:hover { background: var(--accent-soft); border-color: var(--accent); transform: translateY(-1px); }
+.theme-toggle svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+.theme-toggle:not([data-target]) [data-theme-icon] { display: none; }
+.theme-toggle[data-target="dark"] [data-theme-icon="light"], .theme-toggle[data-target="light"] [data-theme-icon="dark"] { display: none; }
+
+.admin-body { background: var(--page); color: var(--text-primary); }
+.admin-body .admin-container, .admin-body .admin-main, .admin-body .admin-content { background: var(--page); color: var(--text-primary); }
+.admin-body .admin-sidebar, .admin-body .admin-topbar, .admin-body .content-section,
+.admin-body .section-header, .admin-body .account-card, .admin-body .account-hero-panel,
+.admin-body .account-stat-card, .admin-body .whatsapp-card, .admin-body .whatsapp-hero-panel,
+.admin-body .upload-card, .admin-body .dashboard-hero, .admin-body .dashboard-panel,
+.admin-body .dashboard-metric-card, .admin-body .dashboard-action, .admin-body .dashboard-health,
+.admin-body .dashboard-empty, .admin-body .dashboard-alert, .admin-body .table-container,
+.admin-body .empty-state, .admin-body .tours-controls, .admin-body .tour-card,
+.admin-body .tour-modal-shell, .admin-body .tour-card-section, .admin-body .media-card,
+.admin-body .modal-content, .admin-body .form-card {
+  color: var(--text-primary);
+  background: var(--surface-raised);
+  border-color: var(--border-color);
+  box-shadow: var(--shadow);
+}
+.admin-body .admin-sidebar { background: linear-gradient(160deg, #13283b, #0b1827); color: #eef7ff; border-right: 1px solid rgba(192,220,245,.14); }
+.admin-body .admin-sidebar .sidebar-logo { color: #eef7ff; }
+.admin-body .admin-sidebar .sidebar-header { background: rgba(0,0,0,.12); border-color: rgba(192,220,245,.14); }
+.admin-body .admin-sidebar .sidebar-nav .nav-section-title { color: rgba(226,239,250,.58); }
+.admin-body .admin-sidebar .sidebar-nav .nav-item { color: rgba(238,247,255,.86); }
+.admin-body .admin-sidebar .sidebar-nav .nav-item:hover { color: #ffffff; background: rgba(255,255,255,.09); }
+.admin-body .admin-sidebar .sidebar-nav .nav-item.active { color: #071321; background: var(--accent); border-color: var(--accent); box-shadow: inset 3px 0 rgba(7,19,33,.2); }
+.admin-body .admin-sidebar .sidebar-nav .nav-item.logout { color: rgba(226,239,250,.72); border-color: rgba(192,220,245,.14); }
+.admin-body .admin-topbar { background: var(--surface); }
+.admin-body .admin-topbar { border-bottom: 1px solid var(--border-color); }
+.admin-body .admin-topbar .page-title { color: var(--text-primary); }
+.admin-body .admin-profile { color: var(--text-primary); background: var(--surface-raised); border-color: var(--border-color); }
+.admin-body .admin-profile .profile-meta { color: var(--text-secondary); }
+.admin-body :is(h1,h2,h3,h4,.page-title,.section-title,.account-hero-title,.whatsapp-hero-title) { color: var(--text-primary); }
+.admin-body .admin-content :is(h1,h2,h3,h4,h5,h6,.page-title,.section-title) { color: var(--text-primary); }
+.admin-body .admin-content .tour-card .tour-card-body :is(.tour-card-title,.tour-card-price) { color: var(--text-primary); }
+.admin-body .admin-content .tour-card .tour-card-body .tour-card-desc { color: var(--text-secondary); }
+.admin-body .admin-content .tour-card .tour-card-body .tour-card-meta { color: var(--accent); }
+.admin-body :is(p,.text-muted,.section-description,.section-subtitle,.account-note,.whatsapp-note) { color: var(--text-secondary); }
+.admin-body :is(input:not([type="checkbox"]):not([type="radio"]),textarea,select,.form-control,.form-input,.search-input,.select-input) {
+  color: var(--text-primary); background: var(--surface); border-color: var(--border-color); color-scheme: inherit;
+}
+.admin-body :is(input,textarea)::placeholder { color: var(--text-muted); opacity: 1; }
+.admin-body :is(input,textarea,select,button,a) { accent-color: var(--accent); }
+.admin-body :is(.nav-item,.sidebar-logo,.admin-profile,.profile-name) { color: var(--text-primary); }
+.admin-body .nav-item.active, .admin-body :is(.btn-primary,.btn-success,.account-action-btn--primary,.whatsapp-action-btn--primary) {
+  color: var(--accent-contrast); background: var(--accent); border-color: var(--accent);
+}
+.admin-body :is(.btn-secondary,.account-action-btn--secondary,.whatsapp-action-btn--secondary) { color: var(--text-primary); background: var(--surface-soft); border-color: var(--border-color); }
+.admin-body :is(.btn-danger,.account-action-btn--danger) { color: var(--danger); background: var(--danger-soft); border-color: color-mix(in srgb, var(--danger) 28%, transparent); }
+.admin-body :is(th,td) { color: var(--text-primary); border-color: var(--border-color); }
+.admin-body :is(thead,.table-header) { background: var(--surface-soft); }
+.admin-body tbody tr:hover { background: var(--accent-soft); }
+.admin-body :is([class*="-card"],[class*="-panel"],[class*="-modal"],[class*="-preview"],[class*="-empty"],[class*="-container"]) {
+  color: var(--text-primary);
+  border-color: var(--border-color);
+}
+.admin-body :is(.tour-form-card,.tour-editor,.tour-modal-content,.tour-detail-modal,.media-upload-zone,.media-preview,
+  .whatsapp-preview,.whatsapp-phone-preview,.account-security-card,.dashboard-chart-card,.dashboard-stat-card) {
+  background: var(--surface-raised);
+}
+.admin-body :is(.form-label,.field-label,.tour-form-label,.tour-card-label,.media-card-title,.tour-card-title) { color: var(--text-primary); }
+.admin-body :is(.form-hint,.field-hint,.tour-form-hint,.tour-card-meta,.media-card-meta) { color: var(--text-secondary); }
+.admin-body .sidebar-toggle { color: var(--text-primary); background: var(--surface-soft); border-color: var(--border-color); }
+.admin-body .tours-controls .search-row > .search-input input { box-sizing: border-box; width: 100%; }
+.admin-body .logout { color: var(--text-secondary); }
+.admin-body .nav-item.active { box-shadow: inset 3px 0 var(--accent); }
+.admin-body .auth-loading-screen { background: var(--page); color: var(--text-primary); }
+.admin-body .auth-loading-spinner { border-color: var(--border-color); border-top-color: var(--accent); }
+.admin-body .status, .admin-body .tour-status, .admin-body .label-success { color: var(--success); }
+.admin-body .label-danger, .admin-body .status-error { color: var(--danger); }
+
+.tour-detail-page { color: var(--text-primary); background: radial-gradient(ellipse at 88% 0%, color-mix(in srgb, var(--accent) 9%, transparent), transparent 38rem), var(--page); }
+.tour-detail-page .tour-top-spacer { height: 84px; }
+.tour-detail-page .tour-product { max-width: 1380px; }
+.tour-detail-page .product-header, .tour-detail-page .product-thumbs,
+.tour-detail-page .product-main, .tour-detail-page .product-info, .tour-detail-page .details-board,
+.tour-detail-page .detail-panel, .tour-detail-page .section-card {
+  color: var(--text-primary); background: var(--surface-raised); border: 1px solid var(--border-color); box-shadow: var(--shadow);
+}
+.tour-detail-page .product-header { padding: 20px 22px; border-radius: 20px; }
+.tour-detail-page .product-main { min-width: 0; padding: 12px; border-radius: 18px; }
+.tour-detail-page .product-thumbs { padding: 10px; border-radius: 16px; }
+.tour-detail-page .product-thumbs .gallery-thumb { background: var(--surface-soft); border-color: var(--border-color); box-shadow: none; }
+.tour-detail-page .product-thumbs .gallery-thumb.active { border-color: var(--accent); }
+.tour-detail-page .main-image-frame, .tour-detail-page .gallery-carousel, .tour-detail-page .gallery-main { background: var(--surface-soft); }
+.tour-detail-page .gallery-main { min-height: 0; max-height: 620px; aspect-ratio: 16 / 10; object-fit: cover; }
+.tour-detail-page .product-title, .tour-detail-page h2, .tour-detail-page h3,
+.tour-detail-page .product-summary-list strong { color: var(--text-primary); }
+.tour-detail-page .product-sub, .tour-detail-page .product-breadcrumb, .tour-detail-page .product-note,
+.tour-detail-page .thumbs-label, .tour-detail-page .detail-panel p,
+.tour-detail-page .product-summary-list span, .tour-detail-page .section-heading p,
+.tour-detail-page .section-card p { color: var(--text-secondary); }
+.tour-detail-page .product-kicker, .tour-detail-page .detail-panel-kicker,
+.tour-detail-page .product-price { color: var(--accent); }
+.tour-detail-page .product-summary-label { color: var(--text-primary); background: var(--surface-soft); border-color: var(--border-color); }
+.tour-detail-page .product-brand { color: var(--text-muted); }
+.tour-detail-page .main-meta { margin-top: 12px; }
+.tour-detail-page .meta-chip, .tour-detail-page .badge, .tour-detail-page .btn-secondary {
+  color: var(--text-primary); background: var(--surface-soft); border-color: var(--border-color);
+}
+.tour-detail-page .badge-estado[data-estado="activo"], .tour-detail-page .badge-estado:not([data-estado]) { color: var(--accent-contrast); background: var(--accent); }
+.tour-detail-page .product-summary-list li { background: var(--surface-soft); border-color: var(--border-color); }
+.tour-detail-page .btn-cta { color: var(--accent-contrast); background: linear-gradient(100deg,var(--accent-strong),var(--accent)); }
+.tour-detail-page .btn-cta.disabled { color: var(--text-muted); background: var(--surface-soft); }
+.tour-detail-page .product-warning { color: var(--warning); background: color-mix(in srgb, var(--warning) 12%, var(--surface-raised)); }
+.tour-detail-page .details-board { background: var(--surface); }
+.tour-detail-page .detail-panel-primary, .tour-detail-page .detail-panel-contrast.detail-panel-includes,
+.tour-detail-page .detail-panel-contrast.detail-panel-excludes, .tour-detail-page .detail-panel-timeline { background: var(--surface-raised); border-color: var(--border-color); }
+.tour-detail-page .detail-panel-includes { box-shadow: inset 3px 0 var(--success), var(--shadow); }
+.tour-detail-page .detail-panel-excludes { box-shadow: inset 3px 0 var(--danger), var(--shadow); }
+.tour-detail-page .gallery-controls button { color: var(--text-primary); background: var(--surface-glass); border-color: var(--border-color); }
+
+.tours-catalog-page { --catalog-ink: var(--text-primary); --catalog-muted: var(--text-secondary); --catalog-line: var(--border-color); --catalog-teal: var(--accent); --catalog-lilac: light-dark(#6b50a8,#c2a5ff); color: var(--text-primary); background: radial-gradient(ellipse at 80% 4%, color-mix(in srgb, var(--accent) 12%, transparent), transparent 34rem), var(--page); }
+.tours-catalog-page .tours-prism-card, .tours-catalog-page .tours-intro-glass,
+.tours-catalog-page .tours-value-card { color: var(--text-primary); background: var(--surface-glass); border-color: var(--border-color); }
+.tours-catalog-page .tours-prism-content { color: var(--text-primary); background: var(--surface-raised); }
+.tours-catalog-page .tours-prism-description, .tours-catalog-page .tours-glass-note,
+.tours-catalog-page .tours-value-card p { color: var(--text-secondary); }
+.tours-catalog-page .tours-prism-card { box-shadow: var(--shadow); }
+
+.home-page { --home-bg: var(--page); --home-panel: var(--surface-raised); --home-ice: var(--text-primary); --home-muted: var(--text-secondary); --home-tide: var(--accent); --home-violet: light-dark(#7357b1,#c2a5ff); background: var(--home-bg); color: var(--home-ice); }
+.home-ribbon { color: var(--text-secondary); background: var(--surface-soft); border-color: var(--border-color); }
+.home-final-cta { border-color: var(--border-color); background: radial-gradient(ellipse at 50% 0%, var(--accent-soft), transparent 54%), var(--surface-glass); }
+.home-section h2,.story-copy h2,.values-intro h2,.home-final-cta h2,.featured-content h3 { color: var(--text-primary); }
+.home-story,.home-values { border-color: var(--border-color); }
+.not-found-page { color: var(--text-primary); background: radial-gradient(circle at top, var(--accent-soft), transparent 38%), var(--page) !important; }
+.not-found-card { color: var(--text-primary); background: var(--surface-glass); border-color: var(--border-color); box-shadow: var(--shadow); }
+.not-found-card h1 { color: var(--text-primary); }
+.not-found-text { color: var(--text-secondary); }
+.not-found-code,.not-found-kicker { color: var(--accent); }
+.not-found-button { color: var(--accent-contrast); background: var(--accent); }
+
+.site-header { background: var(--surface-glass); border-color: var(--border-color); }
+.site-brand,.site-nav-link { color: var(--text-primary); }
+.site-nav-link:hover,.site-nav-link[aria-current="page"] { color: var(--accent); }
+.site-nav-link[aria-current="page"]:after { background: var(--accent); }
+.site-nav-cta { color: var(--accent); background: var(--accent-soft); border-color: color-mix(in srgb,var(--accent) 36%,transparent); }
+.site-nav-cta span { color: var(--accent); }
+@media(max-width:760px) { .site-navigation { background: var(--surface-raised); border-color: var(--border-color); box-shadow: var(--shadow); } }
+
+.admin-login-page { min-height: 100vh; background: radial-gradient(ellipse at 15% 0%, var(--accent-soft), transparent 42%), var(--page); color: var(--text-primary); }
+
+@media (prefers-reduced-transparency: reduce) {
+  .site-header,.site-navigation,.theme-toggle,.admin-body .admin-sidebar,.admin-body .admin-topbar,
+  .admin-body .content-section,.admin-body .account-card,.admin-body .whatsapp-card {
+    backdrop-filter: none; -webkit-backdrop-filter: none;
+  }
+}
+@media (forced-colors: active) {
+  .theme-toggle,.site-nav-link[aria-current="page"] { border: 1px solid ButtonText; }
+  .tour-detail-page .product-main,.tour-detail-page .product-info,.tour-detail-page .detail-panel { border: 1px solid CanvasText; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+}

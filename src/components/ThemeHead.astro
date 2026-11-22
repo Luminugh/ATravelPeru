@@ -1,0 +1,11 @@
+<meta name="color-scheme" content="light dark" />
+<script is:inline>
+  try {
+    const savedTheme = localStorage.getItem("atravel-color-scheme");
+    if (savedTheme === "light" || savedTheme === "dark") {
+      document.querySelector('meta[name="color-scheme"]').content = savedTheme;
+    }
+  } catch {
+    // If storage is blocked, CSS still follows the system preference.
+  }
+</script>

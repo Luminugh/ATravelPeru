@@ -1,0 +1,13 @@
+---
+import AdminLayout from "../../layouts/AdminLayout.astro";
+import AdminDashboard from "../../components/admin/AdminDashboard.astro";
+import { siteIdentity } from "../../lib/site-config";
+
+export const prerender = true;
+
+const title = `Dashboard - ${siteIdentity.adminTitleDefault}`;
+---
+
+<AdminLayout title={title}>
+  <AdminDashboard />
+</AdminLayout>

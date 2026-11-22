@@ -1,0 +1,54 @@
+<button class="theme-toggle" type="button" data-theme-toggle aria-label="Cambiar tema" title="Cambiar tema">
+  <svg data-theme-icon="dark" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.8 14.2A8.8 8.8 0 0 1 9.8 3.2a8.9 8.9 0 1 0 11 11Z" /></svg>
+  <svg data-theme-icon="light" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3.8" /><path d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42" /></svg>
+  <span class="visually-hidden" data-theme-label>Activar tema oscuro</span>
+</button>
+<script>
+  const THEME_KEY = "atravel-color-scheme";
+  const colorSchemeMeta = document.querySelector<HTMLMetaElement>('meta[name="color-scheme"]');
+  const systemScheme = window.matchMedia("(prefers-color-scheme: dark)");
+  let sessionScheme: "light" | "dark" | null = null;
+
+  const readOverride = () => {
+    try {
+      const stored = localStorage.getItem(THEME_KEY);
+      return stored === "light" || stored === "dark" ? stored : sessionScheme;
+    } catch { return sessionScheme; }
+  };
+
+  const syncThemeControls = () => {
+    if (!colorSchemeMeta) return;
+    const saved = readOverride();
+    const current = saved ?? (systemScheme.matches ? "dark" : "light");
+    const target = current === "dark" ? "light" : "dark";
+    colorSchemeMeta.content = saved ?? "light dark";
+    document.querySelectorAll<HTMLButtonElement>("[data-theme-toggle]").forEach((button) => {
+      button.dataset.target = target;
+      button.setAttribute("aria-label", `Activar tema ${target === "dark" ? "oscuro" : "claro"}`);
+      button.title = `Activar tema ${target === "dark" ? "oscuro" : "claro"}`;
+      const label = button.querySelector<HTMLElement>("[data-theme-label]");
+      if (label) label.textContent = `Activar tema ${target === "dark" ? "oscuro" : "claro"}`;
+    });
+    document.querySelector<HTMLMetaElement>('meta[name="theme-color"]')?.setAttribute("content", current === "dark" ? "#071321" : "#f4f7fb");
+  };
+
+  document.querySelectorAll<HTMLButtonElement>("[data-theme-toggle]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const current = readOverride() ?? (systemScheme.matches ? "dark" : "light");
+      const next = current === "dark" ? "light" : "dark";
+      const followsSystem = next === (systemScheme.matches ? "dark" : "light");
+      sessionScheme = followsSystem ? null : next;
+      try {
+        if (followsSystem) localStorage.removeItem(THEME_KEY);
+        else localStorage.setItem(THEME_KEY, next);
+      } catch { /* The choice remains active for this page view. */ }
+      syncThemeControls();
+    });
+  });
+
+  systemScheme.addEventListener("change", () => { if (!readOverride()) syncThemeControls(); });
+  window.addEventListener("storage", (event) => {
+    if (event.key === THEME_KEY || event.key === null) { sessionScheme = null; syncThemeControls(); }
+  });
+  syncThemeControls();
+</script>

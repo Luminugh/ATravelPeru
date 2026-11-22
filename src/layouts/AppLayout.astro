@@ -1,6 +1,7 @@
 ---
 import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
+import ThemeHead from "../components/ThemeHead.astro";
 import "../styles/app.scss";
 import { siteIdentity, siteMetadata } from "../lib/site-config";
 
@@ -19,7 +20,8 @@ const currentPath = Astro.url.pathname;
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{title}</title>
     <meta name="description" content={siteMetadata.description} />
-    <meta name="theme-color" content="#16a34a" />
+    <meta name="theme-color" content="#f4f7fb" />
+    <ThemeHead />
 
     <meta property="og:type" content="website" />
     <meta property="og:title" content={title} />
@@ -38,16 +40,14 @@ const currentPath = Astro.url.pathname;
     <link rel="icon" type="image/png" href={siteMetadata.iconPath} />
     <link rel="apple-touch-icon" href={siteMetadata.iconPath} />
 
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@700;800;900&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.0/css/all.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.0/css/all.min.css" media="print" onload="this.media='all'" />
+    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.0/css/all.min.css" /></noscript>
   </head>
   <body>
     <Header currentPath={currentPath} />
 
     <slot />
 
-    <Footer />
+    <Footer currentPath={currentPath} />
   </body>
 </html>

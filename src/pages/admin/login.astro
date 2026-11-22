@@ -1,6 +1,10 @@
 ---
 export const prerender = true;
 import { siteIdentity } from "../../lib/site-config";
+import ThemeHead from "../../components/ThemeHead.astro";
+import ThemeToggle from "../../components/ThemeToggle.astro";
+import "../../styles/theme.scss";
+import "../../styles/pages/admin/login.scss";
 
 const title = `Login Admin - ${siteIdentity.brand}`;
 const next = "/admin";
@@ -12,235 +16,11 @@ const next = "/admin";
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{title}</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.0/css/all.min.css" />
-    <style>
-      :root {
-        color-scheme: light;
-      }
-      * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-      }
-      body {
-        font-family: "Outfit", sans-serif;
-        background: linear-gradient(135deg, #0f766e 0%, #16a34a 100%);
-        min-height: 100vh;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 20px;
-      }
-      .login-container {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        max-width: 1000px;
-        width: 100%;
-        gap: 0;
-        border-radius: 16px;
-        overflow: hidden;
-        box-shadow: 0 24px 80px rgba(15, 23, 42, 0.3);
-      }
-      .login-visual {
-        background: linear-gradient(135deg, #16a34a 0%, #22c55e 100%);
-        padding: 60px 40px;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        color: white;
-        text-align: center;
-      }
-      .login-visual-icon {
-        width: 72px;
-        height: 72px;
-        margin-bottom: 24px;
-        opacity: 0.95;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-      }
-      .login-visual-icon img {
-        width: auto;
-        height: 100%;
-        max-width: 72px;
-        object-fit: contain;
-      }
-      .login-brand img {
-        width: 24px;
-        height: 24px;
-      }
-      .login-visual h2 {
-        font-size: 32px;
-        font-weight: 700;
-        margin-bottom: 15px;
-      }
-      .login-visual p {
-        font-size: 16px;
-        opacity: 0.9;
-        line-height: 1.6;
-        margin-bottom: 40px;
-      }
-      .visual-secondary-text {
-        font-size: 14px;
-        color: rgba(255, 255, 255, 0.9);
-        margin-bottom: 12px;
-        font-weight: 600;
-      }
-      .visual-secondary-btn {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: 10px;
-        padding: 14px 22px;
-        border-radius: 999px;
-        border: 1px solid rgba(255, 255, 255, 0.18);
-        background: rgba(255, 255, 255, 0.12);
-        color: #ffffff;
-        font-weight: 700;
-        text-decoration: none;
-        box-shadow: 0 14px 30px rgba(0, 0, 0, 0.18);
-        transition: transform 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
-      }
-      .visual-secondary-btn:hover {
-        transform: translateY(-2px);
-        background: rgba(255, 255, 255, 0.18);
-        box-shadow: 0 18px 34px rgba(0, 0, 0, 0.22);
-      }
-      .login-form-container {
-        background: #ffffff;
-        padding: 50px 40px;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-      }
-      .login-brand {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        font-weight: 800;
-        color: #16a34a;
-        margin-bottom: 30px;
-        font-size: 18px;
-      }
-      .login-brand img {
-        width: 32px;
-        height: 32px;
-        object-fit: contain;
-      }
-      h1 {
-        margin: 0 0 10px;
-        font-size: 28px;
-        font-weight: 700;
-        color: #1a202c;
-      }
-      .subtitle {
-        margin: 0 0 30px;
-        font-size: 14px;
-        color: #718096;
-        line-height: 1.6;
-      }
-      .field {
-        display: grid;
-        gap: 8px;
-        margin-bottom: 20px;
-      }
-      label {
-        font-size: 13px;
-        font-weight: 600;
-        color: #2d3748;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-      }
-      input {
-        border: 1px solid #e2e8f0;
-        border-radius: 8px;
-        padding: 12px 14px;
-        font-size: 15px;
-        font-family: inherit;
-        transition: all 0.3s ease;
-      }
-      input:focus {
-        outline: none;
-        border-color: #16a34a;
-        box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.18);
-      }
-      .btn {
-        width: 100%;
-        border: 0;
-        border-radius: 8px;
-        padding: 12px 14px;
-        background: linear-gradient(135deg, #22c55e 0%, #15803d 100%);
-        color: #fff;
-        font-size: 15px;
-        font-weight: 700;
-        cursor: pointer;
-        margin-top: 10px;
-        transition: all 0.3s ease;
-      }
-      .btn:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 10px 24px rgba(16, 185, 129, 0.28);
-      }
-      .btn:disabled {
-        opacity: 0.6;
-        cursor: wait;
-      }
-      .login-secondary-action {
-        margin: 18px 0 0;
-        text-align: center;
-      }
-      .secondary-btn {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: 10px;
-        width: 100%;
-        padding: 14px 18px;
-        border-radius: 12px;
-        border: 0;
-        background: linear-gradient(135deg, #34d399 0%, #059669 100%);
-        color: #ffffff;
-        font-weight: 800;
-        text-decoration: none;
-        box-shadow: 0 16px 28px rgba(5, 150, 105, 0.2);
-        transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
-      }
-      .secondary-btn:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 20px 32px rgba(5, 150, 105, 0.24);
-        opacity: 0.98;
-      }
-      .error {
-        margin-top: 15px;
-        padding: 12px 14px;
-        border-radius: 8px;
-        background: #fee2e2;
-        color: #991b1b;
-        border: 1px solid #fecaca;
-        display: none;
-        font-size: 14px;
-      }
-      .error.show {
-        display: block;
-      }
-      @media (max-width: 768px) {
-        .login-container {
-          grid-template-columns: 1fr;
-        }
-        .login-visual {
-          padding: 40px 30px;
-        }
-        .login-form-container {
-          padding: 40px 30px;
-        }
-      }
-    </style>
+    <meta name="theme-color" content="#f4f7fb" />
+    <ThemeHead />
   </head>
-  <body>
+  <body class="admin-login-page">
+    <div class="login-theme-toggle"><ThemeToggle /></div>
     <div class="login-container">
       <div class="login-visual">
         <div class="login-visual-icon">
@@ -270,14 +50,13 @@ const next = "/admin";
           </div>
 
           <button class="btn" type="submit" id="loginBtn">
-            <i class="fas fa-sign-in-alt"></i> Entrar al panel
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 17l5-5-5-5m5 5H3m9-9h7a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-7" /></svg> Entrar al panel
           </button>
           <div id="errorBox" class="error"></div>
         </form>
       </div>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.0/js/all.min.js"></script>
     <script define:vars={{ next }}>
       const form = document.getElementById("adminLoginForm");
       const loginBtn = document.getElementById("loginBtn");

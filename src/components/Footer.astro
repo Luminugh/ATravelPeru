@@ -1,8 +1,14 @@
 ---
 import { footerConfig, siteIdentity } from "../lib/site-config";
+
+interface Props {
+  currentPath?: string;
+}
+
+const { currentPath = "" } = Astro.props;
 ---
 
-<footer class="footer-premium" style="background-image: linear-gradient(135deg, rgba(0, 0, 0, 0.70) 0%, rgba(15, 0, 30, 0.70) 100%), url('/assets/images/ImageFooter.jpg'); background-position: center; background-size: cover; background-repeat: no-repeat;">
+<footer class:list={["footer-premium", { "footer-premium--catalog": currentPath === "/tours" }]} style="background-image: linear-gradient(135deg, rgba(0, 0, 0, 0.70) 0%, rgba(15, 0, 30, 0.70) 100%), url('/assets/images/ImageFooter.jpg'); background-position: center; background-size: cover; background-repeat: no-repeat;">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="footer-minimal">
       <div class="footer-brand">

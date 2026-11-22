@@ -1,31 +1,37 @@
 export const prerender = false;
 ---
 import AppLayout from "../../layouts/AppLayout.astro";
-import { getTourById } from "../../lib/catalog";
+import { tourUseCases } from "../../infrastructure/composition";
 import { contactConfig } from "../../lib/site-config";
 import { GetWhatsAppConfigUseCase } from "../../application/use-cases/GetWhatsAppConfigUseCase";
 import { SupabaseAppConfigRepository } from "../../infrastructure/repositories/SupabaseAppConfigRepository";
 import { MessageService } from "../../domain/services/MessageService";
+import { optimizedImageUrl, responsiveImageSrcSet } from "../../lib/images";
 import { faWhatsapp } from "@fortawesome/free-brands-svg-icons";
 
 const whatsappPath = Array.isArray(faWhatsapp.icon[4]) ? faWhatsapp.icon[4].join(" ") : faWhatsapp.icon[4];
 const whatsappViewBox = `0 0 ${faWhatsapp.icon[0]} ${faWhatsapp.icon[1]}`;
 
 const id = Number(Astro.params.id);
-const tour = await getTourById(id);
+const tour = await tourUseCases.getById.execute(id);
 
 if (!tour) {
-  throw new Error("Tour no encontrado");
+  Astro.response.status = 404;
 }
 
-const gallery = Array.from(new Set([tour.imagen_principal, ...(tour.galeria ?? [])].filter(Boolean)));
-
+const gallery = tour ? Array.from(new Set([tour.imagen_principal, ...(tour.galeria ?? [])].filter(Boolean))) : [];
+const galleryItems = gallery.map((source, index) => ({
+  index,
+  thumbnail: optimizedImageUrl(source, 240, { quality: 58 }),
+  image: optimizedImageUrl(source, 1200, { quality: 74 }),
+  srcset: responsiveImageSrcSet(source, { quality: 72 }),
+}));
 const appConfigRepository = new SupabaseAppConfigRepository();
 const getWhatsAppConfigUseCase = new GetWhatsAppConfigUseCase(appConfigRepository);
-const { phone } = await getWhatsAppConfigUseCase.execute();
+const { phone } = tour ? await getWhatsAppConfigUseCase.execute() : { phone: null };
 const messageService = new MessageService();
 const phoneDigits = (phone ?? contactConfig.whatsappDigits ?? "").replace(/\D/g, "");
-const reservationMessage = `Hola, quiero reservar ${tour.titulo} en ${tour.ubicacion} (${tour.duracion}) por ${tour.precio}.`;
+const reservationMessage = tour ? `Hola, quiero reservar ${tour.titulo} en ${tour.ubicacion} (${tour.duracion}) por ${tour.precio}.` : "";
 const whatsappReady = messageService.isValidPhoneNumber(phoneDigits);
 const whatsappLink = whatsappReady
   ? messageService.generateWhatsAppLink(phoneDigits, reservationMessage)
@@ -33,12 +39,15 @@ const whatsappLink = whatsappReady
 
 ---
 
-<AppLayout title={tour.titulo}>
+<AppLayout title={tour?.titulo ?? "Tour no encontrado"}>
+  {tour ? (
   <main class="tour-detail-page">
     <div class="tour-top-spacer" aria-hidden="true"></div>
     <section class="tour-product">
       <header class="product-header">
-        <nav class="product-breadcrumb">Home / Tours / {tour.ubicacion} / {tour.titulo}</nav>
+        <nav class="product-breadcrumb" aria-label="Migas de pan">
+          <a href="/">Inicio</a><span aria-hidden="true">/</span><a href="/tours">Tours</a><span aria-hidden="true">/</span><span>{tour.ubicacion} / {tour.titulo}</span>
+        </nav>
         <div class="product-header-row">
           <div>
             <p class="product-kicker">Experiencia destacada</p>
@@ -55,20 +64,26 @@ const whatsappLink = whatsappReady
       <div class="product-grid">
         <aside class="product-thumbs" aria-label="Miniaturas del tour">
           <p class="thumbs-label">Fotos del tour</p>
-          {gallery.map((src, i) => (
-            <button class={`gallery-thumb ${i === 0 ? 'active' : ''}`} type="button" data-src={src} aria-label={`Ver imagen ${i + 1}`}>
-              <img src={src} alt={`Thumb ${i + 1}`} loading="lazy" />
+          {galleryItems.map(({ thumbnail, index }) => (
+            <button class={`gallery-thumb ${index === 0 ? 'active' : ''}`} type="button" data-gallery-index={index} aria-label={`Ver imagen ${index + 1}`} aria-pressed={index === 0}>
+              <img src={thumbnail} alt="" width="120" height="80" loading={index === 0 ? "eager" : "lazy"} decoding="async" />
             </button>
           ))}
         </aside>
 
         <section class="product-main">
           <div class="main-image-frame">
+            {galleryItems.length > 1 && (
+              <div class="gallery-controls" aria-label="Controles de galería">
+                <button type="button" data-gallery-prev aria-label="Imagen anterior">←</button>
+                <button type="button" data-gallery-next aria-label="Imagen siguiente">→</button>
+              </div>
+            )}
             <div class="gallery-carousel" id="tourGalleryCarousel" tabindex="0" aria-label="Galería principal del tour">
               <div class="gallery-carousel-track">
-                {gallery.map((src, index) => (
+                {galleryItems.map(({ image, srcset, index }) => (
                   <figure class="gallery-slide" data-slide-index={index}>
-                    <img class="gallery-main" src={src} alt={`${tour.titulo} - imagen ${index + 1}`} loading={index === 0 ? 'eager' : 'lazy'} />
+                    <img class="gallery-main" src={image} srcset={srcset} sizes="(max-width: 1024px) calc(100vw - 32px), (max-width: 1380px) calc(100vw - 520px), 820px" alt={`${tour.titulo}, imagen ${index + 1}`} width="1200" height="750" loading={index === 0 ? "eager" : "lazy"} fetchpriority={index === 0 ? "high" : undefined} decoding="async" />
                   </figure>
                 ))}
               </div>
@@ -152,124 +167,56 @@ const whatsappLink = whatsappReady
         </section>
     </section>
 
-    <script type="text/javascript">
-      // Galería: cambiar imagen principal al clicar en miniatura
-      (function(){
-        if (typeof document === 'undefined') return;
-        const carousel = document.getElementById('tourGalleryCarousel');
-        const slides = carousel ? Array.from(carousel.querySelectorAll('.gallery-slide')) : [];
-        const thumbs = Array.from(document.querySelectorAll('.gallery-thumb'));
-        let autoScrollTimer = null;
-        let autoScrollResumeTimer = null;
-        let autoScrollEnabled = window.matchMedia('(max-width: 768px)').matches;
+    <script>
+  const gallery = document.querySelector<HTMLElement>("#tourGalleryCarousel");
+  const slides = Array.from(document.querySelectorAll<HTMLElement>(".gallery-slide"));
+  const thumbnails = Array.from(document.querySelectorAll<HTMLButtonElement>(".gallery-thumb"));
+  let activeIndex = 0;
 
-        const getSlideWidth = () => {
-          if (!carousel || slides.length === 0) return 0;
-          return slides[0].getBoundingClientRect().width || carousel.getBoundingClientRect().width || 0;
-        };
+  const setActive = (index: number) => {
+    activeIndex = Math.max(0, Math.min(slides.length - 1, index));
+    thumbnails.forEach((button, buttonIndex) => {
+      const active = buttonIndex === activeIndex;
+      button.classList.toggle("active", active);
+      button.setAttribute("aria-pressed", String(active));
+    });
+  };
+  const showSlide = (index: number, behavior: ScrollBehavior = "smooth") => {
+    const target = slides[index];
+    if (!gallery || !target) return;
+    setActive(index);
+    gallery.scrollTo({ left: target.offsetLeft, behavior });
+  };
 
-        const setActiveThumb = (src) => {
-          thumbs.forEach((t) => t.classList.toggle('active', t.getAttribute('data-src') === src));
-        };
+  thumbnails.forEach((button) => button.addEventListener("click", () => {
+    const index = Number(button.dataset.galleryIndex);
+    if (Number.isInteger(index)) showSlide(index);
+  }));
+  document.querySelector("[data-gallery-prev]")?.addEventListener("click", () => showSlide((activeIndex - 1 + slides.length) % slides.length));
+  document.querySelector("[data-gallery-next]")?.addEventListener("click", () => showSlide((activeIndex + 1) % slides.length));
+  gallery?.addEventListener("keydown", (event) => {
+    if (event.key === "ArrowLeft") { event.preventDefault(); showSlide((activeIndex - 1 + slides.length) % slides.length); }
+    if (event.key === "ArrowRight") { event.preventDefault(); showSlide((activeIndex + 1) % slides.length); }
+  });
 
-        const scrollToSlide = (index, behavior = 'smooth') => {
-          if (!carousel || !slides[index]) return;
-          carousel.scrollTo({ left: slides[index].offsetLeft, behavior });
-          const img = slides[index].querySelector('img');
-          if (img) setActiveThumb(img.getAttribute('src') || '');
-        };
-
-        const getCurrentIndex = () => {
-          if (!carousel || slides.length === 0) return 0;
-          const center = carousel.scrollLeft + carousel.clientWidth / 2;
-          let bestIndex = 0;
-          let bestDistance = Infinity;
-          slides.forEach((slide, index) => {
-            const slideCenter = slide.offsetLeft + slide.clientWidth / 2;
-            const distance = Math.abs(center - slideCenter);
-            if (distance < bestDistance) {
-              bestDistance = distance;
-              bestIndex = index;
-            }
-          });
-          return bestIndex;
-        };
-
-        const stopAutoScroll = () => {
-          if (autoScrollTimer) {
-            window.clearInterval(autoScrollTimer);
-            autoScrollTimer = null;
-          }
-          if (autoScrollResumeTimer) {
-            window.clearTimeout(autoScrollResumeTimer);
-            autoScrollResumeTimer = null;
-          }
-        };
-
-        const queueAutoScrollRestart = () => {
-          if (!autoScrollEnabled) return;
-          if (autoScrollResumeTimer) window.clearTimeout(autoScrollResumeTimer);
-          autoScrollResumeTimer = window.setTimeout(() => {
-            autoScrollResumeTimer = null;
-            startAutoScroll();
-          }, 1800);
-        };
-
-        const startAutoScroll = () => {
-          stopAutoScroll();
-          if (!autoScrollEnabled || !carousel || slides.length < 2) return;
-          autoScrollTimer = window.setInterval(() => {
-            if (!carousel) return;
-            const currentIndex = getCurrentIndex();
-            const nextIndex = currentIndex + 1 < slides.length ? currentIndex + 1 : 0;
-            scrollToSlide(nextIndex);
-          }, 3200);
-        };
-
-        const refreshAutoScrollState = () => {
-          autoScrollEnabled = window.matchMedia('(max-width: 768px)').matches;
-          if (autoScrollEnabled) startAutoScroll();
-          else stopAutoScroll();
-        };
-
-        if (carousel && slides.length > 0) {
-          const firstImg = slides[0].querySelector('img');
-          if (firstImg) setActiveThumb(firstImg.getAttribute('src') || '');
-
-          carousel.addEventListener('scroll', () => {
-            if (!carousel) return;
-            const index = getCurrentIndex();
-            const slide = slides[index];
-            if (!slide) return;
-            const img = slide.querySelector('img');
-            if (img) setActiveThumb(img.getAttribute('src') || '');
-            if (autoScrollEnabled) queueAutoScrollRestart();
-          }, { passive: true });
-
-          carousel.addEventListener('touchstart', stopAutoScroll, { passive: true });
-          carousel.addEventListener('touchend', queueAutoScrollRestart, { passive: true });
-          carousel.addEventListener('mouseenter', stopAutoScroll);
-          carousel.addEventListener('mouseleave', startAutoScroll);
-          window.addEventListener('resize', refreshAutoScrollState);
-          refreshAutoScrollState();
-        }
-
-        document.addEventListener('click', function (e) {
-          const thumb = e.target.closest('.gallery-thumb');
-          if (!thumb) return;
-          const src = thumb.getAttribute('data-src');
-          if (!src) return;
-          const index = slides.findIndex((slide) => {
-            const img = slide.querySelector('img');
-            return img && img.getAttribute('src') === src;
-          });
-          if (index >= 0) {
-            scrollToSlide(index);
-            setActiveThumb(src);
-          }
-        });
-      })();
-    </script>
+  if (gallery && slides.length > 1 && "IntersectionObserver" in window) {
+    const observer = new IntersectionObserver((entries) => {
+      const visible = entries.filter((entry) => entry.isIntersecting).sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+      if (visible) setActive(Number((visible.target as HTMLElement).dataset.slideIndex));
+    }, { root: gallery, threshold: [0.6] });
+    slides.forEach((slide) => observer.observe(slide));
+  }
+</script>
   </main>
+  ) : (
+    <main class="tour-detail-page">
+      <div class="tour-top-spacer" aria-hidden="true"></div>
+      <section class="tour-product">
+        <h1>Tour no encontrado</h1>
+        <p>El tour solicitado no está disponible.</p>
+        <a href="/tours">Volver al catálogo</a>
+      </section>
+    </main>
+  )}
 </AppLayout>
 

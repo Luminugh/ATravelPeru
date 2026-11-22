@@ -1,5 +1,7 @@
 ---
 import "../styles/pages/admin/index.scss";
+import ThemeHead from "../components/ThemeHead.astro";
+import ThemeToggle from "../components/ThemeToggle.astro";
 import { adminSessionConfig, siteIdentity } from "../lib/site-config";
 
 interface Props {
@@ -14,6 +16,7 @@ const navClass = (...paths: string[]) => (paths.includes(currentPath) ? "nav-ite
 // Función para obtener el título de la página basado en la ruta
 function getPageTitle(path: string): string {
   if (path === "/admin" || path === "/admin/") return "Dashboard";
+  if (path === "/admin/dashboard") return "Dashboard";
   if (path === "/admin/tours") return "Tours AT";
   if (path === "/admin/media") return "Multimedia";
   if (path === "/admin/whatsapp-config") return "WhatsApp";
@@ -23,7 +26,7 @@ function getPageTitle(path: string): string {
 
 const currentPageTitle = getPageTitle(currentPath);
 const defaultProfileName = adminSessionConfig.defaultDisplayName;
-const defaultAvatarSrc = `https://ui-avatars.com/api/?name=${encodeURIComponent(defaultProfileName)}&background=${adminSessionConfig.avatarBackground}&color=${adminSessionConfig.avatarColor}`;
+const defaultAvatarSrc = "data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 80 80%27%3E%3Crect width=%2780%27 height=%2780%27 rx=%2740%27 fill=%27%2313283b%27/%3E%3Ccircle cx=%2740%27 cy=%2730%27 r=%2714%27 fill=%27%2383f0df%27/%3E%3Cpath d=%27M14 75c3-17 13-25 26-25s23 8 26 25%27 fill=%27%23c2a5ff%27/%3E%3C/svg%3E";
 ---
 
 <!doctype html>
@@ -32,11 +35,11 @@ const defaultAvatarSrc = `https://ui-avatars.com/api/?name=${encodeURIComponent(
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{title}</title>
+    <meta name="theme-color" content="#f4f7fb" />
+    <ThemeHead />
 
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.0/css/all.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.0/css/all.min.css" media="print" onload="this.media='all'" />
+    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.0/css/all.min.css" /></noscript>
   </head>
   <body class="admin-body">
     <!-- Loading screen para verificación de autenticación -->
@@ -50,7 +53,7 @@ const defaultAvatarSrc = `https://ui-avatars.com/api/?name=${encodeURIComponent(
     <div class="admin-container" id="adminContainer" style="display: none;">
       <div class="admin-backdrop" id="adminBackdrop"></div>
       <!-- Sidebar -->
-      <aside class="admin-sidebar">
+      <aside class="admin-sidebar" id="adminSidebar">
         <div class="sidebar-header">
           <h1 class="sidebar-logo">
             <img src="/assets/images/icon.png" alt={siteIdentity.adminBrand} class="sidebar-logo-icon" /> {siteIdentity.adminBrand}
@@ -60,7 +63,7 @@ const defaultAvatarSrc = `https://ui-avatars.com/api/?name=${encodeURIComponent(
         <nav class="sidebar-nav">
           <div class="nav-section">
             <span class="nav-section-title">Panel</span>
-            <a href="/admin" class={navClass("/admin", "/admin/")}>
+            <a href="/admin/dashboard" class={navClass("/admin", "/admin/", "/admin/dashboard")} aria-current={navClass("/admin", "/admin/", "/admin/dashboard").includes("active") ? "page" : undefined}>
               <i class="fas fa-chart-line"></i>
               <span>Dashboard</span>
             </a>
@@ -68,19 +71,19 @@ const defaultAvatarSrc = `https://ui-avatars.com/api/?name=${encodeURIComponent(
 
           <div class="nav-section">
             <span class="nav-section-title">Gestión de Contenido</span>
-            <a href="/admin/tours" class={navClass("/admin/tours")}>
+            <a href="/admin/tours" class={navClass("/admin/tours")} aria-current={currentPath === "/admin/tours" ? "page" : undefined}>
               <i class="fas fa-map"></i>
               <span>Tours AT</span>
             </a>
-            <a href="/admin/media" class={navClass("/admin/media")}>
+            <a href="/admin/media" class={navClass("/admin/media")} aria-current={currentPath === "/admin/media" ? "page" : undefined}>
               <i class="fas fa-photo-video"></i>
               <span>Multimedia</span>
             </a>
-            <a href="/admin/whatsapp-config" class={navClass("/admin/whatsapp-config")}>
+            <a href="/admin/whatsapp-config" class={navClass("/admin/whatsapp-config")} aria-current={currentPath === "/admin/whatsapp-config" ? "page" : undefined}>
               <i class="fab fa-whatsapp"></i>
               <span>WhatsApp</span>
             </a>
-            <a href="/admin/account" class={navClass("/admin/account")}>
+            <a href="/admin/account" class={navClass("/admin/account")} aria-current={currentPath === "/admin/account" ? "page" : undefined}>
               <i class="fas fa-user-shield"></i>
               <span>Mi Cuenta</span>
             </a>
@@ -104,12 +107,13 @@ const defaultAvatarSrc = `https://ui-avatars.com/api/?name=${encodeURIComponent(
         <!-- Top Bar -->
         <div class="admin-topbar">
           <div class="topbar-left">
-            <button class="sidebar-toggle" id="sidebarToggle">
+            <button class="sidebar-toggle" id="sidebarToggle" type="button" aria-label="Alternar menú lateral" aria-controls="adminSidebar" aria-expanded="false">
               <i class="fas fa-bars"></i>
             </button>
             <h2 class="page-title" id="pageTitle">{currentPageTitle}</h2>
           </div>
           <div class="topbar-right">
+            <ThemeToggle />
             <button class="admin-profile" id="adminAccountButton" type="button" title="Ver cuenta">
               <img src={defaultAvatarSrc} alt="Admin" class="profile-avatar" id="adminAvatar" />
               <div class="profile-info">
@@ -155,7 +159,7 @@ const defaultAvatarSrc = `https://ui-avatars.com/api/?name=${encodeURIComponent(
           if (!payload?.ok || !payload?.user) {
             // No autenticado - redirigir a login
             window.location.href = '/admin/login';
-            return false;
+            return null;
           }
 
           // Autenticado - mostrar contenido
@@ -166,17 +170,21 @@ const defaultAvatarSrc = `https://ui-avatars.com/api/?name=${encodeURIComponent(
             adminContainer.style.display = 'block';
           }
 
-          return true;
+          return payload;
         } catch (error) {
           console.error('Error verificando autenticación:', error);
           window.location.href = '/admin/login';
-          return false;
+          return null;
         }
       }
 
       // Ejecutar verificación inmediatamente
-      verifyAuthentication().then((isAuthenticated) => {
-        if (!isAuthenticated) return;
+      verifyAuthentication().then((session) => {
+        if (!session) return;
+
+        const adminProfileName = document.getElementById('adminProfileName');
+        const displayName = session.vendedor?.nombre?.trim() || session.user.nombre || session.user.email || defaultProfileName;
+        if (adminProfileName) adminProfileName.textContent = displayName;
 
         // Solo ejecutar el resto del código si está autenticado
         
@@ -189,12 +197,14 @@ const defaultAvatarSrc = `https://ui-avatars.com/api/?name=${encodeURIComponent(
           adminContainer.classList.remove('sidebar-active');
           adminContainer.classList.remove('sidebar-collapsed');
           document.body.classList.remove('admin-drawer-open');
+          sidebarToggle?.setAttribute('aria-expanded', 'false');
         }
 
         function openSidebar() {
           if (!adminContainer) return;
           adminContainer.classList.add('sidebar-active');
           document.body.classList.add('admin-drawer-open');
+          sidebarToggle?.setAttribute('aria-expanded', 'true');
         }
 
         function toggleSidebar() {
@@ -209,6 +219,7 @@ const defaultAvatarSrc = `https://ui-avatars.com/api/?name=${encodeURIComponent(
           }
 
           adminContainer.classList.toggle('sidebar-collapsed');
+          sidebarToggle?.setAttribute('aria-expanded', String(!adminContainer.classList.contains('sidebar-collapsed')));
         }
 
         const SIDEBAR_STATE_KEY = 'adminSidebarCollapsed';
@@ -216,7 +227,8 @@ const defaultAvatarSrc = `https://ui-avatars.com/api/?name=${encodeURIComponent(
         function restoreSidebarState() {
           if (!adminContainer) return;
 
-          const savedState = localStorage.getItem(SIDEBAR_STATE_KEY);
+          let savedState = null;
+          try { savedState = localStorage.getItem(SIDEBAR_STATE_KEY); } catch { /* Storage may be disabled. */ }
           if (savedState === 'true' && !isMobile()) {
             adminContainer.classList.add('sidebar-collapsed');
             document.body.classList.remove('admin-drawer-open');
@@ -225,7 +237,7 @@ const defaultAvatarSrc = `https://ui-avatars.com/api/?name=${encodeURIComponent(
 
         function saveSidebarState() {
           if (!adminContainer) return;
-          localStorage.setItem(SIDEBAR_STATE_KEY, adminContainer.classList.contains('sidebar-collapsed').toString());
+          try { localStorage.setItem(SIDEBAR_STATE_KEY, adminContainer.classList.contains('sidebar-collapsed').toString()); } catch { /* Sidebar still works for this visit. */ }
         }
 
         if (sidebarToggle && adminContainer) {
@@ -244,50 +256,14 @@ const defaultAvatarSrc = `https://ui-avatars.com/api/?name=${encodeURIComponent(
         // Navigation items click handlers
         const navItems = document.querySelectorAll('a.nav-item');
         navItems.forEach(item => {
-          item.addEventListener('click', (e) => {
-            // Remove active class from all items
-            navItems.forEach(i => i.classList.remove('active'));
-            // Add active class to clicked item
-            item.classList.add('active');
-
+          item.addEventListener('click', () => {
             if (isMobile()) {
               closeSidebar();
             }
 
             saveSidebarState();
-            
-            // Update page title
-            const title = item.textContent.trim();
-            const pageTitle = document.getElementById('pageTitle');
-            if (pageTitle) {
-              pageTitle.textContent = title;
-            }
           });
         });
-
-        // Session info for top-right profile button
-        const adminProfileName = document.getElementById('adminProfileName');
-        const adminAvatar = document.getElementById('adminAvatar');
-        
-        fetch('/api/admin/auth/me')
-          .then((res) => res.json())
-          .then((payload) => {
-            if (!payload?.ok || !payload?.user) {
-              window.location.href = '/admin/login';
-              return;
-            }
-
-            const displayName = payload.vendedor?.nombre?.trim() || payload.user.nombre || payload.user.email || defaultProfileName;
-            if (adminProfileName) {
-              adminProfileName.textContent = displayName;
-            }
-            if (adminAvatar instanceof HTMLImageElement) {
-              adminAvatar.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=${adminSessionConfig.avatarBackground}&color=${adminSessionConfig.avatarColor}`;
-            }
-          })
-          .catch(() => {
-            window.location.href = '/admin/login';
-          });
 
         if (adminAccountButton) {
           adminAccountButton.addEventListener('click', () => {
@@ -357,7 +333,7 @@ const defaultAvatarSrc = `https://ui-avatars.com/api/?name=${encodeURIComponent(
         left: 0;
         width: 100%;
         height: 100%;
-        background: linear-gradient(135deg, #16a34a 0%, #22c55e 100%);
+        background: linear-gradient(135deg, #071321 0%, #13283b 100%);
         display: flex;
         align-items: center;
         justify-content: center;
