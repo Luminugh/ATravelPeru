@@ -62,7 +62,7 @@ const whatsappLink = whatsappReady
       </header>
 
       <div class="product-grid">
-        <aside class="product-thumbs" aria-label="Miniaturas del tour">
+        <aside class="product-thumbs" aria-label="Miniaturas del tour" tabindex="0">
           <p class="thumbs-label">Fotos del tour</p>
           {galleryItems.map(({ thumbnail, index }) => (
             <button class={`gallery-thumb ${index === 0 ? 'active' : ''}`} type="button" data-gallery-index={index} aria-label={`Ver imagen ${index + 1}`} aria-pressed={index === 0}>
@@ -74,20 +74,25 @@ const whatsappLink = whatsappReady
         <section class="product-main">
           <div class="main-image-frame">
             {galleryItems.length > 1 && (
-              <div class="gallery-controls" aria-label="Controles de galería">
-                <button type="button" data-gallery-prev aria-label="Imagen anterior">←</button>
-                <button type="button" data-gallery-next aria-label="Imagen siguiente">→</button>
+              <div class="gallery-controls" role="group" aria-label="Controles de galería">
+                <button type="button" data-gallery-prev aria-label="Imagen anterior">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6" /></svg>
+                </button>
+                <button type="button" data-gallery-next aria-label="Imagen siguiente">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6" /></svg>
+                </button>
               </div>
             )}
-            <div class="gallery-carousel" id="tourGalleryCarousel" tabindex="0" aria-label="Galería principal del tour">
+            <div class="gallery-carousel" id="tourGalleryCarousel" tabindex="0" role="region" aria-roledescription="carrusel" aria-label="Fotos del tour">
               <div class="gallery-carousel-track">
                 {galleryItems.map(({ image, srcset, index }) => (
-                  <figure class="gallery-slide" data-slide-index={index}>
-                    <img class="gallery-main" src={image} srcset={srcset} sizes="(max-width: 1024px) calc(100vw - 32px), (max-width: 1380px) calc(100vw - 520px), 820px" alt={`${tour.titulo}, imagen ${index + 1}`} width="1200" height="750" loading={index === 0 ? "eager" : "lazy"} fetchpriority={index === 0 ? "high" : undefined} decoding="async" />
+                  <figure class="gallery-slide" data-slide-index={index} role="group" aria-roledescription="diapositiva" aria-label={`Imagen ${index + 1} de ${galleryItems.length}`}>
+                    <img class="gallery-main" src={image} srcset={srcset} sizes="(max-width: 1024px) calc(100vw - 32px), (max-width: 1380px) calc(100vw - 520px), 820px" alt={`${tour.titulo}, imagen ${index + 1}`} width="1200" height="750" loading={index === 0 ? "eager" : "lazy"} fetchpriority={index === 0 ? "high" : galleryItems.length > 1 ? "low" : undefined} decoding="async" />
                   </figure>
                 ))}
               </div>
             </div>
+            <p class="visually-hidden" data-gallery-status role="status" aria-live="polite" aria-atomic="true"></p>
             <div class="main-badges">
               <span class="badge badge-estado" data-estado={tour.estado}>{tour.estado}</span>
             </div>
@@ -95,6 +100,7 @@ const whatsappLink = whatsappReady
           <div class="main-meta">
             <span class="meta-chip">Duracion: {tour.duracion}</span>
             <span class="meta-chip">Ubicacion: {tour.ubicacion}</span>
+            {galleryItems.length > 1 && <span class="gallery-counter" aria-hidden="true"><span data-gallery-current>01</span> / {String(galleryItems.length).padStart(2, "0")}</span>}
           </div>
         </section>
 
@@ -130,38 +136,42 @@ const whatsappLink = whatsappReady
           </div>
 
           <div class="details-grid">
-            <article class="detail-panel detail-panel-primary">
-              <div class="detail-panel-head">
-                <span class="detail-panel-kicker">Descripción</span>
-                <h3>La experiencia</h3>
-              </div>
+            <details class="detail-panel detail-panel-primary" open>
+              <summary class="detail-panel-head">
+                <span class="detail-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3 14.8 9.2 21 12l-6.2 2.8L12 21l-2.8-6.2L3 12l6.2-2.8L12 3Z"/><circle cx="12" cy="12" r="2.1"/></svg></span>
+                <span class="detail-panel-heading"><span class="detail-panel-kicker">Descripción</span><span class="detail-panel-title">La experiencia</span></span>
+                <svg class="detail-disclosure" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+              </summary>
               <p>{tour.descripcion || 'Descripcion no disponible.'}</p>
-            </article>
+            </details>
 
-            <article class="detail-panel detail-panel-contrast detail-panel-includes">
-              <div class="detail-panel-head">
-                <span class="detail-panel-kicker">Incluye</span>
-                <h3>Servicios incluidos</h3>
-              </div>
+            <details class="detail-panel detail-panel-contrast detail-panel-includes" open>
+              <summary class="detail-panel-head">
+                <span class="detail-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m5 12.5 4.5 4L19 7"/><path d="M20 12a8 8 0 1 1-2.35-5.65"/></svg></span>
+                <span class="detail-panel-heading"><span class="detail-panel-kicker">Incluye</span><span class="detail-panel-title">Servicios incluidos</span></span>
+                <svg class="detail-disclosure" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+              </summary>
               <p>{tour.incluye || 'No especificado.'}</p>
-            </article>
+            </details>
 
-            <article class="detail-panel detail-panel-contrast detail-panel-excludes">
-              <div class="detail-panel-head">
-                <span class="detail-panel-kicker">No incluye</span>
-                <h3>Lo que debes considerar</h3>
-              </div>
+            <details class="detail-panel detail-panel-contrast detail-panel-excludes" open>
+              <summary class="detail-panel-head">
+                <span class="detail-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="m9 9 6 6m0-6-6 6"/></svg></span>
+                <span class="detail-panel-heading"><span class="detail-panel-kicker">No incluye</span><span class="detail-panel-title">Lo que debes considerar</span></span>
+                <svg class="detail-disclosure" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+              </summary>
               <p>{tour.no_incluye || 'Consulta antes de reservar.'}</p>
-            </article>
+            </details>
 
             {tour.itinerario && (
-              <article id="itinerario" class="detail-panel detail-panel-wide detail-panel-timeline">
-                <div class="detail-panel-head">
-                  <span class="detail-panel-kicker">Itinerario</span>
-                  <h3>Recorrido paso a paso</h3>
-                </div>
+              <details id="itinerario" class="detail-panel detail-panel-wide detail-panel-timeline" open>
+                <summary class="detail-panel-head">
+                  <span class="detail-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 7v5l3.5 2"/></svg></span>
+                  <span class="detail-panel-heading"><span class="detail-panel-kicker">Itinerario</span><span class="detail-panel-title">Recorrido paso a paso</span></span>
+                  <svg class="detail-disclosure" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+                </summary>
                 <p>{tour.itinerario}</p>
-              </article>
+              </details>
             )}
           </div>
         </section>
@@ -171,22 +181,56 @@ const whatsappLink = whatsappReady
   const gallery = document.querySelector<HTMLElement>("#tourGalleryCarousel");
   const slides = Array.from(document.querySelectorAll<HTMLElement>(".gallery-slide"));
   const thumbnails = Array.from(document.querySelectorAll<HTMLButtonElement>(".gallery-thumb"));
+  const thumbnailRail = document.querySelector<HTMLElement>(".product-thumbs");
+  const galleryStatus = document.querySelector<HTMLElement>("[data-gallery-status]");
+  const galleryCurrentCount = document.querySelector<HTMLElement>("[data-gallery-current]");
+  const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
   let activeIndex = 0;
+  let lastAnnouncedIndex = 0;
+  let statusTimer: number | undefined;
 
-  const setActive = (index: number) => {
-    activeIndex = Math.max(0, Math.min(slides.length - 1, index));
+  const setActive = (index: number, keepThumbnailVisible = false) => {
+    const nextIndex = Math.max(0, Math.min(slides.length - 1, index));
+    if (nextIndex === activeIndex) return;
+    activeIndex = nextIndex;
+    if (galleryCurrentCount) galleryCurrentCount.textContent = String(activeIndex + 1).padStart(2, "0");
     thumbnails.forEach((button, buttonIndex) => {
       const active = buttonIndex === activeIndex;
       button.classList.toggle("active", active);
       button.setAttribute("aria-pressed", String(active));
     });
+
+    if (keepThumbnailVisible && thumbnailRail && thumbnails[activeIndex]) {
+      const railBounds = thumbnailRail.getBoundingClientRect();
+      const thumbnailBounds = thumbnails[activeIndex].getBoundingClientRect();
+      if (thumbnailBounds.top < railBounds.top) {
+        thumbnailRail.scrollBy({ top: thumbnailBounds.top - railBounds.top - 8, behavior: prefersReducedMotion.matches ? "auto" : "smooth" });
+      } else if (thumbnailBounds.bottom > railBounds.bottom) {
+        thumbnailRail.scrollBy({ top: thumbnailBounds.bottom - railBounds.bottom + 8, behavior: prefersReducedMotion.matches ? "auto" : "smooth" });
+      }
+    }
   };
-  const showSlide = (index: number, behavior: ScrollBehavior = "smooth") => {
+  const showSlide = (index: number) => {
     const target = slides[index];
     if (!gallery || !target) return;
-    setActive(index);
-    gallery.scrollTo({ left: target.offsetLeft, behavior });
+    setActive(index, true);
+    gallery.scrollTo({ left: target.offsetLeft, behavior: prefersReducedMotion.matches ? "auto" : "smooth" });
   };
+
+  const announceSettledSlide = () => {
+    if (!galleryStatus || activeIndex === lastAnnouncedIndex) return;
+    galleryStatus.textContent = `Imagen ${activeIndex + 1} de ${slides.length}`;
+    lastAnnouncedIndex = activeIndex;
+  };
+
+  if (gallery && "onscrollend" in gallery) {
+    gallery.addEventListener("scrollend", announceSettledSlide);
+  } else {
+    gallery?.addEventListener("scroll", () => {
+      window.clearTimeout(statusTimer);
+      statusTimer = window.setTimeout(announceSettledSlide, 180);
+    }, { passive: true });
+  }
 
   thumbnails.forEach((button) => button.addEventListener("click", () => {
     const index = Number(button.dataset.galleryIndex);
@@ -202,7 +246,7 @@ const whatsappLink = whatsappReady
   if (gallery && slides.length > 1 && "IntersectionObserver" in window) {
     const observer = new IntersectionObserver((entries) => {
       const visible = entries.filter((entry) => entry.isIntersecting).sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
-      if (visible) setActive(Number((visible.target as HTMLElement).dataset.slideIndex));
+      if (visible) setActive(Number((visible.target as HTMLElement).dataset.slideIndex), true);
     }, { root: gallery, threshold: [0.6] });
     slides.forEach((slide) => observer.observe(slide));
   }

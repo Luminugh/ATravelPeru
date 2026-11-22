@@ -845,6 +845,14 @@
 	position: sticky;
 	top: 182px;
 	align-self: start;
+	max-block-size: min(620px, calc(100dvh - 140px));
+	min-block-size: 0;
+	overflow-x: hidden;
+	overflow-y: auto;
+  overscroll-behavior-y: auto;
+	scroll-snap-type: y proximity;
+	scrollbar-width: thin;
+	scrollbar-gutter: stable;
 	padding-top: 4px;
 }
 
@@ -857,6 +865,7 @@
 }
 
 .product-thumbs .gallery-thumb {
+	flex: 0 0 auto;
 	border: 1px solid #e2e8f0;
 	background: #fff;
 	border-radius: 10px;
@@ -864,6 +873,7 @@
 	cursor: pointer;
 	transition: transform 0.2s ease, border-color 0.2s ease;
 	box-shadow: 0 8px 18px rgba(15, 23, 42, 0.05);
+	scroll-snap-align: start;
 }
 
 .product-thumbs .gallery-thumb img {
@@ -894,6 +904,41 @@
 	overflow: hidden;
 	background: #f8fafc;
 }
+
+.gallery-controls {
+	position: absolute;
+	inset: 0;
+	z-index: 3;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 0 12px;
+	pointer-events: none;
+}
+
+.gallery-controls button {
+	display: grid;
+	width: 44px;
+	height: 44px;
+	place-items: center;
+	padding: 0;
+	border: 1px solid rgba(255,255,255,.58);
+	border-radius: 50%;
+	color: #f7fbff;
+	background: rgba(7,19,33,.7);
+	box-shadow: 0 4px 16px rgba(0,0,0,.2);
+	backdrop-filter: blur(12px);
+	cursor: pointer;
+	pointer-events: auto;
+	touch-action: manipulation;
+	transition: background-color .18s ease, border-color .18s ease, transform .18s ease;
+}
+
+.gallery-controls button svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.gallery-controls button:hover { transform: scale(1.06); background: rgba(7,19,33,.88); border-color: #fff; }
+.gallery-controls button:focus-visible { outline: 3px solid #a7f5e8; outline-offset: 3px; }
+
+.gallery-counter { margin-left: auto; font-variant-numeric: tabular-nums; letter-spacing: .08em; }
 
 .gallery-carousel {
 	width: 100%;
@@ -1155,7 +1200,40 @@
 }
 
 .detail-panel-head {
+	display: flex;
+	align-items: center;
+	gap: 12px;
 	margin-bottom: 10px;
+	list-style: none;
+	cursor: pointer;
+}
+
+.detail-panel-head::-webkit-details-marker { display: none; }
+.detail-panel-head:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; border-radius: 8px; }
+
+.detail-icon {
+	display: grid;
+	width: 42px;
+	height: 42px;
+	flex: 0 0 auto;
+	place-items: center;
+	border: 1px solid var(--border-color);
+	border-radius: 13px;
+	color: var(--accent-strong);
+	background: var(--accent-soft);
+}
+
+.detail-icon svg,.detail-disclosure { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.detail-panel-heading { display: grid; min-width: 0; gap: 3px; }
+.detail-panel-title { color: var(--text-primary); font-size: 1.08rem; font-weight: 700; line-height: 1.25; }
+.detail-disclosure { width: 18px; height: 18px; flex: 0 0 auto; margin-left: auto; color: var(--text-muted); transition: transform .18s ease; }
+.detail-panel:not([open]) .detail-disclosure { transform: rotate(-90deg); }
+.detail-panel[open] > p { margin-top: 12px; }
+.detail-panel:not([open]) { min-height: 0; }
+
+@media (hover: hover) and (pointer: fine) {
+	.detail-panel { transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease; }
+	.detail-panel:hover { transform: translateY(-2px); border-color: color-mix(in srgb, var(--accent) 44%, var(--border-color)); }
 }
 
 .detail-panel-kicker {
@@ -1260,6 +1338,46 @@
 	}
 	.detail-panel h3 { font-size: 1rem; }
 	.detail-panel p { font-size: 0.92rem; }
+}
+
+@media (max-width: 1100px) {
+	.product-grid { grid-template-columns: 88px minmax(0, 1fr); gap: 16px; }
+	.product-info { position: static; grid-column: 2; }
+	.product-thumbs { top: 96px; max-block-size: min(620px, calc(100dvh - 120px)); }
+}
+
+@media (max-width: 768px) {
+	.product-grid { grid-template-columns: minmax(0, 1fr); }
+	.product-thumbs {
+		position: static;
+		grid-column: 1;
+		flex-direction: row;
+		align-items: center;
+		max-block-size: none;
+		min-inline-size: 0;
+		padding: 4px 2px 8px;
+		overflow-x: auto;
+		overflow-y: hidden;
+		overscroll-behavior-x: contain;
+		overscroll-behavior-y: auto;
+		scroll-snap-type: x proximity;
+		scrollbar-gutter: auto;
+	}
+	.product-thumbs .thumbs-label { flex: 0 0 auto; margin-inline: 2px 6px; }
+	.product-thumbs .gallery-thumb { flex: 0 0 88px; min-width: 88px; }
+	.product-thumbs .gallery-thumb img { width: 100%; height: auto; aspect-ratio: 4 / 3; }
+	.product-info { grid-column: 1; }
+	.gallery-controls { padding-inline: 8px; }
+	.gallery-controls button { width: 40px; height: 40px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.gallery-carousel { scroll-behavior: auto; }
+	.gallery-controls button,.detail-disclosure,.detail-panel { transition: none; }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+	.gallery-carousel { scroll-behavior: smooth; }
 }
 
 
@@ -1499,9 +1617,12 @@
 	transition: opacity 180ms ease;
 }
 
-.tours-prism-image-wrap { position: relative; aspect-ratio: 10 / 7; overflow: hidden; background: linear-gradient(135deg, #17334a, #263250); }
+.tours-prism-image-wrap { position: relative; aspect-ratio: 1.3; overflow: hidden; background: linear-gradient(135deg, #17334a, #263250); }
 .tours-prism-image { display: block; width: 100%; height: 100%; object-fit: cover; transition: transform 500ms cubic-bezier(.2,.7,.2,1); }
 .tours-prism-image-shade { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(4, 13, 25, 0.24), transparent 34%, rgba(4, 13, 25, 0.17)); pointer-events: none; }
+.tours-prism-image-caption { position: absolute; bottom: 13px; left: 14px; z-index: 1; display: inline-flex; align-items: center; gap: 7px; max-width: calc(100% - 70px); padding: 8px 11px; overflow: hidden; border: 1px solid rgba(230,248,255,.22); border-radius: 999px; color: #f1f8ff; background: rgba(7,19,32,.66); font-family: system-ui,sans-serif; font-size: .7rem; font-weight: 620; text-overflow: ellipsis; white-space: nowrap; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+.tours-prism-image-caption span:first-child { overflow: hidden; text-overflow: ellipsis; }
+.tours-prism-image-caption span[aria-hidden="true"] { color: #a3eee2; }
 
 .tours-prism-badges {
 	position: absolute;
@@ -1520,17 +1641,17 @@
 .tours-prism-status.is-inactive { color: #e6eaf0; }
 .tours-prism-image-index { position: absolute; right: 15px; bottom: 13px; color: rgba(255, 255, 255, 0.84); font-size: 0.8rem; font-variant-numeric: tabular-nums; }
 
-.tours-prism-content { position: relative; z-index: 1; display: flex; min-height: 218px; flex-direction: column; padding: 20px 21px 18px; }
+.tours-prism-content { position: relative; z-index: 1; display: flex; min-height: 206px; flex-direction: column; padding: 19px 21px 18px; }
 .tours-prism-location { margin: 0 0 10px; color: #9bb4c7; font-family: system-ui, sans-serif; font-size: 0.76rem; font-weight: 550; }
 .tours-prism-location span { padding-inline: 4px; color: #79d9d1; }
 .tours-prism-content h3 { margin: 0; color: #f1f8ff; font-size: clamp(1.22rem, 1.7vw, 1.55rem); font-weight: 650; line-height: 1.15; letter-spacing: -0.035em; }
-.tours-prism-description { display: -webkit-box; min-height: 3.3em; margin: 10px 0 17px; overflow: hidden; color: #b2c2d1; font-family: system-ui, sans-serif; font-size: 0.84rem; line-height: 1.65; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
+.tours-prism-description { display: -webkit-box; min-height: 3.3em; margin: 9px 0 15px; overflow: hidden; color: #b2c2d1; font-family: system-ui, sans-serif; font-size: 0.84rem; line-height: 1.65; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
 
 .tours-prism-footer { display: flex; align-items: end; justify-content: space-between; gap: 12px; margin-top: auto; padding-top: 15px; border-top: 1px solid rgba(207, 236, 255, 0.13); }
 .tours-prism-price { display: grid; gap: 3px; }
 .tours-prism-price span { color: #91a8ba; font-size: 0.7rem; }
 .tours-prism-price strong { color: #dffdf5; font-size: 1.12rem; font-weight: 700; letter-spacing: -0.025em; }
-.tours-prism-link { display: inline-flex; align-items: center; gap: 10px; padding: 10px 13px; border: 1px solid rgba(134, 224, 215, 0.33); border-radius: 999px; color: #d9fff7; font-size: 0.78rem; font-weight: 650; text-decoration: none; transition: background-color 160ms ease, border-color 160ms ease; }
+.tours-prism-link { display: inline-flex; align-items: center; gap: 10px; padding: 10px 13px; border: 1px solid rgba(134, 224, 215, 0.38); border-radius: 999px; color: #e1fff8; background: rgba(104,207,198,.09); font-size: 0.78rem; font-weight: 680; text-decoration: none; transition: background-color 160ms ease, border-color 160ms ease,transform 160ms ease; }
 .tours-prism-link span { color: var(--catalog-teal); }
 .tours-prism-unavailable { padding: 10px 0; color: #91a0ae; font-size: 0.76rem; }
 
@@ -1555,7 +1676,7 @@
 	}
 	.tours-prism-card:hover::before { opacity: 1; }
 	.tours-prism-card:hover .tours-prism-image { transform: scale(1.035); }
-	.tours-prism-link:hover { border-color: rgba(134, 224, 215, 0.7); background: rgba(134, 224, 215, 0.1); }
+	.tours-prism-link:hover { transform: translateY(-1px); border-color: rgba(134, 224, 215, 0.7); background: rgba(134, 224, 215, 0.16); }
 }
 
 @media (max-width: 1000px) {
@@ -1579,7 +1700,7 @@
 	.tours-section-heading h2 { max-width: 14ch; font-size: 2rem; }
 	.tours-prism-grid { grid-template-columns: 1fr; gap: 15px; }
 	.tours-prism-card { border-radius: 22px; }
-	.tours-prism-image-wrap { aspect-ratio: 1.35; }
+	.tours-prism-image-wrap { aspect-ratio: 1.3; }
 	.tours-prism-content { min-height: 205px; padding: 18px 18px 16px; }
 	.tours-values { grid-template-columns: 1fr; gap: 10px; margin-top: 46px; }
 }
@@ -1595,6 +1716,7 @@
 @media (prefers-reduced-transparency: reduce) {
 	.tours-intro-glass { border-color: rgba(224, 242, 255, 0.55); background: #13283b; box-shadow: none; }
 	.tours-prism-card { background: #101f30; }
+	.tours-prism-image-caption { background: #102235; backdrop-filter: none; -webkit-backdrop-filter: none; }
 }
 
 @media (prefers-contrast: more) {

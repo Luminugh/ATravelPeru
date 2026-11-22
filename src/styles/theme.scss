@@ -71,8 +71,12 @@ body { min-height: 100vh; background: var(--page); color: var(--text-primary); }
 
 .admin-body { background: var(--page); color: var(--text-primary); }
 .admin-body .admin-container, .admin-body .admin-main, .admin-body .admin-content { background: var(--page); color: var(--text-primary); }
+.admin-body .admin-main { min-width: 0; overflow: visible; }
+.admin-body .admin-content { min-height: 0; overflow: visible; overscroll-behavior: auto; -webkit-overflow-scrolling: auto; }
+.admin-body .admin-sidebar { height: 100vh; height: 100dvh; }
+.admin-body [hidden] { display: none !important; }
 .admin-body .admin-sidebar, .admin-body .admin-topbar, .admin-body .content-section,
-.admin-body .section-header, .admin-body .account-card, .admin-body .account-hero-panel,
+.admin-body .section-header, .admin-body .account-card,
 .admin-body .account-stat-card, .admin-body .whatsapp-card, .admin-body .whatsapp-hero-panel,
 .admin-body .upload-card, .admin-body .dashboard-hero, .admin-body .dashboard-panel,
 .admin-body .dashboard-metric-card, .admin-body .dashboard-action, .admin-body .dashboard-health,
@@ -95,11 +99,58 @@ body { min-height: 100vh; background: var(--page); color: var(--text-primary); }
 .admin-body .admin-sidebar .sidebar-nav .nav-item.logout { color: rgba(226,239,250,.72); border-color: rgba(192,220,245,.14); }
 .admin-body .admin-topbar { background: var(--surface); }
 .admin-body .admin-topbar { border-bottom: 1px solid var(--border-color); }
+.admin-body .admin-topbar { min-height: 76px; box-sizing: border-box; }
+.admin-body .admin-topbar .topbar-right { display: flex; align-items: center; justify-content: flex-end; gap: 12px; flex: 0 0 auto; min-width: 0; flex-wrap: nowrap; }
+.admin-body .admin-topbar .admin-profile { max-width: min(260px, 42vw); gap: 10px; white-space: nowrap; }
+.admin-body .admin-topbar .profile-info { min-width: 0; }
+.admin-body .admin-topbar .profile-name,.admin-body .admin-topbar .profile-meta { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .admin-body .admin-topbar .page-title { color: var(--text-primary); }
 .admin-body .admin-profile { color: var(--text-primary); background: var(--surface-raised); border-color: var(--border-color); }
 .admin-body .admin-profile .profile-meta { color: var(--text-secondary); }
 .admin-body :is(h1,h2,h3,h4,.page-title,.section-title,.account-hero-title,.whatsapp-hero-title) { color: var(--text-primary); }
 .admin-body .admin-content :is(h1,h2,h3,h4,h5,h6,.page-title,.section-title) { color: var(--text-primary); }
+.admin-body .admin-content .admin-dashboard-page .dashboard-metric-card > strong,
+.admin-body .admin-content .admin-dashboard-page .dashboard-panel-header h2,
+.admin-body .admin-content .admin-dashboard-page .health-score-ring strong,
+.admin-body .admin-content .admin-dashboard-page .health-row > :is(span,strong),
+.admin-body .admin-content .admin-dashboard-page .destination-item strong,
+.admin-body .admin-content .admin-dashboard-page .recent-tour-copy strong { color: var(--text-primary); }
+.admin-body .admin-content .admin-dashboard-page :is(.dashboard-metric-card small,.metric-label,.dashboard-panel-header p,.health-score-ring span,.destination-item span,.recent-tour-copy span,.recent-tour-meta small) { color: var(--text-secondary); }
+.admin-body .admin-dashboard-page .dashboard-metric-card,.admin-body .admin-dashboard-page .dashboard-panel { content-visibility: auto; contain-intrinsic-size: auto 360px; }
+.admin-body .admin-content :is(.account-item strong,.account-stat-card strong,.account-detail-value,.profile-value,.whatsapp-card h2,.whatsapp-card h3,.whatsapp-card strong,.whatsapp-hero-title) { color: var(--text-primary); }
+.admin-body .admin-content :is(.account-item span,.account-stat-card span,.account-detail-label,.whatsapp-card p,.whatsapp-card label,.whatsapp-note) { color: var(--text-secondary); }
+.admin-body .admin-content .whatsapp-hero { color: var(--text-primary); background: var(--surface-raised); border-color: var(--border-color); }
+.admin-body .admin-content .whatsapp-hero :is(.whatsapp-hero-title,h2,h3,strong) { color: var(--text-primary); }
+.admin-body .admin-content .whatsapp-hero :is(.whatsapp-hero-text,p) { color: var(--text-secondary); }
+.admin-body .admin-content .account-hero-panel { color: var(--text-primary); background: var(--surface-soft); border-color: var(--border-color); box-shadow: var(--shadow); }
+.admin-body .admin-content .account-badge { color: var(--accent-strong); background: var(--accent-soft); }
+.admin-body .admin-content .admin-tour-card { color: var(--text-primary); background: var(--surface-raised); border-color: var(--border-color); box-shadow: var(--shadow); }
+.admin-body .admin-content .admin-tour-card .tours-prism-content { color: var(--text-primary); background: var(--surface-raised); }
+.admin-body .admin-content .admin-tour-card :is(.tours-prism-title,.tours-prism-price strong) { color: var(--text-primary); }
+.admin-body .admin-content .admin-tour-card :is(.tours-prism-description,.tours-prism-location,.tours-prism-price span,.tours-prism-unavailable) { color: var(--text-secondary); }
+.admin-body .admin-content .admin-tour-card .tours-prism-footer { border-color: var(--border-color); }
+.admin-body .admin-content .admin-tour-card .admin-tour-edit { color: var(--accent-strong); background: var(--accent-soft); border-color: var(--border-color); }
+.admin-body .admin-content .admin-tour-card .admin-tour-delete { color: var(--danger); background: var(--danger-soft); border-color: color-mix(in srgb,var(--danger) 30%,transparent); }
+.admin-body .admin-content .admin-tour-card .tours-prism-image-wrap.is-empty { background: radial-gradient(circle at 70% 20%,var(--accent-soft),transparent 40%),var(--surface-soft); }
+.admin-body .admin-content .admin-tour-card .admin-tour-image-empty { color: var(--text-secondary); }
+.admin-body .admin-content .admin-tour-card:hover { border-color: var(--accent); box-shadow: var(--shadow); }
+.admin-body .admin-content .media-header h4,.admin-body .admin-content .media-meta :is(.media-filename,.media-size,.media-tags) { color: var(--text-primary); }
+.admin-body .admin-content .header-actions .refresh-btn { color: var(--text-primary); background: var(--surface-soft); border-color: var(--border-color); box-shadow: none; }
+.admin-body .admin-content .header-actions .refresh-btn:hover { color: var(--accent-contrast); background: var(--accent); border-color: var(--accent); }
+.admin-body .admin-content .media-header { border-color: var(--border-color); }
+.admin-body .admin-content .media-card { background: var(--surface-raised); }
+.admin-body .admin-content .upload-card { background: var(--surface-raised); }
+.admin-body .admin-content .media-search { width: min(280px, 45vw); min-height: 40px; padding: 8px 12px; border: 1px solid var(--border-color); border-radius: 12px; color: var(--text-primary); background: var(--surface); }
+.admin-body .admin-content .media-search::placeholder { color: var(--text-muted); }
+.admin-body .admin-content .media-meta .media-tags { color: var(--success); background: var(--accent-soft); border-color: var(--border-color); }
+.admin-body .admin-content .media-meta .media-size { color: var(--text-secondary); }
+.admin-body .admin-content .media-stats { display: flex; align-items: center; flex-wrap: wrap; justify-content: flex-end; gap: 12px; }
+.admin-body .admin-content :is(.file-input-label,.link-upload-row,.image-info) { color: var(--text-secondary); background: var(--surface-soft); border-color: var(--border-color); }
+.admin-body .admin-content .file-input-label :is(strong,small) { color: var(--text-primary); }
+.admin-body .admin-content .empty-state :is(h4,p) { color: var(--text-secondary); }
+.admin-body .admin-content :is(.modal-header,.modal-footer,.info-row) { border-color: var(--border-color); }
+.admin-body .admin-content .modal-close { color: var(--text-secondary); }
+.admin-body .admin-content .modal-close:hover { color: var(--text-primary); background: var(--surface-soft); }
 .admin-body .admin-content .tour-card .tour-card-body :is(.tour-card-title,.tour-card-price) { color: var(--text-primary); }
 .admin-body .admin-content .tour-card .tour-card-body .tour-card-desc { color: var(--text-secondary); }
 .admin-body .admin-content .tour-card .tour-card-body .tour-card-meta { color: var(--accent); }
@@ -126,6 +177,8 @@ body { min-height: 100vh; background: var(--page); color: var(--text-primary); }
   .whatsapp-preview,.whatsapp-phone-preview,.account-security-card,.dashboard-chart-card,.dashboard-stat-card) {
   background: var(--surface-raised);
 }
+.admin-body dialog.tour-modal[open],
+.admin-body dialog.media-picker[open] { color: var(--text-primary); background: transparent; }
 .admin-body :is(.form-label,.field-label,.tour-form-label,.tour-card-label,.media-card-title,.tour-card-title) { color: var(--text-primary); }
 .admin-body :is(.form-hint,.field-hint,.tour-form-hint,.tour-card-meta,.media-card-meta) { color: var(--text-secondary); }
 .admin-body .sidebar-toggle { color: var(--text-primary); background: var(--surface-soft); border-color: var(--border-color); }
@@ -176,15 +229,29 @@ body { min-height: 100vh; background: var(--page); color: var(--text-primary); }
 .tour-detail-page .detail-panel-contrast.detail-panel-excludes, .tour-detail-page .detail-panel-timeline { background: var(--surface-raised); border-color: var(--border-color); }
 .tour-detail-page .detail-panel-includes { box-shadow: inset 3px 0 var(--success), var(--shadow); }
 .tour-detail-page .detail-panel-excludes { box-shadow: inset 3px 0 var(--danger), var(--shadow); }
-.tour-detail-page .gallery-controls button { color: var(--text-primary); background: var(--surface-glass); border-color: var(--border-color); }
+.tour-detail-page .main-image-frame .gallery-controls button { color: #f7fbff; background: rgba(7, 19, 33, .72); border-color: rgba(255, 255, 255, .58); }
+.tour-detail-page .main-image-frame .gallery-controls button:hover { color: #fff; background: rgba(7, 19, 33, .92); border-color: #fff; }
+.tour-detail-page .main-image-frame .gallery-controls button:focus-visible { outline: 3px solid #a7f5e8; outline-offset: 3px; }
 
 .tours-catalog-page { --catalog-ink: var(--text-primary); --catalog-muted: var(--text-secondary); --catalog-line: var(--border-color); --catalog-teal: var(--accent); --catalog-lilac: light-dark(#6b50a8,#c2a5ff); color: var(--text-primary); background: radial-gradient(ellipse at 80% 4%, color-mix(in srgb, var(--accent) 12%, transparent), transparent 34rem), var(--page); }
 .tours-catalog-page .tours-prism-card, .tours-catalog-page .tours-intro-glass,
 .tours-catalog-page .tours-value-card { color: var(--text-primary); background: var(--surface-glass); border-color: var(--border-color); }
 .tours-catalog-page .tours-prism-content { color: var(--text-primary); background: var(--surface-raised); }
+.tours-catalog-page .tours-prism-content h3 { color: var(--text-primary); }
 .tours-catalog-page .tours-prism-description, .tours-catalog-page .tours-glass-note,
 .tours-catalog-page .tours-value-card p { color: var(--text-secondary); }
+.tours-catalog-page .tours-prism-footer { border-color: var(--border-color); }
+.tours-catalog-page .tours-prism-price span { color: var(--text-muted); }
+.tours-catalog-page .tours-prism-price strong { color: var(--accent-strong); }
+.tours-catalog-page .tours-prism-link { color: var(--accent-strong); background: var(--accent-soft); border-color: color-mix(in srgb,var(--accent) 38%,transparent); }
+.tours-catalog-page .tours-prism-link span { color: var(--accent-strong); }
+.tours-catalog-page .tours-empty-state { color: var(--text-primary); background: var(--surface-raised); border-color: var(--border-color); }
+.tours-catalog-page .tours-empty-state h3 { color: var(--text-primary); }
+.tours-catalog-page .tours-empty-state p { color: var(--text-secondary); }
 .tours-catalog-page .tours-prism-card { box-shadow: var(--shadow); }
+.tours-catalog-page .tours-intro-text { color: var(--text-secondary); }
+.tours-catalog-page .tours-glass-count span:last-child,.tours-catalog-page .tours-glass-note { color: var(--text-secondary); }
+.tours-catalog-page .tours-intro h1 span { background-image: linear-gradient(105deg, light-dark(#087d73,#a8fff0) 6%, light-dark(#7357b1,#d4c3ff) 52%, light-dark(#315b9c,#99c9ff) 100%); }
 
 .home-page { --home-bg: var(--page); --home-panel: var(--surface-raised); --home-ice: var(--text-primary); --home-muted: var(--text-secondary); --home-tide: var(--accent); --home-violet: light-dark(#7357b1,#c2a5ff); background: var(--home-bg); color: var(--home-ice); }
 .home-ribbon { color: var(--text-secondary); background: var(--surface-soft); border-color: var(--border-color); }

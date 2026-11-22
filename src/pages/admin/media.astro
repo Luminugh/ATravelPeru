@@ -78,11 +78,14 @@ const title = `Gestión de Multimedia - ${siteIdentity.adminTitleDefault}`;
       <div class="media-header">
         <h4><i class="fas fa-images"></i> Biblioteca de Medios</h4>
         <div class="media-stats">
+          <label class="visually-hidden" for="mediaSearch">Buscar medios</label>
+          <input id="mediaSearch" class="media-search" type="search" placeholder="Buscar por nombre o etiqueta" />
           <span id="mediaCount">0 imágenes</span>
         </div>
       </div>
 
       <div id="mediaGrid" class="media-grid"></div>
+      <button id="mediaLoadMore" class="media-load-more" type="button" hidden>Cargar más imágenes</button>
 
       <div id="emptyState" class="empty-state">
         <div class="empty-icon">
@@ -94,51 +97,54 @@ const title = `Gestión de Multimedia - ${siteIdentity.adminTitleDefault}`;
     </div>
   </section>
 
-  <!-- Image Preview Modal -->
-  <div id="imageModal" class="image-modal">
-    <div class="modal-backdrop" id="modalBackdrop"></div>
-    <div class="modal-content">
+  <!-- Editor de medios -->
+  <dialog id="imageModal" class="image-modal" aria-labelledby="modalTitle" closedby="any">
+    <section class="modal-content media-editor-dialog">
       <div class="modal-header">
-        <h4 id="modalTitle">Vista previa</h4>
-        <button id="modalClose" class="modal-close">
+        <div>
+          <span class="media-editor-kicker">Biblioteca multimedia</span>
+          <h2 id="modalTitle">Editar imagen</h2>
+        </div>
+        <button type="button" id="modalClose" class="modal-close" aria-label="Cerrar editor">
           <i class="fas fa-times"></i>
         </button>
       </div>
-      <div class="modal-body">
-        <img id="modalImage" src="" alt="" />
-        <div class="image-info">
-          <div class="info-row">
-            <span class="info-label">Nombre:</span>
-            <span id="infoFilename"></span>
-          </div>
-          <div class="info-row">
-            <span class="info-label">Tamaño:</span>
-            <span id="infoSize"></span>
-          </div>
-          <div class="info-row">
-            <span class="info-label">Tipo:</span>
-            <span id="infoType"></span>
-          </div>
-          <div class="info-row">
-            <span class="info-label">URL:</span>
-            <input id="infoUrl" type="text" readonly class="url-input" />
-          </div>
+      <div class="modal-body media-editor-body">
+        <div class="media-editor-preview">
+          <img id="modalImage" src="" alt="" width="960" height="720" />
+          <div class="media-editor-file-meta"><span id="infoSize"></span><span id="infoType"></span></div>
         </div>
+        <form id="mediaEditForm" class="media-edit-form">
+          <label for="editFilename">Nombre del archivo</label>
+          <input id="editFilename" name="filename" maxlength="240" required />
+          <label for="editAltText">Texto alternativo</label>
+          <input id="editAltText" name="alt_text" maxlength="300" placeholder="Describe la imagen para lectores de pantalla" />
+          <label for="editTags">Etiquetas</label>
+          <input id="editTags" name="tags" placeholder="Cusco, montaña, aventura" />
+          <p class="media-edit-help">Separa las etiquetas con comas. El texto alternativo describe la imagen a quienes usan lectores de pantalla.</p>
+          <details class="media-url-details">
+            <summary>URL del archivo</summary>
+            <input id="infoUrl" type="text" readonly class="url-input" aria-label="URL del archivo" />
+          </details>
+        </form>
       </div>
       <div class="modal-footer">
-        <button id="copyUrlBtn" class="btn btn-secondary">
+        <p id="mediaEditStatus" class="media-edit-status" role="status" aria-live="polite"></p>
+        <button type="button" id="copyUrlBtn" class="btn btn-secondary">
           <i class="fas fa-copy"></i> Copiar URL
         </button>
-        <button id="deleteBtn" class="btn btn-danger">
+        <button type="button" id="modalCancel" class="btn btn-secondary">Cancelar</button>
+        <button type="submit" form="mediaEditForm" id="saveMediaBtn" class="btn btn-primary"><i class="fas fa-save"></i> Guardar cambios</button>
+        <button type="button" id="deleteBtn" class="btn btn-danger">
           <i class="fas fa-trash"></i> Eliminar
         </button>
       </div>
-    </div>
-  </div>
+    </section>
+  </dialog>
 
   <script type="module">
     async function fetchJson(url, options) {
-      const response = await fetch(url, options);
+      const response = await fetch(url, { ...options, signal: options?.signal || AbortSignal.timeout(options?.method ? 60000 : 15000) });
       const contentType = response.headers.get('content-type') || '';
       const rawBody = await response.text();
 
@@ -172,6 +178,7 @@ const title = `Gestión de Multimedia - ${siteIdentity.adminTitleDefault}`;
     const api = {
       list: () => fetchJson('/api/admin/media'),
       upload: (form) => fetchJson('/api/admin/media', { method: 'POST', body: form }),
+      update: (payload) => fetchJson('/api/admin/media', { method: 'PATCH', headers: { 'content-type': 'application/json' }, body: JSON.stringify(payload) }),
       sync: () => fetchJson('/api/admin/media?sync=1', { method: 'POST' }),
       del: (id) => fetchJson('/api/admin/media', { method: 'DELETE', headers:{'content-type':'application/json'}, body: JSON.stringify({id})}),
     };
@@ -192,21 +199,27 @@ const title = `Gestión de Multimedia - ${siteIdentity.adminTitleDefault}`;
     const imageUrlInput = document.getElementById('imageUrlInput');
     const linkUploadBtn = document.getElementById('linkUploadBtn');
     const mediaCount = document.getElementById('mediaCount');
+    const mediaSearch = document.getElementById('mediaSearch');
+    const mediaLoadMore = document.getElementById('mediaLoadMore');
 
     // Modal elements
     const imageModal = document.getElementById('imageModal');
-    const modalBackdrop = document.getElementById('modalBackdrop');
     const modalClose = document.getElementById('modalClose');
+    const modalCancel = document.getElementById('modalCancel');
     const modalImage = document.getElementById('modalImage');
     const modalTitle = document.getElementById('modalTitle');
-    const infoFilename = document.getElementById('infoFilename');
     const infoSize = document.getElementById('infoSize');
     const infoType = document.getElementById('infoType');
     const infoUrl = document.getElementById('infoUrl');
     const copyUrlBtn = document.getElementById('copyUrlBtn');
     const deleteBtn = document.getElementById('deleteBtn');
+    const mediaEditForm = document.getElementById('mediaEditForm');
+    const mediaEditStatus = document.getElementById('mediaEditStatus');
+    const saveMediaBtn = document.getElementById('saveMediaBtn');
 
     let currentMediaItem = null;
+    let mediaItems = [];
+    let visibleMediaLimit = 48;
 
     function setUploadCollapsed(collapsed) {
       uploadBody.classList.toggle('is-collapsed', collapsed);
@@ -288,25 +301,43 @@ const title = `Gestión de Multimedia - ${siteIdentity.adminTitleDefault}`;
       modalImage.src = item.url || item.storage_path;
       modalImage.alt = item.alt_text || '';
       modalTitle.textContent = item.filename || 'Vista previa';
-      infoFilename.textContent = item.filename || 'Sin nombre';
       infoSize.textContent = formatFileSize(item.size);
       infoType.textContent = item.mime_type || 'Desconocido';
       infoUrl.value = item.url || item.storage_path;
-      imageModal.style.display = 'block';
-      document.body.style.overflow = 'hidden';
+      mediaEditForm.elements.filename.value = item.filename || '';
+      mediaEditForm.elements.alt_text.value = item.alt_text || '';
+      mediaEditForm.elements.tags.value = Array.isArray(item.tags) ? item.tags.join(', ') : item.tags || '';
+      mediaEditStatus.textContent = '';
+      mediaEditStatus.className = 'media-edit-status';
+      if (!imageModal.open) imageModal.showModal();
     }
 
     function closeModal() {
-      imageModal.style.display = 'none';
-      document.body.style.overflow = '';
+      if (imageModal.open) imageModal.close();
       currentMediaItem = null;
     }
+
+    imageModal.addEventListener('click', (event) => {
+      if (event.target === imageModal) closeModal();
+    });
+    imageModal.addEventListener('close', () => { currentMediaItem = null; });
 
     function formatFileSize(bytes) {
       if (!bytes) return 'Desconocido';
       const sizes = ['Bytes', 'KB', 'MB', 'GB'];
       const i = Math.floor(Math.log(bytes) / Math.log(1024));
       return Math.round(bytes / Math.pow(1024, i) * 100) / 100 + ' ' + sizes[i];
+    }
+
+    function escapeHtml(value) {
+      return String(value ?? '').replace(/[&<>"']/g, (character) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[character]);
+    }
+
+    function safeMediaUrl(value) {
+      try {
+        const url = new URL(String(value || ''), window.location.origin);
+        return ['http:', 'https:'].includes(url.protocol) ? url.href : '';
+      } catch { return ''; }
     }
 
     // Load media
@@ -322,8 +353,8 @@ const title = `Gestión de Multimedia - ${siteIdentity.adminTitleDefault}`;
           return;
         }
 
-        const items = res.data || [];
-        render(items);
+        mediaItems = Array.isArray(res.data) ? res.data : [];
+        render(mediaItems);
       } catch (error) {
         console.error('[admin/media] load failed:', error);
         uploadStatus.textContent = 'Error de conexión al cargar medios';
@@ -333,41 +364,53 @@ const title = `Gestión de Multimedia - ${siteIdentity.adminTitleDefault}`;
 
     // Render media grid
     function render(items) {
-      mediaCount.textContent = `${items.length} ${items.length === 1 ? 'imagen' : 'imágenes'}`;
+      const term = mediaSearch.value.trim().toLocaleLowerCase('es');
+      const filtered = items.filter((item) => `${item.filename || ''} ${item.alt_text || ''} ${Array.isArray(item.tags) ? item.tags.join(' ') : item.tags || ''}`.toLocaleLowerCase('es').includes(term));
+      mediaCount.textContent = `${filtered.length}${term ? ` de ${items.length}` : ''} ${filtered.length === 1 ? 'imagen' : 'imágenes'}`;
 
-      if (!items || items.length === 0) {
+      if (filtered.length === 0) {
         grid.style.display = 'none';
         empty.style.display = 'block';
+        mediaLoadMore.hidden = true;
+        const emptyHeading = empty.querySelector('h4');
+        const emptyDescription = empty.querySelector('p');
+        if (emptyHeading) emptyHeading.textContent = term ? 'No hay coincidencias' : 'No hay imágenes aún';
+        if (emptyDescription) emptyDescription.textContent = term ? 'Prueba con otro nombre o etiqueta.' : 'Sube tu primera imagen para comenzar a construir tu biblioteca de medios.';
         return;
       }
 
       grid.style.display = 'grid';
       empty.style.display = 'none';
+      const visibleItems = filtered.slice(0, visibleMediaLimit);
+      mediaLoadMore.hidden = visibleItems.length >= filtered.length;
+      mediaLoadMore.textContent = `Cargar ${Math.min(48, filtered.length - visibleItems.length)} imágenes más`;
 
-      grid.innerHTML = items.map(i => {
-        const aspectRatio = getImageAspectRatio(i);
-        const orientation = aspectRatio > 1 ? 'landscape' : 'portrait';
-
+      grid.innerHTML = visibleItems.map(i => {
+        const id = escapeHtml(i.id);
+        const name = escapeHtml(i.filename || 'Sin nombre');
+        const url = escapeHtml(safeMediaUrl(i.url || i.storage_path));
+        const alt = escapeHtml(i.alt_text || i.filename || 'Imagen de la biblioteca');
+        const tags = Array.isArray(i.tags) ? i.tags : String(i.tags || '').split(',').map((tag) => tag.trim()).filter(Boolean);
         return `
-          <div class="media-card ${orientation}" data-id="${i.id}">
+          <div class="media-card" data-id="${id}">
             <div class="media-thumb">
-              <img src="${i.url || i.storage_path}" alt="${i.alt_text || ''}" loading="lazy" />
+              <img src="${url}" alt="${alt}" loading="lazy" decoding="async" width="480" height="320" sizes="(max-width: 640px) 100vw, (max-width: 1100px) 50vw, 33vw" />
               <div class="media-overlay">
-                <button class="preview-btn" data-id="${i.id}">
+                <button class="preview-btn" aria-label="Vista previa de ${name}" data-id="${id}">
                   <i class="fas fa-eye"></i>
                 </button>
-                <button class="copy-btn" data-id="${i.id}">
+                <button class="copy-btn" aria-label="Copiar URL de ${name}" data-id="${id}">
                   <i class="fas fa-copy"></i>
                 </button>
-                <button class="delete-btn" data-id="${i.id}">
+                <button class="delete-btn" aria-label="Eliminar ${name}" data-id="${id}">
                   <i class="fas fa-trash"></i>
                 </button>
               </div>
             </div>
             <div class="media-meta">
-              <div class="media-filename" title="${i.filename || ''}">${i.filename || 'Sin nombre'}</div>
+              <div class="media-filename" title="${name}">${name}</div>
               <div class="media-size">${formatFileSize(i.size)}</div>
-              ${i.tags && i.tags.length > 0 ? `<div class="media-tags">${i.tags.slice(0, 2).join(', ')}${i.tags.length > 2 ? '...' : ''}</div>` : ''}
+              ${tags.length > 0 ? `<div class="media-tags">${escapeHtml(tags.slice(0, 2).join(', '))}${tags.length > 2 ? '…' : ''}</div>` : ''}
             </div>
           </div>
         `;
@@ -378,7 +421,7 @@ const title = `Gestión de Multimedia - ${siteIdentity.adminTitleDefault}`;
         btn.addEventListener('click', (e) => {
           e.stopPropagation();
           const id = btn.dataset.id;
-          const item = items.find(i => i.id === id);
+          const item = items.find(i => String(i.id) === String(id));
           if (item) openModal(item);
         });
       });
@@ -387,7 +430,7 @@ const title = `Gestión de Multimedia - ${siteIdentity.adminTitleDefault}`;
         btn.addEventListener('click', async (e) => {
           e.stopPropagation();
           const id = btn.dataset.id;
-          const item = items.find(i => i.id === id);
+          const item = items.find(i => String(i.id) === String(id));
           if (item) {
             const url = item.url || item.storage_path;
             try {
@@ -404,7 +447,7 @@ const title = `Gestión de Multimedia - ${siteIdentity.adminTitleDefault}`;
         btn.addEventListener('click', async (e) => {
           e.stopPropagation();
           const id = btn.dataset.id;
-          const item = items.find(i => i.id === id);
+          const item = items.find(i => String(i.id) === String(id));
           if (item && confirm(`¿Eliminar "${item.filename}"?`)) {
             try {
               const res = await api.del(id);
@@ -425,18 +468,17 @@ const title = `Gestión de Multimedia - ${siteIdentity.adminTitleDefault}`;
       grid.querySelectorAll('.media-card').forEach(card => {
         card.addEventListener('click', () => {
           const id = card.dataset.id;
-          const item = items.find(i => i.id === id);
+          const item = items.find(i => String(i.id) === String(id));
           if (item) openModal(item);
         });
       });
     }
 
-    // Get image aspect ratio (placeholder - in real implementation you'd need image dimensions)
-    function getImageAspectRatio(item) {
-      // This is a simplified version. In a real implementation, you'd store dimensions
-      // or calculate them from the image. For now, we'll use a default.
-      return 1.5; // Assume landscape by default
-    }
+    mediaSearch.addEventListener('input', () => { visibleMediaLimit = 48; render(mediaItems); });
+    mediaLoadMore.addEventListener('click', () => {
+      visibleMediaLimit += 48;
+      render(mediaItems);
+    });
 
     // Toast notification
     function showToast(message, type = 'info') {
@@ -533,8 +575,34 @@ const title = `Gestión de Multimedia - ${siteIdentity.adminTitleDefault}`;
     });
 
     // Modal event listeners
-    modalBackdrop.addEventListener('click', closeModal);
     modalClose.addEventListener('click', closeModal);
+    modalCancel.addEventListener('click', closeModal);
+
+    mediaEditForm.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      if (!currentMediaItem || !mediaEditForm.reportValidity()) return;
+      saveMediaBtn.disabled = true;
+      mediaEditStatus.textContent = 'Guardando cambios…';
+      const tags = mediaEditForm.elements.tags.value.split(',').map((tag) => tag.trim()).filter(Boolean);
+      try {
+        const result = await api.update({
+          id: currentMediaItem.id,
+          filename: mediaEditForm.elements.filename.value.trim(),
+          alt_text: mediaEditForm.elements.alt_text.value.trim(),
+          tags,
+        });
+        if (!result.ok) throw new Error(result.error || 'No se pudieron guardar los cambios.');
+        if (result.data) currentMediaItem = result.data;
+        showToast('Cambios guardados', 'success');
+        closeModal();
+        await load();
+      } catch (error) {
+        mediaEditStatus.textContent = error instanceof Error ? error.message : 'No se pudieron guardar los cambios.';
+        mediaEditStatus.classList.add('is-error');
+      } finally {
+        saveMediaBtn.disabled = false;
+      }
+    });
 
     copyUrlBtn.addEventListener('click', async () => {
       if (currentMediaItem) {

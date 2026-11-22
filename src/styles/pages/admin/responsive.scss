@@ -1178,3 +1178,14 @@
 @media (prefers-color-scheme: dark) {
   /* Aquí se pueden agregar estilos para tema oscuro */
 }
+
+@media (max-width: 760px) {
+  .account-hero-panel { grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: 12px; padding: 15px; }
+  .account-avatar { width: 60px; height: 60px; border-radius: 18px; }
+  .account-identity { min-width: 0; }
+  .account-identity strong,.account-identity span { overflow-wrap: anywhere; }
+  .account-hero-summary { grid-column: 1 / -1; }
+  .account-stats-grid { grid-template-columns: 1fr; }
+  .account-stat-card { min-width: 0; }
+  .account-stat-card strong { font-size: clamp(17px, 5vw, 21px); }
+}

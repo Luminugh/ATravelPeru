@@ -145,6 +145,7 @@
     media: [],
     whatsappPhone: '',
     errors: [],
+    loaded: { tours: false, media: false, whatsapp: false },
   };
 
   const $ = (id) => document.getElementById(id);
@@ -187,7 +188,7 @@
   }
 
   async function fetchJson(url) {
-    const response = await fetch(url);
+    const response = await fetch(url, { signal: AbortSignal.timeout(15000) });
     const payload = await response.json().catch(() => null);
     if (!response.ok || !payload?.ok) {
       throw new Error(payload?.error || `No se pudo cargar ${url}`);
@@ -204,18 +205,21 @@
 
     if (toursResult.status === 'fulfilled') {
       state.tours = Array.isArray(toursResult.value.data) ? toursResult.value.data : [];
+      state.loaded.tours = true;
     } else {
       state.errors.push('No se pudieron cargar los tours.');
     }
 
     if (mediaResult.status === 'fulfilled') {
       state.media = Array.isArray(mediaResult.value.data) ? mediaResult.value.data : [];
+      state.loaded.media = true;
     } else {
       state.errors.push('No se pudo cargar la biblioteca multimedia.');
     }
 
     if (whatsappResult.status === 'fulfilled') {
       state.whatsappPhone = whatsappResult.value.phone || '';
+      state.loaded.whatsapp = true;
     } else {
       state.errors.push('No se pudo revisar la configuracion de WhatsApp.');
     }
@@ -246,29 +250,30 @@
     const catalogScore = percent(active, total);
     const contentScore = percent(complete, total);
     const bookingScore = state.whatsappPhone ? 100 : 0;
-    const healthScore = Math.round((catalogScore * 0.4) + (contentScore * 0.4) + (bookingScore * 0.2));
+    const healthKnown = state.loaded.tours && state.loaded.whatsapp;
+    const healthScore = healthKnown ? Math.round((catalogScore * 0.4) + (contentScore * 0.4) + (bookingScore * 0.2)) : null;
 
-    setText('metricTotalTours', String(total));
-    setText('metricTotalToursNote', total ? `${inactive} inactivo${inactive === 1 ? '' : 's'} y precio promedio ${formatMoney(avgPrice)}` : 'Aun no hay tours registrados');
-    setText('metricActiveTours', String(active));
-    setText('metricActiveToursNote', `${catalogScore}% del catalogo esta publicado`);
-    setText('metricFeaturedTours', String(featured));
-    setText('metricFeaturedToursNote', featured ? `${percent(featured, total)}% con prioridad comercial` : 'Sin tours destacados');
-    setText('metricMediaFiles', String(state.media.length));
-    setText('metricMediaFilesNote', state.media.length ? 'Recursos disponibles para tours' : 'Biblioteca sin imagenes');
+    setText('metricTotalTours', state.loaded.tours ? String(total) : '—');
+    setText('metricTotalToursNote', !state.loaded.tours ? 'No se pudieron consultar los datos del catálogo' : total ? `${inactive} inactivo${inactive === 1 ? '' : 's'} y precio promedio ${formatMoney(avgPrice)}` : 'Aún no hay tours registrados');
+    setText('metricActiveTours', state.loaded.tours ? String(active) : '—');
+    setText('metricActiveToursNote', state.loaded.tours ? `${catalogScore}% del catálogo está publicado` : 'Datos no disponibles');
+    setText('metricFeaturedTours', state.loaded.tours ? String(featured) : '—');
+    setText('metricFeaturedToursNote', !state.loaded.tours ? 'Datos no disponibles' : featured ? `${percent(featured, total)}% con prioridad comercial` : 'Sin tours destacados');
+    setText('metricMediaFiles', state.loaded.media ? String(state.media.length) : '—');
+    setText('metricMediaFilesNote', !state.loaded.media ? 'Datos no disponibles' : state.media.length ? 'Recursos disponibles para tours' : 'Biblioteca sin imágenes');
 
-    setText('healthScore', String(healthScore));
-    setText('barCatalogValue', `${catalogScore}%`);
-    setText('barContentValue', `${contentScore}%`);
-    setText('barBookingValue', `${bookingScore}%`);
-    setBar('barCatalog', catalogScore);
-    setBar('barContent', contentScore);
-    setBar('barBooking', bookingScore);
+    setText('healthScore', healthScore === null ? '—' : String(healthScore));
+    setText('barCatalogValue', state.loaded.tours ? `${catalogScore}%` : '—');
+    setText('barContentValue', state.loaded.tours ? `${contentScore}%` : '—');
+    setText('barBookingValue', state.loaded.whatsapp ? `${bookingScore}%` : '—');
+    setBar('barCatalog', state.loaded.tours ? catalogScore : 0);
+    setBar('barContent', state.loaded.tours ? contentScore : 0);
+    setBar('barBooking', state.loaded.whatsapp ? bookingScore : 0);
 
     const healthBadge = $('healthBadge');
     if (healthBadge) {
-      healthBadge.textContent = healthScore >= 80 ? 'Salud alta' : healthScore >= 55 ? 'Atencion media' : 'Requiere accion';
-      healthBadge.className = `dashboard-status-badge ${healthScore >= 80 ? 'is-good' : healthScore >= 55 ? 'is-warning' : 'is-danger'}`;
+      healthBadge.textContent = healthScore === null ? 'Datos incompletos' : healthScore >= 80 ? 'Salud alta' : healthScore >= 55 ? 'Atencion media' : 'Requiere accion';
+      healthBadge.className = `dashboard-status-badge ${healthScore === null || healthScore < 80 ? 'is-warning' : 'is-good'}`;
     }
 
     renderWhatsapp();
@@ -298,6 +303,10 @@
   function renderDestinations() {
     const container = $('destinationList');
     if (!container) return;
+    if (!state.loaded.tours) {
+      container.innerHTML = '<p class="dashboard-empty">Los destinos no están disponibles en este momento.</p>';
+      return;
+    }
 
     const counts = new Map();
     state.tours.forEach((tour) => {
@@ -329,19 +338,21 @@
     if (!container) return;
 
     const recommendations = [];
-    if (!metrics.total) {
+    if (!state.loaded.tours) {
+      recommendations.push({ icon: 'fa-triangle-exclamation', title: 'Catálogo no disponible', text: 'No fue posible consultar los tours. Revisa la conexión y vuelve a cargar esta sección.', href: '/admin/tours' });
+    } else if (!metrics.total) {
       recommendations.push({ icon: 'fa-plus', title: 'Crear el primer tour', text: 'El catalogo no tiene registros para vender desde la web.', href: '/admin/tours' });
     }
-    if (metrics.inactive > 0) {
+    if (state.loaded.tours && metrics.inactive > 0) {
       recommendations.push({ icon: 'fa-eye-slash', title: 'Revisar tours inactivos', text: `${metrics.inactive} tour${metrics.inactive === 1 ? '' : 's'} no aparece${metrics.inactive === 1 ? '' : 'n'} en el catalogo publico.`, href: '/admin/tours' });
     }
-    if (metrics.withoutImage > 0) {
+    if (state.loaded.tours && metrics.withoutImage > 0) {
       recommendations.push({ icon: 'fa-image', title: 'Completar imagenes principales', text: `${metrics.withoutImage} tour${metrics.withoutImage === 1 ? '' : 's'} necesita${metrics.withoutImage === 1 ? '' : 'n'} portada.`, href: '/admin/media' });
     }
-    if (metrics.withoutItinerary > 0) {
+    if (state.loaded.tours && metrics.withoutItinerary > 0) {
       recommendations.push({ icon: 'fa-route', title: 'Agregar descripcion dia a dia', text: `${metrics.withoutItinerary} tour${metrics.withoutItinerary === 1 ? '' : 's'} puede${metrics.withoutItinerary === 1 ? '' : 'n'} explicar mejor la experiencia.`, href: '/admin/tours' });
     }
-    if (!state.whatsappPhone) {
+    if (state.loaded.whatsapp && !state.whatsappPhone) {
       recommendations.push({ icon: 'fa-phone', title: 'Configurar WhatsApp', text: 'El flujo de reservas necesita un numero global activo.', href: '/admin/whatsapp-config' });
     }
     if (!recommendations.length) {
@@ -368,7 +379,7 @@
       .slice(0, 5);
 
     if (!recent.length) {
-      container.innerHTML = '<p class="dashboard-empty">No hay tours recientes.</p>';
+      container.innerHTML = `<p class="dashboard-empty">${state.loaded.tours ? 'No hay tours recientes.' : 'No se pudieron consultar los tours.'}</p>`;
       return;
     }
 

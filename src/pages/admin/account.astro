@@ -11,16 +11,10 @@ const title = "Cuenta del Vendedor";
     <div class="account-hero">
       <div class="account-hero-copy">
         <div class="account-badge"><i class="fas fa-user-shield"></i> Cuenta del vendedor</div>
-        <h1 class="account-hero-title">Tu perfil administrativo</h1>
+        <h1 class="account-hero-title">Perfil del vendedor</h1>
         <p class="account-hero-text">
-          Administra el nombre visible y el teléfono de tu vendedor. El nombre configurado será el que se muestre en el panel cuando exista.
+          Revisa tus datos de contacto, el estado de tu perfil y la actividad del catálogo.
         </p>
-
-        <div class="account-badge-row">
-          <span class="account-badge-pill"><i class="fas fa-pen-to-square"></i> Editar datos</span>
-          <span class="account-badge-pill"><i class="fas fa-bolt"></i> Vista rápida</span>
-          <span class="account-badge-pill"><i class="fas fa-mobile-screen-button"></i> Optimizado para móvil</span>
-        </div>
 
         <div class="account-actions account-actions--hero">
           <button type="button" id="editAccountBtn" class="account-action-btn account-action-btn--primary"><i class="fas fa-pen"></i> Editar</button>
@@ -35,19 +29,9 @@ const title = "Cuenta del Vendedor";
           <strong id="sellerDisplayNameCard">-</strong>
           <span id="sellerEmailCard">-</span>
         </div>
-        <div class="account-hero-mini-grid">
-          <div class="mini-metric">
-            <span>Tours</span>
-            <strong id="sellerToursCountHero">-</strong>
-          </div>
-          <div class="mini-metric">
-            <span>Teléfono</span>
-            <strong id="sellerPhoneHero">-</strong>
-          </div>
-          <div class="mini-metric">
-            <span>Cuenta</span>
-            <strong id="sellerCreatedHero">-</strong>
-          </div>
+        <div class="account-hero-summary">
+          <span>Tours asociados</span>
+          <strong id="sellerToursCountHero">-</strong>
         </div>
       </div>
     </div>
@@ -137,20 +121,12 @@ const title = "Cuenta del Vendedor";
       return vendedor?.nombre?.trim() || user?.nombre?.trim() || user?.email || 'Sin nombre';
     }
 
-    function isCompactViewport() {
-      return window.matchMedia('(max-width: 767px)').matches;
-    }
-
-    function formatAccountDate(dateValue, compact = false) {
+    function formatAccountDate(dateValue) {
       if (!dateValue) return 'No disponible';
 
       const parsedDate = new Date(dateValue);
-
-      if (compact) {
-        return parsedDate.toLocaleDateString('es-PE');
-      }
-
-      return parsedDate.toLocaleString('es-PE');
+      if (Number.isNaN(parsedDate.getTime())) return 'No disponible';
+      return new Intl.DateTimeFormat('es-PE', { day: '2-digit', month: 'short', year: 'numeric' }).format(parsedDate);
     }
 
     function maskIdentifier(value) {
@@ -195,12 +171,10 @@ const title = "Cuenta del Vendedor";
       const sellerEmail = getEl('sellerEmail');
       const sellerEmailCard = getEl('sellerEmailCard');
       const sellerPhone = getEl('sellerPhone');
-      const sellerPhoneHero = getEl('sellerPhoneHero');
       const sellerId = getEl('sellerId');
       const sellerToursCount = getEl('sellerToursCount');
       const sellerToursCountHero = getEl('sellerToursCountHero');
       const sellerCreatedAt = getEl('sellerCreatedAt');
-      const sellerCreatedHero = getEl('sellerCreatedHero');
       const sellerVendorCreatedAt = getEl('sellerVendorCreatedAt');
       const displayNameInput = getEl('displayNameInput');
       const phoneInput = getEl('phoneInput');
@@ -213,13 +187,11 @@ const title = "Cuenta del Vendedor";
       if (sellerEmail) sellerEmail.textContent = user?.email || 'Sin email';
       if (sellerEmailCard) sellerEmailCard.textContent = user?.email || 'Sin email';
       if (sellerPhone) sellerPhone.textContent = vendedor?.telefono || 'No registrado';
-      if (sellerPhoneHero) sellerPhoneHero.textContent = vendedor?.telefono || 'No registrado';
       if (sellerId) sellerId.textContent = maskIdentifier(fullSellerId);
       if (sellerToursCount) sellerToursCount.textContent = String(metrics?.tours ?? 0);
       if (sellerToursCountHero) sellerToursCountHero.textContent = String(metrics?.tours ?? 0);
-      if (sellerCreatedAt) sellerCreatedAt.textContent = formatAccountDate(user?.created_at, isCompactViewport());
-      if (sellerCreatedHero) sellerCreatedHero.textContent = formatAccountDate(user?.created_at, true);
-      if (sellerVendorCreatedAt) sellerVendorCreatedAt.textContent = formatAccountDate(vendedor?.created_at, isCompactViewport());
+      if (sellerCreatedAt) sellerCreatedAt.textContent = formatAccountDate(user?.created_at);
+      if (sellerVendorCreatedAt) sellerVendorCreatedAt.textContent = formatAccountDate(vendedor?.created_at);
       if (displayNameInput && displayNameInput instanceof HTMLInputElement) {
         displayNameInput.value = vendedor?.nombre || user?.nombre || '';
       }

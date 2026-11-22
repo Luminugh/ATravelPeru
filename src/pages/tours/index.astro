@@ -84,11 +84,13 @@ const experienceCount = String(tours.length).padStart(2, "0");
                       {tour.estado === "activo" ? "Disponible" : "No disponible"}
                     </span>
                   </div>
+                  <div class="tours-prism-image-caption">
+                    <span>{tour.ubicacion}</span><span aria-hidden="true">·</span><span>{tour.duracion}</span>
+                  </div>
                   <span class="tours-prism-image-index" aria-hidden="true">{String(index + 1).padStart(2, "0")}</span>
                 </div>
 
                 <div class="tours-prism-content">
-                  <p class="tours-prism-location">{tour.ubicacion} <span aria-hidden="true">/</span> {tour.duracion}</p>
                   <h3>{tour.titulo}</h3>
                   <p class="tours-prism-description">{tour.descripcion}</p>
                   <footer class="tours-prism-footer">
@@ -98,7 +100,7 @@ const experienceCount = String(tours.length).padStart(2, "0");
                     </div>
                     {tour.estado === "activo" ? (
                       <a class="tours-prism-link" href={`/tours/${tour.id}`} aria-label={`Ver detalles de ${tour.titulo}`}>
-                        Descubrir <span aria-hidden="true">↗</span>
+                        Ver este viaje <span aria-hidden="true">↗</span>
                       </a>
                     ) : (
                       <span class="tours-prism-unavailable">No disponible</span>

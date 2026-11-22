@@ -390,6 +390,44 @@ export const POST: APIRoute = async ({ cookies, request }) => {
   }
 };
 
+export const PATCH: APIRoute = async ({ cookies, request }) => {
+  try {
+    const auth = await getAuthenticatedClient(cookies);
+    if ("error" in auth) return auth.error;
+
+    const admin = await isAdmin(auth.userId, auth.client);
+    if (!admin) return jsonResponse({ ok: false, error: "No autorizado: permisos de administrador requeridos" }, 403);
+
+    const body = await request.json().catch(() => null) as {
+      id?: string | number;
+      filename?: string;
+      alt_text?: string | null;
+      tags?: unknown;
+    } | null;
+    if (!body?.id) return jsonResponse({ ok: false, error: 'ID requerido' }, 400);
+
+    const filename = String(body.filename ?? '').trim();
+    if (!filename || filename.length > 240) return jsonResponse({ ok: false, error: 'El nombre debe tener entre 1 y 240 caracteres' }, 400);
+    const altText = String(body.alt_text ?? '').trim();
+    if (altText.length > 300) return jsonResponse({ ok: false, error: 'El texto alternativo no puede superar 300 caracteres' }, 400);
+    const rawTags = Array.isArray(body.tags) ? body.tags : [];
+    const tags = [...new Set(rawTags.map((tag) => String(tag).trim()).filter(Boolean))].slice(0, 20);
+
+    const result = await auth.client
+      .from('media_files')
+      .update({ filename, alt_text: altText || null, tags })
+      .eq('id', body.id)
+      .select('*')
+      .single();
+
+    if (result.error) return jsonResponse({ ok: false, error: result.error.message }, 500);
+    return jsonResponse({ ok: true, data: result.data });
+  } catch (error) {
+    console.error('PATCH /api/admin/media error:', error);
+    return jsonResponse({ ok: false, error: error instanceof Error ? error.message : 'Error interno' }, 500);
+  }
+};
+
 export const DELETE: APIRoute = async ({ cookies, request }) => {
   try {
     const auth = await getAuthenticatedClient(cookies);

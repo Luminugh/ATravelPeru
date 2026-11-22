@@ -25,22 +25,23 @@ const title = `Gestion de Tours AT - ${siteIdentity.adminTitleDefault}`;
     <div class="tours-controls">
       <div class="search-row">
         <div class="search-input">
+          <label class="visually-hidden" for="searchInput">Buscar por título o destino</label>
           <i class="fas fa-search"></i>
           <input id="searchInput" type="text" placeholder="Buscar por título o destino..." />
         </div>
-        <select id="filterStatus" class="select-input">
+        <select id="filterStatus" class="select-input" aria-label="Filtrar por estado">
           <option value="">Todos los estados</option>
           <option value="activo">Activo</option>
           <option value="inactivo">Inactivo</option>
         </select>
-        <select id="filterDestino" class="select-input">
+        <select id="filterDestino" class="select-input" aria-label="Filtrar por destino">
           <option value="">Todos los destinos</option>
         </select>
       </div>
     </div>
 
     <!-- Grid de tarjetas -->
-    <div id="toursList" class="tours-grid"></div>
+    <div id="toursList" class="tours-prism-grid admin-tour-grid" aria-label="Tours disponibles"></div>
 
     <!-- Empty state -->
     <div id="emptyState" class="empty-state" style="display: none;">
@@ -50,25 +51,29 @@ const title = `Gestion de Tours AT - ${siteIdentity.adminTitleDefault}`;
     </div>
 
     <!-- Modal overlay -->
-    <div id="modalOverlay" class="modal-overlay" style="display: none;"></div>
-
     <!-- Edit modal refactorizado -->
-    <div id="editor" class="tour-modal" style="display: none;">
-      <div id="editorBackdrop" class="tour-modal-backdrop"></div>
-      <div class="tour-modal-shell" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <dialog id="editor" class="tour-modal" aria-labelledby="modalTitle" closedby="closerequest">
+      <div class="tour-modal-shell">
         <div class="tour-modal-header">
           <div class="tour-modal-heading">
             <span class="tour-modal-eyebrow">Gestión de tours</span>
             <h2 id="modalTitle">Nuevo Tour</h2>
             <p class="tour-modal-subtitle">Completa la información principal y navega por secciones rápidas sin perder el botón de guardar.</p>
           </div>
-          <button type="button" id="closeBtn" class="tour-modal-close">&times;</button>
+          <button type="button" id="closeBtn" class="tour-modal-close" aria-label="Cerrar editor">&times;</button>
         </div>
 
         <form id="editorForm" class="tour-modal-form">
           <input type="hidden" name="id" />
 
           <div class="tour-modal-scroll">
+            <nav class="tour-form-nav" aria-label="Secciones del formulario">
+              <a href="#tour-basic">Datos básicos</a>
+              <a href="#tour-content">Descripción</a>
+              <a href="#tour-image">Portada</a>
+              <a href="#tour-gallery">Galería</a>
+              <a href="#tour-options">Publicación</a>
+            </nav>
             <div class="guide-note tour-flow-note">
               Organiza el tour en este orden: primero la información base, luego el contenido, y al final las imágenes y opciones de publicación.
             </div>
@@ -82,28 +87,29 @@ const title = `Gestion de Tours AT - ${siteIdentity.adminTitleDefault}`;
                   </div>
 
                   <div class="tour-field">
-                    <label><i class="fas fa-heading"></i> Título del Tour *</label>
-                    <input name="titulo" required placeholder="Ej. Machu Picchu Express" />
+                    <label for="tourTitle"><i class="fas fa-heading"></i> Título del tour *</label>
+                    <input id="tourTitle" name="titulo" required maxlength="90" placeholder="Ej. Machu Picchu Express" />
                   </div>
 
                   <div class="tour-field">
-                    <label><i class="fas fa-file-alt"></i> Descripción Corta *</label>
-                    <textarea name="descripcion" rows="3" required placeholder="Describe brevemente el tour..."></textarea>
+                    <label for="tourDescription"><i class="fas fa-file-alt"></i> Descripción breve *</label>
+                    <small class="field-note">Resume lo más atractivo en una o dos frases.</small>
+                    <textarea id="tourDescription" name="descripcion" rows="3" maxlength="220" required placeholder="Describe brevemente el tour..."></textarea>
                   </div>
 
                   <div class="tour-grid-3">
                     <div class="tour-field tour-field-compact">
-                      <label><i class="fas fa-coins"></i> Precio (S/) *</label>
-                      <input type="number" step="0.01" name="precio" required placeholder="1200" />
+                      <label for="tourPrice"><i class="fas fa-coins"></i> Precio (S/) *</label>
+                      <input id="tourPrice" type="number" min="0" step="0.01" name="precio" required placeholder="350" />
                     </div>
                     <div class="tour-field tour-field-compact">
-                      <label><i class="fas fa-hourglass-end"></i> Duración *</label>
+                      <label for="tourDuration"><i class="fas fa-hourglass-end"></i> Duración *</label>
                       <small class="field-note">Ejemplo: 3 días, 2 noches.</small>
-                      <input name="duracion" required placeholder="Ej. 3 dias" />
+                      <input id="tourDuration" name="duracion" required placeholder="Ej. 3 días" />
                     </div>
                     <div class="tour-field tour-field-compact">
-                      <label><i class="fas fa-location-dot"></i> Destino *</label>
-                      <select name="ubicacion_id" required></select>
+                      <label for="tourLocation"><i class="fas fa-location-dot"></i> Destino *</label>
+                      <select id="tourLocation" name="ubicacion_id" required></select>
                     </div>
                   </div>
                 </section>
@@ -116,24 +122,46 @@ const title = `Gestion de Tours AT - ${siteIdentity.adminTitleDefault}`;
 
                   <div class="tour-grid-2">
                     <div class="tour-field">
-                      <label class="label-success"><i class="fas fa-check-circle"></i> Incluye *</label>
-                        <textarea name="incluye" rows="4" placeholder="- Transporte\n- Entradas\n- Guía profesional"></textarea>
+                      <label for="tourIncludes" class="label-success"><i class="fas fa-check-circle"></i> Incluye</label>
+                        <textarea id="tourIncludes" name="incluye" rows="4" placeholder="Transporte\nEntradas\nGuía profesional"></textarea>
                     </div>
                     <div class="tour-field">
-                      <label class="label-danger"><i class="fas fa-times-circle"></i> No Incluye</label>
-                      <textarea name="no_incluye" rows="4" placeholder="- Seguro\n- Gastos personales\n- Propinas"></textarea>
+                      <label for="tourExcludes" class="label-danger"><i class="fas fa-times-circle"></i> No incluye</label>
+                      <textarea id="tourExcludes" name="no_incluye" rows="4" placeholder="Seguro\nGastos personales\nPropinas"></textarea>
                     </div>
                   </div>
 
                   <div class="tour-field">
-                    <label><i class="fas fa-route"></i> Descripción día a día</label>
+                    <label for="tourItinerary"><i class="fas fa-route"></i> Itinerario</label>
                     <small class="field-note">Divide el texto por días para que el usuario entienda el flujo del tour.</small>
-                    <textarea name="itinerario" rows="5" placeholder="Día 1: llegada y traslado\nDía 2: actividad principal\nDía 3: retorno"></textarea>
+                    <textarea id="tourItinerary" name="itinerario" rows="5" placeholder="Día 1: llegada y traslado\nDía 2: actividad principal\nDía 3: retorno"></textarea>
                   </div>
                 </section>
               </div>
 
               <div class="tour-column tour-column-side">
+                <section class="tour-preview-panel" aria-labelledby="tourPreviewTitle">
+                  <div class="tour-preview-heading">
+                    <div><span>Vista previa</span><h3 id="tourPreviewTitle">Así verá el tour tu cliente</h3></div>
+                    <i class="fas fa-eye" aria-hidden="true"></i>
+                  </div>
+                  <article class="tours-prism-card admin-tour-card admin-tour-preview">
+                    <div class="tours-prism-image-wrap">
+                      <img class="tours-prism-image" data-preview-image alt="" width="800" height="560" loading="lazy" decoding="async" />
+                      <span class="admin-tour-image-empty" data-preview-empty>Selecciona una portada para ver la tarjeta completa</span>
+                      <div class="tours-prism-image-shade" aria-hidden="true"></div>
+                      <div class="tours-prism-badges"><span class="tours-prism-badge tours-prism-featured" data-preview-featured hidden>Recomendado</span><span class="tours-prism-badge tours-prism-status is-active" data-preview-status>Disponible</span></div>
+                      <div class="tours-prism-image-caption"><span data-preview-location>Elige un destino</span><span aria-hidden="true">·</span><span data-preview-duration>Duración</span></div>
+                    </div>
+                    <div class="tours-prism-content">
+                      <h3 class="tours-prism-title" data-preview-title>Nombre del tour</h3>
+                      <p class="tours-prism-description" data-preview-description>La descripción breve aparecerá aquí.</p>
+                      <footer class="tours-prism-footer"><div class="tours-prism-price"><span>Desde</span><strong data-preview-price>S/ 0</strong></div><span class="tours-prism-unavailable" data-preview-cta>Ver detalles ↗</span></footer>
+                    </div>
+                  </article>
+                  <p class="tour-preview-hint">La vista se actualiza mientras editas.</p>
+                </section>
+
                 <section class="tour-card-section tour-card-section-media" id="tour-image">
                   <div class="section-heading">
                     <h3 class="section-title"><i class="fas fa-image"></i> Imagen Principal</h3>
@@ -220,30 +248,66 @@ const title = `Gestion de Tours AT - ${siteIdentity.adminTitleDefault}`;
           </div>
 
           <div class="tour-modal-footer">
-            <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Guardar Tour</button>
+            <p id="saveStatus" class="tour-save-status" role="status" aria-live="polite"></p>
+            <button id="saveTourBtn" type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Guardar cambios</button>
             <button type="button" id="cancelBtn" class="btn btn-secondary"><i class="fas fa-times"></i> Cancelar</button>
           </div>
         </form>
       </div>
-    </div>
-    <!-- Media Picker Modal -->
-    <MediaPicker />
+      <!-- Keep the picker inside the editor so the modal stack remains interactive. -->
+      <MediaPicker />
+    </dialog>
   </section>
 
     <script type="module">
+      // Este script es inline y el navegador resuelve sus imports respecto a la URL actual,
+      // no respecto al archivo Astro. Mantener estos helpers aquí evita un 404 en /admin/tours.
+      const IMAGE_WIDTHS = [480, 800, 1200];
+      function optimizedImageUrl(source, width = 800, options = {}) {
+        if (!source) return '';
+        try {
+          const url = new URL(source, window.location.origin);
+          const quality = Math.min(85, Math.max(40, Math.round(options.quality ?? 68)));
+          const requestedWidth = Math.min(1800, Math.max(160, Math.round(width)));
+          if (url.hostname === 'images.unsplash.com') {
+            url.searchParams.set('auto', 'format');
+            url.searchParams.set('fit', options.fit === 'contain' ? 'max' : 'crop');
+            url.searchParams.set('w', String(requestedWidth));
+            url.searchParams.set('q', String(quality));
+          } else if (url.hostname.endsWith('.supabase.co') && url.pathname.includes('/storage/v1/object/public/')) {
+            url.pathname = url.pathname.replace('/storage/v1/object/public/', '/storage/v1/render/image/public/');
+            url.searchParams.set('width', String(requestedWidth));
+            url.searchParams.set('quality', String(quality));
+            url.searchParams.set('resize', options.fit === 'contain' ? 'contain' : 'cover');
+            url.searchParams.set('format', 'webp');
+          }
+          return url.toString();
+        } catch { return source; }
+      }
+      function responsiveImageSrcSet(source, options = {}) {
+        return IMAGE_WIDTHS.map((width) => `${optimizedImageUrl(source, width, options)} ${width}w`).join(', ');
+      }
+
       const api = {
-        list: () => fetch('/api/admin/tours').then(r=>r.json()),
+        list: () => fetchJson('/api/admin/tours'),
         create: (payload) => fetch('/api/admin/tours', { method: 'POST', headers:{'content-type':'application/json'}, body: JSON.stringify(payload)}).then(r=>r.json()),
         update: (payload) => fetch('/api/admin/tours', { method: 'PUT', headers:{'content-type':'application/json'}, body: JSON.stringify(payload)}).then(r=>r.json()),
         del: (id) => fetch('/api/admin/tours', { method: 'DELETE', headers:{'content-type':'application/json'}, body: JSON.stringify({id})}).then(r=>r.json()),
-        ubicaciones: () => fetch('/api/admin/ubicaciones').then(r=>r.json()),
+        ubicaciones: () => fetchJson('/api/admin/ubicaciones'),
       };
+
+      async function fetchJson(url, options = {}) {
+        const response = await fetch(url, { ...options, signal: AbortSignal.timeout(15000) });
+        const payload = await response.json().catch(() => null);
+        if (!response.ok || !payload?.ok) {
+          throw new Error(payload?.error || `Error ${response.status} al cargar el catálogo.`);
+        }
+        return payload;
+      }
 
       const listEl = document.getElementById('toursList');
       const emptyEl = document.getElementById('emptyState');
       const editor = document.getElementById('editor');
-      const editorBackdrop = document.getElementById('editorBackdrop');
-      const modalOverlay = document.getElementById('modalOverlay');
       const form = document.getElementById('editorForm');
       const newBtn = document.getElementById('newBtn');
       const cancelBtn = document.getElementById('cancelBtn');
@@ -252,25 +316,21 @@ const title = `Gestion de Tours AT - ${siteIdentity.adminTitleDefault}`;
       const filterStatus = document.getElementById('filterStatus');
       const filterDestino = document.getElementById('filterDestino');
       const tourCount = document.getElementById('tourCount');
+      const saveStatus = document.getElementById('saveStatus');
+      const saveTourBtn = document.getElementById('saveTourBtn');
       const tourModalScroll = document.querySelector('.tour-modal-scroll');
-
-      let bodyScrollLockCount = 0;
-      let previousBodyOverflow = '';
-
-      function lockBodyScroll() {
-        if (bodyScrollLockCount === 0) {
-          previousBodyOverflow = document.body.style.overflow;
-          document.body.style.overflow = 'hidden';
-        }
-        bodyScrollLockCount += 1;
-      }
-
-      function unlockBodyScroll() {
-        bodyScrollLockCount = Math.max(0, bodyScrollLockCount - 1);
-        if (bodyScrollLockCount === 0) {
-          document.body.style.overflow = previousBodyOverflow;
-        }
-      }
+      const tourPreview = {
+        image: document.querySelector('[data-preview-image]'),
+        empty: document.querySelector('[data-preview-empty]'),
+        title: document.querySelector('[data-preview-title]'),
+        description: document.querySelector('[data-preview-description]'),
+        location: document.querySelector('[data-preview-location]'),
+        duration: document.querySelector('[data-preview-duration]'),
+        price: document.querySelector('[data-preview-price]'),
+        status: document.querySelector('[data-preview-status]'),
+        featured: document.querySelector('[data-preview-featured]'),
+      };
+      let previewImageSource = '';
 
       let tours = [];
       let ubicaciones = [];
@@ -288,12 +348,46 @@ const title = `Gestion de Tours AT - ${siteIdentity.adminTitleDefault}`;
       }
 
       async function load() {
-        const [tRes, uRes] = await Promise.all([api.list(), api.ubicaciones()]);
-        if (uRes.ok) ubicaciones = uRes.data;
-        if (tRes.ok) tours = tRes.data;
-        populateUbicaciones();
-        populateFilterDestino();
-        applyFilters();
+        let catalogError = false;
+        tourCount.textContent = 'Cargando tours…';
+        listEl.setAttribute('aria-busy', 'true');
+        emptyEl.style.display = 'none';
+        listEl.style.display = 'grid';
+        listEl.replaceChildren();
+        const tourRequest = api.list();
+        try {
+          const tRes = await tourRequest;
+          tours = Array.isArray(tRes.data) ? tRes.data : [];
+          applyFilters();
+        } catch (error) {
+          catalogError = true;
+          tours = [];
+          tourCount.textContent = 'No se pudo conectar con el catálogo';
+          listEl.style.display = 'none';
+          emptyEl.style.display = 'block';
+          emptyEl.setAttribute('role', 'alert');
+          const message = emptyEl.querySelector('p');
+          if (message) message.textContent = error instanceof Error ? error.message : 'Intenta recargar la página.';
+        } finally {
+          listEl.removeAttribute('aria-busy');
+        }
+
+        try {
+          const uRes = await api.ubicaciones();
+          ubicaciones = Array.isArray(uRes.data) ? uRes.data : [];
+          if (!catalogError) {
+            emptyEl.removeAttribute('role');
+            const emptyMessage = emptyEl.querySelector('p');
+            if (emptyMessage) emptyMessage.textContent = 'No se encontraron tours';
+          }
+          populateUbicaciones();
+          populateFilterDestino();
+        } catch (error) {
+          ubicaciones = [];
+          populateUbicaciones();
+          populateFilterDestino();
+          console.warn('[admin/tours] No se pudieron cargar los destinos:', error);
+        }
       }
 
       function applyFilters() {
@@ -302,7 +396,7 @@ const title = `Gestion de Tours AT - ${siteIdentity.adminTitleDefault}`;
         const destinoTerm = filterDestino.value;
 
         const filtered = tours.filter(t => {
-          const matchSearch = !searchTerm || t.titulo.toLowerCase().includes(searchTerm) || t.ubicacion?.toLowerCase().includes(searchTerm);
+          const matchSearch = !searchTerm || String(t.titulo || '').toLowerCase().includes(searchTerm) || String(t.ubicacion || '').toLowerCase().includes(searchTerm);
           const matchStatus = !statusTerm || t.estado === statusTerm;
           const matchDestino = !destinoTerm || t.ubicacion_id == destinoTerm;
           return matchSearch && matchStatus && matchDestino;
@@ -321,47 +415,139 @@ const title = `Gestion de Tours AT - ${siteIdentity.adminTitleDefault}`;
         listEl.style.display = 'grid';
         emptyEl.style.display = 'none';
 
-        listEl.innerHTML = items.map(t => {
-          const statusText = t.estado === 'activo' ? 'Activo' : 'Inactivo';
-          return `
-            <div class="tour-card">
-              <div class="tour-card-media">
-                ${t.imagen_principal ? `<img src="${t.imagen_principal}" alt="${t.titulo}" />` : ''}
-                <div class="tour-card-badge status ${t.estado}"><i class="fas ${t.estado === 'activo' ? 'fa-check-circle' : 'fa-times-circle'}"></i> ${statusText}</div>
-                ${t.destacado ? `<div class="tour-card-badge featured"><i class="fas fa-star"></i></div>` : ''}
-              </div>
-              <div class="tour-card-body">
-                <h4 class="tour-card-title">${t.titulo}</h4>
-                <div class="tour-card-meta"><i class="fas fa-map-marker-alt"></i> ${t.ubicacion} <span>•</span> <i class="fas fa-clock"></i> ${t.duracion}</div>
-                <div class="tour-card-price">${formatSoles(t.precio)}</div>
-                <p class="tour-card-desc">${t.descripcion?.slice(0,100) ?? ''}...</p>
-                <div class="tour-card-actions">
-                  <button data-id="${t.id}" class="editBtn btn-edit"><i class="fas fa-edit"></i> Editar</button>
-                  <button data-id="${t.id}" class="delBtn btn-delete"><i class="fas fa-trash"></i> Eliminar</button>
-                </div>
-              </div>
-            </div>
-          `;
-        }).join('');
+        const fragment = document.createDocumentFragment();
+        items.forEach((tour, index) => fragment.append(createTourCard(tour, index)));
+        listEl.replaceChildren(fragment);
+      }
 
-        listEl.querySelectorAll('.editBtn').forEach(b=>b.addEventListener('click', ()=>openEditor(b.dataset.id)));
-        listEl.querySelectorAll('.delBtn').forEach(b=>b.addEventListener('click', ()=>delItem(b.dataset.id)));
+      function createTourCard(tour, index) {
+        const active = tour.estado === 'activo';
+        const card = document.createElement('article');
+        card.className = 'tours-prism-card admin-tour-card';
+        const imageWrap = document.createElement('div');
+        imageWrap.className = 'tours-prism-image-wrap';
+        if (tour.imagen_principal) {
+          const image = document.createElement('img');
+          image.className = 'tours-prism-image';
+          image.src = optimizedImageUrl(tour.imagen_principal, 480, { quality: 58 });
+          image.srcset = responsiveImageSrcSet(tour.imagen_principal, { quality: 58 });
+          image.sizes = '(max-width: 700px) calc(100vw - 40px), (max-width: 1100px) calc(50vw - 36px), 360px';
+          image.alt = tour.titulo || 'Imagen del tour';
+          image.width = 800;
+          image.height = 560;
+          image.loading = index === 0 ? 'eager' : 'lazy';
+          image.decoding = 'async';
+          if (index === 0) image.fetchPriority = 'high';
+          imageWrap.append(image);
+        } else {
+          imageWrap.classList.add('is-empty');
+          const empty = document.createElement('span');
+          empty.className = 'admin-tour-image-empty';
+          empty.textContent = 'Añade una imagen de portada';
+          imageWrap.append(empty);
+        }
+
+        const shade = document.createElement('div');
+        shade.className = 'tours-prism-image-shade';
+        shade.setAttribute('aria-hidden', 'true');
+        const badges = document.createElement('div');
+        badges.className = 'tours-prism-badges';
+        if (tour.destacado) {
+          const featured = document.createElement('span');
+          featured.className = 'tours-prism-badge tours-prism-featured';
+          featured.textContent = 'Recomendado';
+          badges.append(featured);
+        }
+        const status = document.createElement('span');
+        status.className = `tours-prism-badge tours-prism-status ${active ? 'is-active' : 'is-inactive'}`;
+        status.textContent = active ? 'Disponible' : 'No disponible';
+        badges.append(status);
+        const caption = document.createElement('div');
+        caption.className = 'tours-prism-image-caption';
+        const destination = document.createElement('span');
+        destination.textContent = tour.ubicacion || 'Destino por definir';
+        const separator = document.createElement('span');
+        separator.setAttribute('aria-hidden', 'true');
+        separator.textContent = '·';
+        const durationCaption = document.createElement('span');
+        durationCaption.textContent = tour.duracion || 'Duración por definir';
+        caption.append(destination, separator, durationCaption);
+        const number = document.createElement('span');
+        number.className = 'tours-prism-image-index';
+        number.setAttribute('aria-hidden', 'true');
+        number.textContent = String(index + 1).padStart(2, '0');
+        imageWrap.append(shade, badges, caption, number);
+
+        const content = document.createElement('div');
+        content.className = 'tours-prism-content';
+        const title = document.createElement('h3');
+        title.className = 'tours-prism-title';
+        title.textContent = tour.titulo || 'Tour sin título';
+        const description = document.createElement('p');
+        description.className = 'tours-prism-description';
+        description.textContent = tour.descripcion || 'Añade una breve descripción para presentar el recorrido.';
+
+        const footer = document.createElement('footer');
+        footer.className = 'tours-prism-footer admin-tour-card-footer';
+        const price = document.createElement('div');
+        price.className = 'tours-prism-price';
+        const priceLabel = document.createElement('span');
+        priceLabel.textContent = 'Desde';
+        const priceValue = document.createElement('strong');
+        priceValue.textContent = formatSoles(tour.precio);
+        price.append(priceLabel, priceValue);
+        const actions = document.createElement('div');
+        actions.className = 'admin-tour-card-actions';
+        const edit = document.createElement('button');
+        edit.type = 'button';
+        edit.className = 'admin-tour-edit';
+        edit.dataset.action = 'edit';
+        edit.dataset.id = String(tour.id);
+        edit.setAttribute('aria-label', `Editar ${tour.titulo || 'tour'}`);
+        edit.textContent = 'Editar tour';
+        const remove = document.createElement('button');
+        remove.type = 'button';
+        remove.className = 'admin-tour-delete';
+        remove.dataset.action = 'delete';
+        remove.dataset.id = String(tour.id);
+        remove.setAttribute('aria-label', `Eliminar ${tour.titulo || 'tour'}`);
+        remove.innerHTML = '<i class="fas fa-trash" aria-hidden="true"></i>';
+        actions.append(edit, remove);
+        footer.append(price, actions);
+        content.append(title, description, footer);
+        card.append(imageWrap, content);
+        return card;
       }
 
       function populateUbicaciones() {
         const sel = form.querySelector('select[name="ubicacion_id"]');
-        sel.innerHTML = ubicaciones.map(u=>`<option value="${u.id}">${u.nombre}</option>`).join('');
+        sel.replaceChildren(...ubicaciones.map(({ id, nombre }) => {
+          const option = document.createElement('option');
+          option.value = String(id);
+          option.textContent = String(nombre || 'Destino sin nombre');
+          return option;
+        }));
       }
 
       function populateFilterDestino() {
         const sel = filterDestino;
-        sel.innerHTML = '<option value="">Todos los destinos</option>' + ubicaciones.map(u=>`<option value="${u.id}">${u.nombre}</option>`).join('');
+        const allOption = document.createElement('option');
+        allOption.value = '';
+        allOption.textContent = 'Todos los destinos';
+        sel.replaceChildren(allOption, ...ubicaciones.map(({ id, nombre }) => {
+          const option = document.createElement('option');
+          option.value = String(id);
+          option.textContent = String(nombre || 'Destino sin nombre');
+          return option;
+        }));
       }
 
       function openEditor(id) {
         const data = tours.find(t=>String(t.id)===String(id)) || {};
         const modalTitle = document.getElementById('modalTitle');
         modalTitle.textContent = data.id ? `Editar: ${data.titulo}` : 'Nuevo Tour';
+        saveStatus.textContent = '';
+        saveStatus.className = 'tour-save-status';
 
         form.querySelector('input[name="id"]').value = data.id || '';
         form.querySelector('input[name="titulo"]').value = data.titulo || '';
@@ -380,18 +566,44 @@ const title = `Gestion de Tours AT - ${siteIdentity.adminTitleDefault}`;
         openModal();
       }
 
+      function updateTourPreview() {
+        const read = (name) => form.querySelector(`[name="${name}"]`);
+        const selectedLocation = read('ubicacion_id')?.selectedOptions?.[0]?.textContent?.trim();
+        const title = read('titulo')?.value?.trim() || 'Nombre del tour';
+        const description = read('descripcion')?.value?.trim() || 'La descripción breve aparecerá aquí.';
+        const duration = read('duracion')?.value?.trim() || 'Duración';
+        const price = read('precio')?.value;
+        const active = form.querySelector('input[name="estado"]:checked')?.value !== 'inactivo';
+        const imageUrl = read('imagen_principal')?.value?.trim();
+        tourPreview.title.textContent = title;
+        tourPreview.description.textContent = description;
+        tourPreview.location.textContent = selectedLocation || 'Elige un destino';
+        tourPreview.duration.textContent = duration;
+        tourPreview.price.textContent = price ? formatSoles(price) : 'S/ 0';
+        tourPreview.status.textContent = active ? 'Disponible' : 'No disponible';
+        tourPreview.status.classList.toggle('is-active', active);
+        tourPreview.status.classList.toggle('is-inactive', !active);
+        tourPreview.featured.hidden = !read('destacado')?.checked;
+        tourPreview.image.hidden = !imageUrl;
+        tourPreview.empty.hidden = Boolean(imageUrl);
+        if (imageUrl && imageUrl !== previewImageSource) {
+          previewImageSource = imageUrl;
+          tourPreview.image.src = optimizedImageUrl(imageUrl, 480, { quality: 58 });
+        }
+      }
+
       function openModal() {
-        editor.style.display = 'flex';
-        lockBodyScroll();
+        if (!editor.open) editor.showModal();
         tourModalScroll?.scrollTo({ top: 0, behavior: 'auto' });
         updateImagePreview(document.getElementById('imagenPrincipalInput').value);
         loadGalleryFromForm();
         wireAutosize();
+        updateTourPreview();
+        document.getElementById('tourTitle')?.focus({ preventScroll: true });
       }
 
       function closeModal() {
-        editor.style.display = 'none';
-        unlockBodyScroll();
+        if (editor.open) editor.close();
       }
 
       async function delItem(id) {
@@ -402,6 +614,11 @@ const title = `Gestion de Tours AT - ${siteIdentity.adminTitleDefault}`;
 
       form.addEventListener('submit', async (ev) => {
         ev.preventDefault();
+        if (!form.reportValidity()) return;
+        saveTourBtn.disabled = true;
+        saveTourBtn.innerHTML = '<i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Guardando…';
+        saveStatus.textContent = '';
+        saveStatus.className = 'tour-save-status';
         const idVal = form.querySelector('input[name="id"]').value;
         const estadoRadio = Array.from(form.querySelectorAll('input[name="estado"]')).find(r => r.checked);
         const payload = {
@@ -421,18 +638,29 @@ const title = `Gestion de Tours AT - ${siteIdentity.adminTitleDefault}`;
         try {
           payload.galeria = JSON.parse(form.querySelector('textarea[name="galeria"]').value || '[]');
         } catch (e) {
-          alert('Error: Galería JSON inválido - ' + e.message);
+          saveTourBtn.disabled = false;
+          saveTourBtn.innerHTML = '<i class="fas fa-save" aria-hidden="true"></i> Guardar cambios';
+          saveStatus.textContent = 'No se pudo leer la galería. Revisa las imágenes agregadas.';
+          saveStatus.classList.add('is-error');
           return;
         }
 
         let res;
-        if (payload.id) {
-          res = await api.update(payload);
-        } else {
-          res = await api.create(payload);
+        try {
+          res = payload.id ? await api.update(payload) : await api.create(payload);
+        } catch {
+          res = { ok: false, error: 'No pudimos conectar con el servidor. Intenta nuevamente.' };
         }
-        if (res.ok) { await load(); closeModal(); } else {
-          alert('Error al guardar: ' + (res.error || 'Error desconocido'));
+        saveTourBtn.disabled = false;
+        saveTourBtn.innerHTML = '<i class="fas fa-save" aria-hidden="true"></i> Guardar cambios';
+        if (res.ok) {
+          saveStatus.textContent = payload.id ? 'Cambios guardados.' : 'Tour creado.';
+          saveStatus.classList.add('is-success');
+          await load();
+          closeModal();
+        } else {
+          saveStatus.textContent = res.error || 'No se pudo guardar. Revisa los datos e inténtalo otra vez.';
+          saveStatus.classList.add('is-error');
         }
       });
 
@@ -445,9 +673,6 @@ const title = `Gestion de Tours AT - ${siteIdentity.adminTitleDefault}`;
 
       cancelBtn.addEventListener('click', closeModal);
       closeBtn.addEventListener('click', closeModal);
-      modalOverlay.addEventListener('click', closeModal);
-      editorBackdrop?.addEventListener('click', closeModal);
-      editor.addEventListener('click', (e) => e.stopPropagation());
 
       function autoResizeTextarea(textarea) {
         if (!textarea) return;
@@ -467,11 +692,18 @@ const title = `Gestion de Tours AT - ${siteIdentity.adminTitleDefault}`;
       searchInput.addEventListener('input', applyFilters);
       filterStatus.addEventListener('change', applyFilters);
       filterDestino.addEventListener('change', applyFilters);
+      form.addEventListener('input', updateTourPreview);
+      form.addEventListener('change', updateTourPreview);
+      listEl.addEventListener('click', (event) => {
+        const button = event.target.closest('[data-action]');
+        if (!button) return;
+        if (button.dataset.action === 'edit') openEditor(button.dataset.id);
+        if (button.dataset.action === 'delete') delItem(button.dataset.id);
+      });
 
       // ==== IMAGE & GALLERY MANAGEMENT ====
 
       let galleryImages = [];
-      let isEditingTour = false;
 
       function updateImagePreview(url) {
         const previewContainer = document.getElementById('imagenPrincipalPreview');
@@ -490,18 +722,14 @@ const title = `Gestion de Tours AT - ${siteIdentity.adminTitleDefault}`;
           previewContainer.style.display = 'none';
           emptyContainer.style.display = 'block';
         }
+        updateTourPreview();
       }
 
       function renderGalleryGrid() {
         const grid = document.getElementById('galeriaGrid');
         const empty = document.getElementById('galeriaEmpty');
         
-        if (!grid) {
-          console.error('❌ galeriaGrid no encontrado en DOM');
-          return;
-        }
-        
-        console.log('📸 renderGalleryGrid - imágenes:', galleryImages.length);
+        if (!grid) return;
         
         if (galleryImages.length === 0) {
           grid.innerHTML = '';
@@ -509,21 +737,25 @@ const title = `Gestion de Tours AT - ${siteIdentity.adminTitleDefault}`;
         } else {
           if (empty) empty.style.display = 'none';
           
-          grid.innerHTML = galleryImages.map((img, idx) => {
-            return `<div class="gallery-item" data-idx="${idx}">
-              <img src="${img}" alt="Foto ${idx + 1}" />
-              <button type="button" class="gallery-item-delete" data-idx="${idx}" onclick="deleteGalleryItem(${idx}); return false;">
-                <i class="fas fa-times"></i>
-              </button>
-            </div>`;
-          }).join('');
+          grid.replaceChildren(...galleryImages.map((url, idx) => {
+            const item = document.createElement('div');
+            item.className = 'gallery-item';
+            const image = document.createElement('img');
+            image.src = optimizedImageUrl(url, 320, { quality: 56 });
+            image.alt = `Foto ${idx + 1}`;
+            image.loading = 'lazy';
+            image.decoding = 'async';
+            const remove = document.createElement('button');
+            remove.type = 'button';
+            remove.className = 'gallery-item-delete';
+            remove.setAttribute('aria-label', `Quitar foto ${idx + 1}`);
+            remove.innerHTML = '<i class="fas fa-times" aria-hidden="true"></i>';
+            remove.addEventListener('click', () => removeFromGallery(idx));
+            item.append(image, remove);
+            return item;
+          }));
         }
       }
-
-      window.deleteGalleryItem = function(idx) {
-        console.log('🗑️ deleteGalleryItem llamado con index:', idx);
-        removeFromGallery(idx);
-      };
 
       function updateGalleryJSON() {
         const jsonArray = galleryImages.map((url, idx) => ({
@@ -533,37 +765,29 @@ const title = `Gestion de Tours AT - ${siteIdentity.adminTitleDefault}`;
         const textarea = document.getElementById('galeriaTextarea');
         if (textarea) {
           textarea.value = JSON.stringify(jsonArray, null, 2);
-          console.log('💾 JSON galería actualizado:', jsonArray.length, 'fotos');
         }
       }
 
       function addToGallery(url) {
         if (!url || !url.trim()) {
-          console.warn('⚠️ URL vacía');
           return;
         }
         
         if (galleryImages.includes(url)) {
-          console.log('⚠️ Foto ya existe');
           return;
         }
         
         galleryImages.push(url);
-        console.log('✅ Foto AGREGADA. Total:', galleryImages.length);
-        
         updateGalleryJSON();
         renderGalleryGrid();
       }
 
       function removeFromGallery(index) {
         if (index < 0 || index >= galleryImages.length) {
-          console.warn('⚠️ Index inválido:', index);
           return;
         }
         
-        const removed = galleryImages[index];
         galleryImages.splice(index, 1);
-        console.log('✅ Foto REMOVIDA. Total:', galleryImages.length);
         
         updateGalleryJSON();
         renderGalleryGrid();
@@ -576,16 +800,13 @@ const title = `Gestion de Tours AT - ${siteIdentity.adminTitleDefault}`;
           
           if (!galeriaText || galeriaText === '[]') {
             galleryImages = [];
-            console.log('📋 Galería vacía en textarea');
           } else {
             const parsed = JSON.parse(galeriaText);
             if (Array.isArray(parsed)) {
               galleryImages = parsed.map(it => it.imagen || it.url || '').filter(Boolean);
-              console.log('📋 Galería cargada:', galleryImages.length, 'fotos');
             }
           }
         } catch (e) {
-          console.error('❌ Error al parsear JSON:', e);
           galleryImages = [];
         }
         
@@ -594,7 +815,6 @@ const title = `Gestion de Tours AT - ${siteIdentity.adminTitleDefault}`;
 
       // Media picker integration
       const mediaPicker = document.getElementById('mediaPicker');
-      const mediaPickerBackdrop = document.getElementById('mediaPickerBackdrop');
       const mediaPickerContent = document.getElementById('mediaPickerContent');
       const mediaPickerClose = document.getElementById('mediaPickerClose');
       const mediaPickerSelect = document.getElementById('mediaPickerSelect');
@@ -606,18 +826,28 @@ const title = `Gestion de Tours AT - ${siteIdentity.adminTitleDefault}`;
         mediaSelectionMode = mode;
         selectedMedia = new Set();
         mediaPickerContent.innerHTML = 'Cargando...';
-        mediaPicker.style.display = 'flex';
-        lockBodyScroll();
+        if (!mediaPicker.open) mediaPicker.showModal();
         const res = await fetch('/api/admin/media');
         const payload = await res.json().catch(()=>({ok:false}));
         if (!payload?.ok) { mediaPickerContent.innerHTML = 'Error cargando medios'; return; }
         const items = payload.data || [];
-        mediaPickerContent.innerHTML = items.map(i => `
-          <div class="picker-item" data-id="${i.id}" data-url="${i.url}">
-            <img src="${i.url}" alt="${i.alt_text || ''}" />
-            <div class="picker-meta">${i.filename || ''}</div>
-          </div>
-        `).join('');
+        mediaPickerContent.replaceChildren(...items.map((item) => {
+          const tile = document.createElement('button');
+          tile.type = 'button';
+          tile.className = 'picker-item';
+          tile.dataset.id = String(item.id);
+          tile.dataset.url = String(item.url || '');
+          const image = document.createElement('img');
+          image.src = optimizedImageUrl(String(item.url || ''), 320, { quality: 56 });
+          image.alt = item.alt_text || item.filename || 'Imagen de la biblioteca';
+          image.loading = 'lazy';
+          image.decoding = 'async';
+          const meta = document.createElement('span');
+          meta.className = 'picker-meta';
+          meta.textContent = item.filename || 'Imagen sin nombre';
+          tile.append(image, meta);
+          return tile;
+        }));
 
         mediaPickerContent.querySelectorAll('.picker-item').forEach(el=>{
           el.addEventListener('click', ()=>{
@@ -637,30 +867,19 @@ const title = `Gestion de Tours AT - ${siteIdentity.adminTitleDefault}`;
       }
 
       function closeMediaPicker() {
-        mediaPicker.style.display = 'none';
-        unlockBodyScroll();
+        if (mediaPicker.open) mediaPicker.close();
       }
 
       mediaPickerClose?.addEventListener('click', closeMediaPicker);
       mediaPickerCancel?.addEventListener('click', closeMediaPicker);
-      mediaPickerBackdrop?.addEventListener('click', closeMediaPicker);
       
       mediaPickerSelect?.addEventListener('click', ()=>{
         const arr = Array.from(selectedMedia).map(s=>JSON.parse(s));
-        console.log('🎬 mediaPickerSelect - modo:', mediaSelectionMode, '- items:', arr.length);
-        
         if (mediaSelectionMode === 'single' && arr[0]) {
-          console.log('🖼️ Imagen principal seleccionada:', arr[0].url);
           document.getElementById('imagenPrincipalInput').value = arr[0].url;
           updateImagePreview(arr[0].url);
         } else if (mediaSelectionMode === 'multiple') {
-          console.log('🖼️ Agregando', arr.length, 'foto(s) a galería');
-          arr.forEach((it, i) => {
-            if (it && it.url) {
-              console.log(`  [${i}] ${it.url}`);
-              addToGallery(it.url);
-            }
-          });
+          arr.forEach((item) => item?.url && addToGallery(item.url));
         }
         closeMediaPicker();
       });
@@ -676,6 +895,7 @@ const title = `Gestion de Tours AT - ${siteIdentity.adminTitleDefault}`;
       removePrimaryBtn?.addEventListener('click', () => {
         document.getElementById('imagenPrincipalInput').value = '';
         updateImagePreview('');
+        updateTourPreview();
       });
       addGalleryBtn?.addEventListener('click', () => openMediaPicker('multiple'));
 
